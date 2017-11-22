@@ -6,7 +6,7 @@ package com.pamarin.oauth2;
 import com.pamarin.oauth2.model.OAuth2RefreshToken;
 import com.pamarin.oauth2.repository.OAuth2AllowDomainRepo;
 import com.pamarin.oauth2.repository.UserRepo;
-import com.pamarin.oauth2.security.CsrfVerificationInterceptor;
+import com.pamarin.oauth2.security.CsrfInterceptor;
 import com.pamarin.oauth2.security.GetCsrfTokenIntorceptor;
 import com.pamarin.commons.security.UserSessionStub;
 import com.pamarin.commons.security.LoginSession;
@@ -46,7 +46,7 @@ public class IntegrationTestBase {
     private GetCsrfTokenIntorceptor getCsrfTokenIntorceptor;
 
     @MockBean
-    private CsrfVerificationInterceptor csrfVerificationInterceptor;
+    private CsrfInterceptor csrfVerificationInterceptor;
 
     @MockBean
     private LoginSession loginSession;

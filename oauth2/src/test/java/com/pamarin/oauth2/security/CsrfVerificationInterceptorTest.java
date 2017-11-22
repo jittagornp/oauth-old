@@ -29,7 +29,7 @@ public class CsrfVerificationInterceptorTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
-    private CsrfVerificationInterceptor interceptor;
+    private CsrfInterceptor interceptor;
 
     private HttpServletRequest httpReq;
     private HttpServletResponse httpResp;
@@ -38,7 +38,7 @@ public class CsrfVerificationInterceptorTest {
 
     @Before
     public void before() {
-        interceptor = new CsrfVerificationInterceptor();
+        interceptor = new CsrfInterceptor();
         httpReq = mock(HttpServletRequest.class);
         httpResp = mock(HttpServletResponse.class);
         authenticityToken = mock(AuthenticityToken.class);

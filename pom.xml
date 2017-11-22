@@ -8,6 +8,7 @@
     <modules>
         <module>oauth2</module>
         <module>commons</module>
+        <module>credential</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

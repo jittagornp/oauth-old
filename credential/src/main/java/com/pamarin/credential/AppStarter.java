@@ -2,7 +2,7 @@
  * Copyright 2017 Pamarin.com
  */
 
-package com.pamarin.oauth2;
+package com.pamarin.credential;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

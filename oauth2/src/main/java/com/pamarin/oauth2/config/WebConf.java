@@ -4,9 +4,8 @@
 package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.security.AuthenticityToken;
-import com.pamarin.oauth2.security.CsrfVerificationInterceptor;
+import com.pamarin.oauth2.security.CsrfInterceptor;
 import com.pamarin.commons.security.DefaultAuthenticityToken;
-import com.pamarin.oauth2.security.GetCsrfTokenIntorceptor;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -67,18 +66,18 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(newGetCsrfTokenIntorceptor());
+//        registry.addInterceptor(newGetCsrfTokenIntorceptor());
         registry.addInterceptor(newCsrfVerificationInterceptor());
     }
+//
+//    @Bean
+//    public GetCsrfTokenIntorceptor newGetCsrfTokenIntorceptor() {
+//        return new GetCsrfTokenIntorceptor();
+//    }
 
     @Bean
-    public GetCsrfTokenIntorceptor newGetCsrfTokenIntorceptor() {
-        return new GetCsrfTokenIntorceptor();
-    }
-
-    @Bean
-    public CsrfVerificationInterceptor newCsrfVerificationInterceptor() {
-        return new CsrfVerificationInterceptor();
+    public CsrfInterceptor newCsrfVerificationInterceptor() {
+        return new CsrfInterceptor();
     }
 
     @Bean
