@@ -46,6 +46,7 @@ public class ApprovalService_approvedClientByUserIdTest {
 
         approvalService.approvedClientByUserId(AuthorizationRequest.builder()
                 .clientId("1234")
+                .scope("user:public_profile")
                 .build(),
                 any(Long.class)
         );
