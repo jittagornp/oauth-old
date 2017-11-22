@@ -1,16 +1,6 @@
 OAuth 2.0
 =================
 
-[![Build Status](https://travis-ci.org/pamarin-tech/oauth2.svg?branch=master)](https://travis-ci.org/pamarin-tech/oauth2)
-[![Coverage Status](https://coveralls.io/repos/github/pamarin-tech/oauth2/badge.svg?branch=master)](https://coveralls.io/github/pamarin-tech/oauth2?branch=master)
-[![codecov](https://codecov.io/gh/pamarin-tech/oauth2/branch/master/graph/badge.svg)](https://codecov.io/gh/pamarin-tech/oauth2)
-[![CodeFactor](https://www.codefactor.io/repository/github/pamarin-tech/oauth2/badge)](https://www.codefactor.io/repository/github/pamarin-tech/oauth2)
-[![Maintainability](https://api.codeclimate.com/v1/badges/e85d9a83858693089c62/maintainability)](https://codeclimate.com/github/pamarin-tech/oauth2/maintainability)
-[![BCH compliance](https://bettercodehub.com/edge/badge/pamarin-tech/oauth2?branch=master)](https://bettercodehub.com/)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/aa8033d61aba478aa0f9541c6d3d59d4)](https://www.codacy.com/app/jittagornp/oauth2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pamarin-tech/oauth2&amp;utm_campaign=Badge_Grade)
-[![Known Vulnerabilities](https://snyk.io/test/github/pamarin-tech/oauth2/badge.svg)](https://snyk.io/test/github/pamarin-tech/oauth2)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/pamarin-tech/oauth2.svg?columns=all)](https://waffle.io/pamarin-tech/oauth2)
-
 ตัวอย่างการเขียน OAuth 2.0 - Java Spring-Boot
 
 Implement ตาม Spec `RFC6749` : https://tools.ietf.org/html/rfc6749
@@ -73,11 +63,16 @@ Enter password: ********
 
 # วิธีการ Run Project
 
-1. build
+1. build parent
 
-> $ mvn clean install -P error-prone -U
+> $ mvn clean install -U
 
-2. run
+2. build OAuth2
+
+> $ cd oauth2  
+> $ mvn clean install -P error-prone
+
+3. run
 > $ mvn spring-boot:run
 
 # Http Session
