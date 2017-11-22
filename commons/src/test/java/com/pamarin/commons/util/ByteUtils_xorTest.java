@@ -1,8 +1,9 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.util;
+package com.pamarin.commons.util;
 
+import com.pamarin.commons.util.ByteUtils;
 import java.lang.reflect.Constructor;
 import static java.lang.reflect.Modifier.isPrivate;
 import static org.assertj.core.api.Assertions.assertThat;

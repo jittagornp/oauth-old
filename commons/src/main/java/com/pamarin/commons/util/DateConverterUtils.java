@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.util;
+package com.pamarin.commons.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

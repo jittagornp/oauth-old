@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
  * create : 2017/09/24
  */
 @SpringBootApplication
-@ComponentScan("com.pamarin.oauth2")
+@ComponentScan("com.pamarin")
 public class AppStarter {
 
     public static void main(String[] args) throws Exception {

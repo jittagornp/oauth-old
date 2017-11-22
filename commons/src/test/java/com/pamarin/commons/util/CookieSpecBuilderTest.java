@@ -1,8 +1,9 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.util;
+package com.pamarin.commons.util;
 
+import com.pamarin.commons.util.CookieSpecBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 

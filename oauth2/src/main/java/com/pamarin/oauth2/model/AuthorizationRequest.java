@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.model;
 
-import com.pamarin.oauth2.util.QuerystringBuilder;
+import com.pamarin.commons.util.QuerystringBuilder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

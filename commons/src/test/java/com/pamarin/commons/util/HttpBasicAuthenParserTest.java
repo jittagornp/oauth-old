@@ -1,10 +1,10 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.util;
+package com.pamarin.commons.util;
 
-import com.pamarin.oauth2.exception.InvalidHttpBasicAuthenException;
-import com.pamarin.oauth2.util.HttpBasicAuthenParser.Output;
+import com.pamarin.commons.exception.InvalidHttpBasicAuthenException;
+import com.pamarin.commons.util.HttpBasicAuthenParser.Output;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Rule;

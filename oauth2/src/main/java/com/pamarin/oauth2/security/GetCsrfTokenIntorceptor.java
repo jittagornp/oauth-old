@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.security;
 
-import com.pamarin.oauth2.util.CookieSpecBuilder;
+import com.pamarin.commons.util.CookieSpecBuilder;
 import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

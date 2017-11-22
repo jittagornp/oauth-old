@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.security;
 
-import com.pamarin.oauth2.util.ByteUtils;
+import com.pamarin.commons.util.ByteUtils;
 import java.security.MessageDigest;
 import java.util.Base64;
 import org.apache.commons.lang.RandomStringUtils;

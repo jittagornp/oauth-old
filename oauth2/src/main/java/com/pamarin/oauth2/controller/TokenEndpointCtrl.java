@@ -7,7 +7,7 @@ import com.pamarin.oauth2.model.AccessTokenResponse;
 import com.pamarin.oauth2.model.CodeAccessTokenRequest;
 import com.pamarin.oauth2.model.RefreshAccessTokenRequest;
 import com.pamarin.oauth2.service.AccessTokenGenerator;
-import com.pamarin.oauth2.util.HttpBasicAuthenParser;
+import com.pamarin.commons.util.HttpBasicAuthenParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MissingServletRequestParameterException;

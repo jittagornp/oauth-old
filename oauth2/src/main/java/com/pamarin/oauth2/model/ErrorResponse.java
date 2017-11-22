@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pamarin.oauth2.util.QuerystringBuilder;
+import com.pamarin.commons.util.QuerystringBuilder;
 import com.pamarin.oauth2.validator.ValidUri;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;

@@ -18,7 +18,7 @@ import com.pamarin.oauth2.service.AccessTokenGenerator;
 import com.pamarin.oauth2.service.ClientVerification;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.service.TokenVerification;
-import static com.pamarin.oauth2.util.DateConverterUtils.convert2Date;
+import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
 import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

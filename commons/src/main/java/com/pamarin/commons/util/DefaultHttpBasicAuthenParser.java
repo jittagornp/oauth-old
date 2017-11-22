@@ -1,9 +1,9 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.util;
+package com.pamarin.commons.util;
 
-import com.pamarin.oauth2.exception.InvalidHttpBasicAuthenException;
+import com.pamarin.commons.exception.InvalidHttpBasicAuthenException;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

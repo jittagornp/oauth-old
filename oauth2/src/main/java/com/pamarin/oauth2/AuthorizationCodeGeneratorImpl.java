@@ -10,7 +10,7 @@ import com.pamarin.oauth2.model.AuthorizationResponse;
 import com.pamarin.oauth2.security.KeyPairs;
 import com.pamarin.oauth2.service.AuthorizationCodeGenerator;
 import com.pamarin.commons.security.LoginSession;
-import static com.pamarin.oauth2.util.DateConverterUtils.convert2Date;
+import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
