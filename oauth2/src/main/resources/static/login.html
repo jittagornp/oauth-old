@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+Copyright 2017 Pamarin.com
+-->
+<html>
+    <head>
+        <title>Login</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-param" th:attr="content=${csrfParam}">
+        <meta name="csrf-token" th:attr="content=${csrfToken}">
+        <link rel="stylesheet" th:href="@{/assets/css/app.css}"/>
+    </head>
+    <body>
+        <style>
+            .alert{
+                padding: 10px;
+                margin-top: 15px;
+                margin-bottom: 15px;
+                display: block;
+                max-width: 400px;
+            }
+
+            .alert.info{
+                background-color: #daf3ff;
+            }
+
+            .alert.warning{
+                background-color: #ffefc4;
+                color: #e69e2f;
+            }
+
+            .login-container{
+                border: solid 1px #b9b9b9;
+                padding: 10px;
+                position: absolute;
+                left: 50%;
+                width: 350px;
+                margin-left: -175px;
+                top: 30%;
+                border-radius: 3px;
+            }
+
+            .login-container input[type=text],
+            .login-container input[type=password]{
+                width: 100%;
+                margin: 10px 0;
+                line-height: 24px;
+                padding: 0 8px;
+                box-sizing: border-box;
+            }
+
+            .login-container button{
+                width: 100%;
+                line-height: 24px;
+            }
+
+            .login-header{
+                font-size: 16pt;
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+        </style>
+        <div class="login-container">
+            <div class="login-header">
+                Login
+            </div>
+            <div class="login-body">
+                <form id="login_form" th:attr="action=${processUrl}" method="post">
+                    <input th:attr="name=${csrfParam}" type="hidden" th:value="${csrfToken}"/>
+                    username <input id="login_username" name="username" type="text" required="true"/>
+                    password <input id="login_password" name="password" type="password" required="true"/>
+                    <button type="submit">login</button>
+                </form>
+                <div class="alert warning" style="margin-bottom: 0;" th:if="${error eq 'invalid_username_password'}">
+                    Invalid username or password
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--
+Copyright 2017 Pamarin.com
+-->
+<html>
+    <head>
+        <title>Authorize</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-param" th:attr="content=${csrfParam}">
+        <meta name="csrf-token" th:attr="content=${csrfToken}">
+        <link rel="stylesheet" th:href="@{/assets/css/app.css}"/>
+    </head>
+    <body>
+        <style>
+            .authorize-container{
+                border: solid 1px #b9b9b9;
+                padding: 10px;
+                position: absolute;
+                left: 50%;
+                width: 350px;
+                margin-left: -175px;
+                top: 30%;
+                border-radius: 3px;
+            }
+
+            .authorize-container button{
+                width: 100%;
+                line-height: 24px;
+            }
+
+            .authorize-header{
+                font-size: 16pt;
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+            
+            .authorize-grant{
+                margin-bottom: 10px;
+            }
+            
+            .authorize-scope{
+                margin-bottom: 10px;
+            }
+            
+            .authorize-scope ul{
+                padding-left: 20px;
+            }
+            
+            .authorize-scope li{
+                list-style-type: disc;
+            }
+            
+            label{
+                font-weight: bold;
+                line-height: 22px;
+            }
+            
+            .authorize-scope li label{
+                display: block;
+            }   
+            
+            .text-small{
+                font-size: 90%;
+                color : #999;
+                line-height: 20px;
+            }
+        </style>
+        <div class="authorize-container">
+            <div class="authorize-header">
+                Authorize
+            </div>
+            <div class="authorize-body">
+                <div class="authorize-grant">
+                    <label th:text="${model.clientName}"></label>
+                    wants to access your 
+                    <label th:text="${model.userName}"></label>
+                    account
+                    <span></span>
+                </div>
+                <div class="authorize-scope">
+                    <ul>
+                        <li th:each="scope : ${model.scopes}">
+                            <label th:text="${scope.id}"></label>
+                            <span class="text-small" th:text="${scope.description}"></span>
+                        </li>
+                    </ul>
+                </div>
+                <form id="authorize_form" th:attr="action=${processUrl}" method="post">
+                    <input th:attr="name=${csrfParam}" type="hidden" th:value="${csrfToken}"/>
+                    <input id="authorize_answer" type="hidden" name="answer"/>
+                    <button type="submit" onclick="document.getElementById('authorize_answer').value = 'approved'">Approved</button>
+                    <button type="submit" style="margin-top: 10px;" onclick="document.getElementById('authorize_answer').value = 'not_approve'">Not Approve</button>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
+

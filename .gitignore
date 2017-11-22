@@ -1,0 +1,38 @@
+/commons/target
+/commons/nbproject
+
+/oauth2/target
+/oauth2/node_modules
+/oauth2/etc
+/oauth2/webpack
+/oauth2/webpack.cmd
+/oauth2/webpack-dev-server
+/oauth2/webpack-dev-server.cmd
+/oauth2/src/main/resources/static/assets/js/dist
+/oauth2/.classpath
+/oauth2/.settings
+/oauth2/.project
+/oauth2/bin
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
