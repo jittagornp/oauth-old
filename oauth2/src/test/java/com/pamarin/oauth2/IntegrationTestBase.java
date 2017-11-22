@@ -7,7 +7,6 @@ import com.pamarin.oauth2.model.OAuth2RefreshToken;
 import com.pamarin.oauth2.repository.OAuth2AllowDomainRepo;
 import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.oauth2.security.CsrfInterceptor;
-import com.pamarin.oauth2.security.GetCsrfTokenIntorceptor;
 import com.pamarin.commons.security.UserSessionStub;
 import com.pamarin.commons.security.LoginSession;
 import java.util.UUID;
@@ -41,9 +40,6 @@ public class IntegrationTestBase {
 
     @MockBean
     private UserRepo userRepo;
-
-    @MockBean
-    private GetCsrfTokenIntorceptor getCsrfTokenIntorceptor;
 
     @MockBean
     private CsrfInterceptor csrfVerificationInterceptor;
@@ -85,15 +81,6 @@ public class IntegrationTestBase {
         OAuth2RefreshToken refreshToken = stubRefreshToken();
         when(refreshTokenRepo.save(any(OAuth2RefreshToken.class))).thenReturn(refreshToken);
         when(refreshTokenRepo.findById(any(String.class))).thenReturn(refreshToken);
-    }
-
-    @Before
-    public void mockGetCsrfTokenIntorceptor() throws Exception {
-        when(getCsrfTokenIntorceptor.preHandle(
-                any(HttpServletRequest.class),
-                any(HttpServletResponse.class),
-                any(Object.class)
-        )).thenReturn(true);
     }
 
     @Before

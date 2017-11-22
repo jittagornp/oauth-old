@@ -66,17 +66,11 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(newGetCsrfTokenIntorceptor());
-        registry.addInterceptor(newCsrfVerificationInterceptor());
+        registry.addInterceptor(newCsrfInterceptor());
     }
-//
-//    @Bean
-//    public GetCsrfTokenIntorceptor newGetCsrfTokenIntorceptor() {
-//        return new GetCsrfTokenIntorceptor();
-//    }
 
     @Bean
-    public CsrfInterceptor newCsrfVerificationInterceptor() {
+    public CsrfInterceptor newCsrfInterceptor() {
         return new CsrfInterceptor();
     }
 
