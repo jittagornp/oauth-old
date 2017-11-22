@@ -82,7 +82,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
     }
 
     private Object getCsrfSession(HttpServletRequest httpReq, String token) {
-        return httpReq.getSession().getAttribute(CSRF_HEADER_KEY + ":" + token);
+        return httpReq.getSession().getAttribute(getCsrfSessionKey(token));
     }
 
     private String getCsrfToken(HttpServletRequest httpReq) {
@@ -128,7 +128,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
     }
 
     private void saveToken(AuthenticityToken.RandomOutput random, HttpSession session) {
-        session.setAttribute(CSRF_HEADER_KEY + ":" + random.getToken(), true);
+        session.setAttribute(getCsrfSessionKey(random.getToken()), true);
     }
 
     /**
@@ -146,6 +146,10 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
                 .setSecure(hostUrl.startsWith("https://"))
                 .sameSiteStrict()
                 .build());
+    }
+
+    private String getCsrfSessionKey(String token) {
+        return CSRF_HEADER_KEY + ":" + token;
     }
 
 }
