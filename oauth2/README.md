@@ -63,11 +63,16 @@ Enter password: ********
 
 # วิธีการ Run Project
 
-1. build
+1. build parent
 
-> $ mvn clean install -P error-prone -U
+> $ mvn clean install -U
 
-2. run
+2. build OAuth2
+
+> cd oauth2  
+> $ mvn clean install -P error-prone
+
+3. run
 > $ mvn spring-boot:run
 
 # Http Session
