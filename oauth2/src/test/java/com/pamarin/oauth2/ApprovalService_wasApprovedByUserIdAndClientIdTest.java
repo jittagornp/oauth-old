@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.service;
+package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.ApprovalServiceImpl;
 import com.pamarin.oauth2.domain.OAuth2Approval;
