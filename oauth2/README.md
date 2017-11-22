@@ -69,7 +69,7 @@ Enter password: ********
 
 2. build OAuth2
 
-> cd oauth2  
+> $ cd oauth2  
 > $ mvn clean install -P error-prone
 
 3. run
