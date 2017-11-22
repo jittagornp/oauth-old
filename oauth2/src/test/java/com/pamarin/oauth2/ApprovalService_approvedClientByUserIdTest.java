@@ -4,10 +4,10 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.domain.OAuth2Approval;
+import com.pamarin.oauth2.domain.OAuth2ApprovalScope;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
 import com.pamarin.oauth2.repository.OAuth2ApprovalScopeRepo;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -52,6 +52,6 @@ public class ApprovalService_approvedClientByUserIdTest {
         );
         
         verify(approvalRepo).save(Mockito.any(OAuth2Approval.class));
-        verify(approvalScopeRepo).save(Mockito.any(List.class));
+        verify(approvalScopeRepo).save(Mockito.anyListOf(OAuth2ApprovalScope.class));
     }
 }
