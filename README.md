@@ -6,4 +6,5 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/pamarin-tech/commons/badge)](https://www.codefactor.io/repository/github/pamarin-tech/commons)
 [![BCH compliance](https://bettercodehub.com/edge/badge/pamarin-tech/commons?branch=master)](https://bettercodehub.com/)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f2e6b437560442d828ac/maintainability)](https://codeclimate.com/github/pamarin-tech/commons/maintainability)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2e394bffe27241cfbdb11043965126b1)](https://www.codacy.com/app/pamarin-tech/commons?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pamarin-tech/commons&amp;utm_campaign=Badge_Grade)
 
