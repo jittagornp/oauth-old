@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.security;
 
+import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.oauth2.exception.InvalidCsrfTokenException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.security;
 
+import com.pamarin.commons.security.AuthenticityToken;
 import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
