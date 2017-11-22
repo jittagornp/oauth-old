@@ -10,7 +10,6 @@ import com.pamarin.commons.security.DefaultUserSession;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.security.PasswordEncryption;
 import com.pamarin.oauth2.service.UserService;
-import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +32,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void login(String username, String password) {
-        Objects.requireNonNull(username, "Require username.");
-        Objects.requireNonNull(password, "Require password.");
+        if (username == null || password == null) {
+            throw new InvalidUsernamePasswordException("Require username and password.");
+        }
 
         User user = userRepo.findByUsername(username);
         if (user == null) {

@@ -35,7 +35,7 @@ public class UserService_loginTest {
 
     @Mock
     private PasswordEncryption passwordEncryption;
-    
+
     @Mock
     private LoginSession loginSession;
 
@@ -49,10 +49,10 @@ public class UserService_loginTest {
     }
 
     @Test
-    public void shouldBeErrorRequireUsername_whenUsernameAndPasswordIsNull() {
+    public void shouldBeErrorRequireUsernameAndPassword_whenUsernameAndPasswordIsNull() {
 
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("Require username.");
+        exception.expect(InvalidUsernamePasswordException.class);
+        exception.expectMessage("Require username and password.");
 
         String username = null;
         String password = null;
@@ -60,10 +60,10 @@ public class UserService_loginTest {
     }
 
     @Test
-    public void shouldBeErrorRequirePassword_whenPasswordIsNull() {
+    public void shouldBeErrorRequireUsernameAndPassword_whenPasswordIsNull() {
 
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("Require password.");
+        exception.expect(InvalidUsernamePasswordException.class);
+        exception.expectMessage("Require username and password.");
 
         String username = "test";
         String password = null;
@@ -94,7 +94,7 @@ public class UserService_loginTest {
         String password = "root";
         userService.login(username, password);
     }
-    
+
     @Test
     public void shouldBeOk() {
         when(passwordEncryption.matches(any(String.class), any(String.class)))
