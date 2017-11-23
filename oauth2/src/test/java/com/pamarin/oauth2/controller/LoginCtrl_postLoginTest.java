@@ -45,9 +45,12 @@ public class LoginCtrl_postLoginTest extends IntegrationTestBase {
 
     @Test
     public void shouldBeInvalidRequest_whenUsernameAndPasswordIsEmpty() throws Exception {
+        doThrow(InvalidUsernamePasswordException.class)
+                .when(userService)
+                .login(null, null);
         this.mockMvc.perform(post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read"))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost/callback?error=invalid_request"));
+                .andExpect(redirectedUrl("http://localhost/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
     }
 
     @Test

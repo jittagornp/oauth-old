@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.service;
 
-import com.pamarin.oauth2.security.PasswordEncryption;
+import com.pamarin.commons.security.PasswordEncryption;
 import com.pamarin.oauth2.exception.InvalidClientIdAndClientSecretException;
 import com.pamarin.oauth2.exception.InvalidClientIdException;
 import org.junit.Before;

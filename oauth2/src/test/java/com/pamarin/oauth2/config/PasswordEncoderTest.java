@@ -5,7 +5,7 @@ package com.pamarin.oauth2.config;
 
 import com.pamarin.oauth2.AppStarter;
 import com.pamarin.oauth2.IntegrationTestBase;
-import com.pamarin.oauth2.security.PasswordEncryption;
+import com.pamarin.commons.security.PasswordEncryption;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;

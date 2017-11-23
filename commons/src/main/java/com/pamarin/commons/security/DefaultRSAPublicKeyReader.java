@@ -1,9 +1,9 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.security;
+package com.pamarin.commons.security;
 
-import com.pamarin.oauth2.exception.RSAKeyReaderException;
+import com.pamarin.commons.exception.RSAKeyReaderException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyFactory;

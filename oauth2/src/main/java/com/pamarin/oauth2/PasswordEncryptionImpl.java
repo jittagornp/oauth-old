@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.security.PasswordEncryption;
+import com.pamarin.commons.security.PasswordEncryption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

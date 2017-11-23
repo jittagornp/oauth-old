@@ -8,7 +8,7 @@ import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.LoginCredential;
 import com.pamarin.oauth2.provider.HostUrlProvider;
-import com.pamarin.oauth2.security.GetCsrfToken;
+import com.pamarin.commons.security.GetCsrfToken;
 import com.pamarin.oauth2.service.AuthorizationRequestVerification;
 import com.pamarin.oauth2.view.ModelAndViewBuilder;
 import java.io.IOException;
@@ -68,7 +68,7 @@ public class LoginCtrl {
     public void login(
             HttpServletRequest httpReq,
             HttpServletResponse httpResp,
-            @Validated LoginCredential credential
+            LoginCredential credential
     ) throws IOException, MissingServletRequestParameterException {
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
         try {

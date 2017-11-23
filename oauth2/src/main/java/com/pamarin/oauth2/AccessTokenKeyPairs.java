@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.security.ClassPathDERFileKeyPairsAdapter;
+import com.pamarin.commons.security.ClassPathDERFileKeyPairsAdapter;
 import org.springframework.stereotype.Component;
 
 /**

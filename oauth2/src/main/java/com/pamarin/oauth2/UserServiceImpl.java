@@ -8,7 +8,7 @@ import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.DefaultUserSession;
 import com.pamarin.commons.security.LoginSession;
-import com.pamarin.oauth2.security.PasswordEncryption;
+import com.pamarin.commons.security.PasswordEncryption;
 import com.pamarin.oauth2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

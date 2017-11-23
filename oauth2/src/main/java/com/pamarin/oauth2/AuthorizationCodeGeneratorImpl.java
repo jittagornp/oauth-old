@@ -7,7 +7,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.AuthorizationResponse;
-import com.pamarin.oauth2.security.KeyPairs;
+import com.pamarin.commons.security.KeyPairs;
 import com.pamarin.oauth2.service.AuthorizationCodeGenerator;
 import com.pamarin.commons.security.LoginSession;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Date;

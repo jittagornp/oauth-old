@@ -4,7 +4,7 @@
 package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.security.AuthenticityToken;
-import com.pamarin.oauth2.security.CsrfInterceptor;
+import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.DefaultAuthenticityToken;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;

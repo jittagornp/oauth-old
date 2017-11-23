@@ -6,7 +6,7 @@ package com.pamarin.oauth2;
 import com.pamarin.oauth2.model.OAuth2RefreshToken;
 import com.pamarin.oauth2.repository.OAuth2AllowDomainRepo;
 import com.pamarin.oauth2.repository.UserRepo;
-import com.pamarin.oauth2.security.CsrfInterceptor;
+import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.UserSessionStub;
 import com.pamarin.commons.security.LoginSession;
 import java.util.UUID;

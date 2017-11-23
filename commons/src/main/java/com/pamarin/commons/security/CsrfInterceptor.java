@@ -1,11 +1,10 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.security;
+package com.pamarin.commons.security;
 
-import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.util.CookieSpecBuilder;
-import com.pamarin.oauth2.exception.InvalidCsrfTokenException;
+import com.pamarin.commons.exception.InvalidCsrfTokenException;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.Arrays;

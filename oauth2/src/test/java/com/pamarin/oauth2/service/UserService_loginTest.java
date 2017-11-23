@@ -8,7 +8,7 @@ import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.LoginSession;
-import com.pamarin.oauth2.security.PasswordEncryption;
+import com.pamarin.commons.security.PasswordEncryption;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

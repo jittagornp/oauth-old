@@ -3,6 +3,8 @@
  */
 package com.pamarin.oauth2.security;
 
+import com.pamarin.commons.security.RSAPrivateKeyReader;
+import com.pamarin.commons.security.RSAPublicKeyReader;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;

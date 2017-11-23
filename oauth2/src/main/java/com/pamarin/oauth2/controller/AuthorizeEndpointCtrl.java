@@ -7,7 +7,7 @@ import com.pamarin.oauth2.converter.HttpServletRequest2AuthorizationRequestConve
 import com.pamarin.oauth2.exception.RequireApprovalException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.provider.HostUrlProvider;
-import com.pamarin.oauth2.security.GetCsrfToken;
+import com.pamarin.commons.security.GetCsrfToken;
 import com.pamarin.oauth2.service.AuthorizationService;
 import com.pamarin.oauth2.service.AuthorizeViewModelService;
 import com.pamarin.oauth2.view.ModelAndViewBuilder;

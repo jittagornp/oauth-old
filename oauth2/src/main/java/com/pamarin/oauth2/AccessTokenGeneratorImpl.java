@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.security.KeyPairs;
+import com.pamarin.commons.security.KeyPairs;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
