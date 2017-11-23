@@ -1,5 +1,3 @@
-
-
 insert into user(id, username, password, created_date, created_user)
 values (1, 'test', '$2a$10$2SLqTL7.Ug9cyfRPFwxQeemMA4SeB9MymLjRl4RGR0h7aHwLDy7qC', now(), 1);
 
