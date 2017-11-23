@@ -9,6 +9,7 @@ import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.LoginCredential;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.GetCsrfToken;
+import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.service.AuthorizationRequestVerification;
 import com.pamarin.commons.view.ModelAndViewBuilder;
 import java.io.IOException;
@@ -46,6 +47,9 @@ public class LoginCtrl {
     @Autowired
     private LoginService loginService;
 
+    @Autowired
+    private LoginSession loginSession;
+
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);
         req.requireParameters();
@@ -55,8 +59,11 @@ public class LoginCtrl {
 
     @GetCsrfToken
     @GetMapping("/login")
-    public ModelAndView login(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
+    public ModelAndView login(HttpServletRequest httpReq, HttpServletResponse httpResp) throws MissingServletRequestParameterException, IOException {
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
+        if (loginSession.wasCreated()) {
+            httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + req.buildQuerystring());
+        }
         return new ModelAndViewBuilder()
                 .setName("login")
                 .addAttribute("error", httpReq.getParameter("error"))
