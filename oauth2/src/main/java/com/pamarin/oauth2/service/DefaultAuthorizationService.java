@@ -9,7 +9,7 @@ import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.AccessTokenResponse;
 import com.pamarin.oauth2.model.AuthorizationResponse;
 import com.pamarin.oauth2.model.ErrorResponse;
-import com.pamarin.oauth2.provider.HostUrlProvider;
+import com.pamarin.commons.provider.HostUrlProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

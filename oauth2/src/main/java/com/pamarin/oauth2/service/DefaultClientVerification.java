@@ -8,7 +8,7 @@ import com.pamarin.oauth2.exception.InvalidClientIdAndClientSecretException;
 import com.pamarin.oauth2.exception.InvalidClientIdAndRedirectUriException;
 import com.pamarin.oauth2.exception.InvalidClientIdException;
 import com.pamarin.oauth2.exception.InvalidRedirectUriException;
-import com.pamarin.oauth2.validator.ValidUri;
+import com.pamarin.commons.validator.ValidUri;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

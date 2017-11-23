@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.view;
+package com.pamarin.commons.view;
 
 import java.util.HashMap;
 import java.util.Map;

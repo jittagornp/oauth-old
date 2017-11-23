@@ -4,7 +4,7 @@
 package com.pamarin.oauth2.controller;
 
 import com.pamarin.oauth2.IntegrationTestBase;
-import com.pamarin.oauth2.provider.HostUrlProvider;
+import com.pamarin.commons.provider.HostUrlProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -3,8 +3,8 @@
  */
 package com.pamarin.oauth2.controller;
 
-import com.pamarin.oauth2.provider.HostUrlProvider;
-import com.pamarin.oauth2.view.ModelAndViewBuilder;
+import com.pamarin.commons.provider.HostUrlProvider;
+import com.pamarin.commons.view.ModelAndViewBuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import org.apache.commons.lang.RandomStringUtils;

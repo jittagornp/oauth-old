@@ -6,7 +6,7 @@ package com.pamarin.oauth2.service;
 import com.pamarin.oauth2.exception.InvalidClientIdAndRedirectUriException;
 import com.pamarin.oauth2.exception.InvalidClientIdException;
 import com.pamarin.oauth2.exception.InvalidRedirectUriException;
-import com.pamarin.oauth2.validator.ValidUri;
+import com.pamarin.commons.validator.ValidUri;
 import java.util.Arrays;
 import java.util.Collections;
 import org.junit.Before;

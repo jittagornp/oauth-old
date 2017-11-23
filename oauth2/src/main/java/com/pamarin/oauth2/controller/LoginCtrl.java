@@ -7,10 +7,10 @@ import com.pamarin.oauth2.converter.HttpServletRequest2AuthorizationRequestConve
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.LoginCredential;
-import com.pamarin.oauth2.provider.HostUrlProvider;
+import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.GetCsrfToken;
 import com.pamarin.oauth2.service.AuthorizationRequestVerification;
-import com.pamarin.oauth2.view.ModelAndViewBuilder;
+import com.pamarin.commons.view.ModelAndViewBuilder;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

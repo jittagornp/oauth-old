@@ -2,8 +2,9 @@
  * Copyright 2017 Pamarin.com
  */
 
-package com.pamarin.oauth2.provider;
+package com.pamarin.commons.provider;
 
+import com.pamarin.commons.provider.HostUrlProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

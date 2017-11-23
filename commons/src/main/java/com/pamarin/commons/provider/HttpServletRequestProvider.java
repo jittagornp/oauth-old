@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.provider;
+package com.pamarin.commons.provider;
 
 import javax.servlet.http.HttpServletRequest;
 

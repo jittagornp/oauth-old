@@ -6,7 +6,7 @@ package com.pamarin.oauth2.service;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.ClientDetails;
-import com.pamarin.oauth2.provider.HostUrlProvider;
+import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.UserSessionStub;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;

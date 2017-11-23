@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.validator;
+package com.pamarin.commons.validator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
