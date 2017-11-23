@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.pamarin.oauth2.service.UserService;
+import com.pamarin.oauth2.service.LoginService;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -36,7 +36,7 @@ public class LoginCtrl_postLoginTest extends IntegrationTestBase {
     private HostUrlProvider hostUrlProvider;
 
     @MockBean
-    private UserService userService;
+    private LoginService loginService;
 
     @Before
     public void before() {
@@ -46,7 +46,7 @@ public class LoginCtrl_postLoginTest extends IntegrationTestBase {
     @Test
     public void shouldBeInvalidRequest_whenUsernameAndPasswordIsEmpty() throws Exception {
         doThrow(InvalidUsernamePasswordException.class)
-                .when(userService)
+                .when(loginService)
                 .login(null, null);
         this.mockMvc.perform(post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read"))
                 .andExpect(status().isFound())
@@ -56,7 +56,7 @@ public class LoginCtrl_postLoginTest extends IntegrationTestBase {
     @Test
     public void shouldBeInvalidUsernamePassword_whenUsernameAndPasswordIsAAA() throws Exception {
         doThrow(InvalidUsernamePasswordException.class)
-                .when(userService)
+                .when(loginService)
                 .login("AAA", "AAA");
         this.mockMvc.perform(
                 post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read")

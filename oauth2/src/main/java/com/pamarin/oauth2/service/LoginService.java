@@ -8,7 +8,7 @@ package com.pamarin.oauth2.service;
  * create : 2017/10/21
  */
 @FunctionalInterface
-public interface UserService {
+public interface LoginService {
 
     void login(String username, String password);
 

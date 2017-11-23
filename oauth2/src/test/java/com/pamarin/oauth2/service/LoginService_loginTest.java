@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.service;
 
-import com.pamarin.oauth2.UserServiceImpl;
+import com.pamarin.oauth2.LoginServiceImpl;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import com.pamarin.oauth2.repository.UserRepo;
@@ -22,13 +22,13 @@ import org.mockito.MockitoAnnotations;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/18
  */
-public class UserService_loginTest {
+public class LoginService_loginTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
-    private UserServiceImpl userService;
+    private LoginServiceImpl loginService;
 
     @Mock
     private UserRepo userRepo;
@@ -56,7 +56,7 @@ public class UserService_loginTest {
 
         String username = null;
         String password = null;
-        userService.login(username, password);
+        loginService.login(username, password);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class UserService_loginTest {
 
         String username = "test";
         String password = null;
-        userService.login(username, password);
+        loginService.login(username, password);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class UserService_loginTest {
 
         String username = "test";
         String password = "test";
-        userService.login(username, password);
+        loginService.login(username, password);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class UserService_loginTest {
 
         String username = "root";
         String password = "root";
-        userService.login(username, password);
+        loginService.login(username, password);
     }
 
     @Test
@@ -102,6 +102,6 @@ public class UserService_loginTest {
 
         String username = "root";
         String password = "password";
-        userService.login(username, password);
+        loginService.login(username, password);
     }
 }

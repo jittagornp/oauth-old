@@ -23,7 +23,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-import com.pamarin.oauth2.service.UserService;
+import com.pamarin.oauth2.service.LoginService;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -44,7 +44,7 @@ public class LoginCtrl {
     private AuthorizationRequestVerification requestVerification;
 
     @Autowired
-    private UserService userService;
+    private LoginService loginService;
 
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);
@@ -72,7 +72,7 @@ public class LoginCtrl {
     ) throws IOException, MissingServletRequestParameterException {
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
         try {
-            userService.login(credential.getUsername(), credential.getPassword());
+            loginService.login(credential.getUsername(), credential.getPassword());
             httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + req.buildQuerystring());
         } catch (InvalidUsernamePasswordException ex) {
             LOG.warn("Invalid username password ", ex);

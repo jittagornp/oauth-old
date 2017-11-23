@@ -9,17 +9,17 @@ import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.DefaultUserSession;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.commons.security.PasswordEncryption;
-import com.pamarin.oauth2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.pamarin.oauth2.service.LoginService;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
  */
 @Service
 @Transactional
-public class UserServiceImpl implements UserService {
+public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private UserRepo userRepo;
