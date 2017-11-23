@@ -3,23 +3,19 @@
  */
 package com.pamarin.commons.util;
 
-import com.pamarin.commons.util.ByteUtils;
-import java.lang.reflect.Constructor;
-import static java.lang.reflect.Modifier.isPrivate;
+import static com.pamarin.commons.util.ClassUtils.isPrivateConstructor;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/18
  */
 public class ByteUtils_xorTest {
-
+    
     @Test
-    public void shouldBePrivateConstructor() throws NoSuchMethodException {
-        Constructor<ByteUtils> input = ByteUtils.class.getDeclaredConstructor();
-        boolean output = isPrivate(input.getModifiers());
-        boolean expected = true;
-        assertThat(output).isEqualTo(expected);
+    public void shouldBePrivateConstructor() {
+        assertTrue(isPrivateConstructor(ByteUtils.class));
     }
 
     /*

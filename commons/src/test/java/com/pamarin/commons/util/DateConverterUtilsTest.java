@@ -3,7 +3,7 @@
  */
 package com.pamarin.commons.util;
 
-import com.pamarin.commons.util.DateConverterUtils;
+import static com.pamarin.commons.util.ClassUtils.isPrivateConstructor;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
@@ -35,6 +36,11 @@ public class DateConverterUtilsTest {
 
     private LocalDateTime createLocalDateTime(String date) {
         return LocalDateTime.parse(date, DateTimeFormatter.ofPattern(FORMAT));
+    }
+    
+    @Test
+    public void shouldBePrivateConstructor() {
+        assertTrue(isPrivateConstructor(DateConverterUtils.class));
     }
 
     @Test
