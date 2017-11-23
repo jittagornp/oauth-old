@@ -3,15 +3,13 @@
  */
 package com.pamarin.commons.util;
 
-import com.pamarin.commons.exception.UnsupportedPrivateConstructorException;
-
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/18
  */
 public class ByteUtils {
 
     private ByteUtils() {
-        throw new UnsupportedPrivateConstructorException();
+        
     }
 
     public static byte[] xor(byte[] data1, byte[] data2) {

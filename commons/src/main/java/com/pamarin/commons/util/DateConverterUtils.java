@@ -3,7 +3,6 @@
  */
 package com.pamarin.commons.util;
 
-import com.pamarin.commons.exception.UnsupportedPrivateConstructorException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -15,7 +14,7 @@ import java.util.Date;
 public class DateConverterUtils {
 
     private DateConverterUtils() {
-        throw new UnsupportedPrivateConstructorException();
+        
     }
 
     public static Date convert2Date(LocalDate localDate) {

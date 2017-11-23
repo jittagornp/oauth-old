@@ -3,7 +3,6 @@
  */
 package com.pamarin.commons.util;
 
-import com.pamarin.commons.exception.UnsupportedPrivateConstructorException;
 import static com.pamarin.commons.util.ClassUtils.isPrivateConstructor;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -25,18 +24,10 @@ public class ClassUtils_isPrivateConstructorTest {
         }
     }
 
-    public static class InvalidPrivateConstructor {
+    public static class PrivateConstructor {
 
-        private InvalidPrivateConstructor() {
+        private PrivateConstructor() {
 
-        }
-
-    }
-
-    public static class ValidPrivateConstructor {
-
-        private ValidPrivateConstructor() {
-            throw new UnsupportedPrivateConstructorException();
         }
 
     }
@@ -52,17 +43,7 @@ public class ClassUtils_isPrivateConstructorTest {
     }
 
     @Test
-    public void shouldBeFalse_whenInvalidPrivateConstructor() {
-        assertFalse(isPrivateConstructor(InvalidPrivateConstructor.class));
-    }
-
-    @Test
-    public void shouldBeTrue_whenValidPrivateConstructor() {
-        assertTrue(isPrivateConstructor(ValidPrivateConstructor.class));
-    }
-
-    @Test
-    public void shouldBePrivateConstructor() {
-        assertTrue(isPrivateConstructor(ClassUtils.class));
+    public void shouldBeFalse_whenPrivateConstructor() {
+        assertTrue(isPrivateConstructor(PrivateConstructor.class));
     }
 }
