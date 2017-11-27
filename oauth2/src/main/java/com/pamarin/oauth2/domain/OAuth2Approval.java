@@ -30,7 +30,7 @@ public class OAuth2Approval extends AuditingEntity {
     public static class PK implements Serializable {
 
         @Column(name = "user_id")
-        private Long userId;
+        private String userId;
 
         @Column(name = "client_id")
         private String clientId;
@@ -39,7 +39,7 @@ public class OAuth2Approval extends AuditingEntity {
 
         }
 
-        public PK(Long userId, String clientId) {
+        public PK(String userId, String clientId) {
             this.userId = userId;
             this.clientId = clientId;
         }

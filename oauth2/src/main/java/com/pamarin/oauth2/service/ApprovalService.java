@@ -12,9 +12,9 @@ import java.util.List;
  */
 public interface ApprovalService {
 
-    boolean wasApprovedByUserIdAndClientId(Long userId, String clientId);
+    boolean wasApprovedByUserIdAndClientId(String userId, String clientId);
 
-    void approvedClientByUserId(ClientDetails details, Long userId);
+    void approvedClientByUserId(ClientDetails details, String userId);
 
-    List<String> findScopeByUserIdAndClientId(Long userId, String clientId);
+    List<String> findScopeByUserIdAndClientId(String userId, String clientId);
 }

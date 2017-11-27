@@ -20,7 +20,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class PersistenceConf {
 
     @Bean
-    public AuditorAware<Long> auditorProvider() {
+    public AuditorAware<String> auditorProvider() {
         return new ModifyUserAuditorAware();
     }
 }

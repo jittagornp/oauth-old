@@ -4,9 +4,6 @@
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.AuthenticationException;
-import com.pamarin.commons.security.LoginSession;
-import com.pamarin.commons.security.DefaultUserSession;
-import com.pamarin.commons.security.UserSession;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
@@ -54,7 +51,7 @@ public class LoginSession_getUserSessionTest {
     @Test
     public void shouldBeOk() {
         UserSession input = DefaultUserSession.builder()
-                .id(1L)
+                .id("00000000000000000000000000000000")
                 .username("test")
                 .password(null)
                 .build();

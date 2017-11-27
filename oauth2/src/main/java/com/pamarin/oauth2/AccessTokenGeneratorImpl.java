@@ -71,7 +71,6 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         LocalDateTime expires = now.plusMinutes(expiresMinute);
         String[] arr = new String[scopes.size()];
         return JWT.create()
-                .withSubject(base.getUsername())
                 .withIssuer(String.valueOf(base.getUserId()))
                 .withIssuedAt(convert2Date(now))
                 .withExpiresAt(convert2Date(expires))
@@ -95,7 +94,6 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     private OAuth2RefreshToken generateRefreshToken(TokenBase base) {
         return refreshTokenRepo.save(OAuth2RefreshToken.builder()
                 .userId(base.getUserId())
-                .username(base.getUsername())
                 .build());
     }
 
@@ -105,7 +103,6 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         return buildAccessTokenResponse(
                 TokenBase.builder()
                         .userId(userSession.getId())
-                        .username(userSession.getUsername())
                         .build(),
                 approvalService.findScopeByUserIdAndClientId(
                         userSession.getId(),
@@ -142,7 +139,6 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         refreshTokenRepo.save(refreshToken);
         return buildAccessTokenResponse(TokenBase.builder()
                 .userId(refreshToken.getUserId())
-                .username(refreshToken.getUsername())
                 .build(),
                 approvalService.findScopeByUserIdAndClientId(
                         refreshToken.getUserId(),

@@ -36,7 +36,7 @@ public class ApprovalService_wasApprovedByUserIdAndClientIdTest {
         when(approvalRepo.findOne(any(OAuth2Approval.PK.class)))
                 .thenReturn(null);
 
-        Long userId = 1L;
+        String userId = "00000000000000000000000000000000";
         String clientId = "1";
         boolean output = approvalService.wasApprovedByUserIdAndClientId(userId, clientId);
         boolean expected = false;
@@ -49,7 +49,7 @@ public class ApprovalService_wasApprovedByUserIdAndClientIdTest {
         when(approvalRepo.findOne(any(OAuth2Approval.PK.class)))
                 .thenReturn(approval);
 
-        Long userId = 1L;
+        String userId = "00000000000000000000000000000000";
         String clientId = "1";
         boolean output = approvalService.wasApprovedByUserIdAndClientId(userId, clientId);
         boolean expected = true;

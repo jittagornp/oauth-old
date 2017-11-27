@@ -59,7 +59,7 @@ public class AuthorizationService_approvedTest {
         String expected = "http://localhost/authorize?response_type=code&client_id=123456&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=basic&state=XYZ";
         assertThat(output).isEqualTo(expected);
         verify(requestVerification).verify(any(AuthorizationRequest.class));
-        verify(approvalService).approvedClientByUserId(any(ClientDetails.class), any(Long.class));
+        verify(approvalService).approvedClientByUserId(any(ClientDetails.class), any(String.class));
     }
 
 }

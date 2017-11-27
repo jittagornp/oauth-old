@@ -14,6 +14,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface OAuth2ApprovalScopeRepo extends JpaRepository<OAuth2ApprovalScope, Long> {
 
     @Query("SELECT s.scope FROM OAuth2ApprovalScope s WHERE s.userId  = ?1 AND s.clientId = ?2")
-    List<String> findScopeByUserIdAndClientId(Long userId, String clientId);
+    List<String> findScopeByUserIdAndClientId(String userId, String clientId);
 
 }

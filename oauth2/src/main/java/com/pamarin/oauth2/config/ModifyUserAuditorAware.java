@@ -10,13 +10,13 @@ import org.springframework.data.domain.AuditorAware;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/20
  */
-public class ModifyUserAuditorAware implements AuditorAware<Long> {
+public class ModifyUserAuditorAware implements AuditorAware<String> {
 
     @Autowired
     private LoginSession loginSession;
 
     @Override
-    public Long getCurrentAuditor() {
+    public String getCurrentAuditor() {
         return loginSession.getUserSession().getId();
     }
 

@@ -71,7 +71,7 @@ public class IntegrationTestBase {
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()
                 .id(UUID.randomUUID().toString().replace("-", ""))
-                .userId(1L)
+                .userId("00000000000000000000000000000000")
                 .username("test")
                 .build();
     }

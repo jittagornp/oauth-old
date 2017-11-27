@@ -29,7 +29,7 @@ public class ApprovalServiceImpl implements ApprovalService {
     private OAuth2ApprovalScopeRepo approvalScopeRepo;
 
     @Override
-    public boolean wasApprovedByUserIdAndClientId(Long userId, String clientId) {
+    public boolean wasApprovedByUserIdAndClientId(String userId, String clientId) {
         OAuth2Approval approval = approveRepo.findOne(new OAuth2Approval.PK(userId, clientId));
         return approval != null;
     }
@@ -45,14 +45,14 @@ public class ApprovalServiceImpl implements ApprovalService {
         }).collect(Collectors.toList()));
     }
 
-    private OAuth2Approval newOAuth2Approval(Long userId, String clientId) {
+    private OAuth2Approval newOAuth2Approval(String userId, String clientId) {
         OAuth2Approval approval = new OAuth2Approval();
         approval.setId(new OAuth2Approval.PK(userId, clientId));
         return approval;
     }
 
     @Override
-    public void approvedClientByUserId(ClientDetails details, Long userId) {
+    public void approvedClientByUserId(ClientDetails details, String userId) {
         saveScope(approveRepo.save(newOAuth2Approval(
                 userId,
                 details.getClientId()
@@ -60,7 +60,7 @@ public class ApprovalServiceImpl implements ApprovalService {
     }
 
     @Override
-    public List<String> findScopeByUserIdAndClientId(Long userId, String clientId) {
+    public List<String> findScopeByUserIdAndClientId(String userId, String clientId) {
         return approvalScopeRepo.findScopeByUserIdAndClientId(userId, clientId);
     }
 

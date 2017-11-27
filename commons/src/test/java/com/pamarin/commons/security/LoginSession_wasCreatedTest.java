@@ -3,8 +3,6 @@
  */
 package com.pamarin.commons.security;
 
-import com.pamarin.commons.security.LoginSession;
-import com.pamarin.commons.security.DefaultUserSession;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +34,7 @@ public class LoginSession_wasCreatedTest {
     @Test
     public void shouldBeTrue_whenLogedIn() {
         loginSession.create(DefaultUserSession.builder()
-                .id(1L)
+                .id("00000000000000000000000000000000")
                 .username("test")
                 .password(null)
                 .build());

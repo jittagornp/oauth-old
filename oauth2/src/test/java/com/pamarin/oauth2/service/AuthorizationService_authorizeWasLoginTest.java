@@ -58,13 +58,13 @@ public class AuthorizationService_authorizeWasLoginTest {
         when(loginSession.wasCreated()).thenReturn(true);
         when(loginSession.getUserSession()).thenReturn(UserSessionStub.get());
         when(responseTypeValidator.isValid(any(String.class))).thenReturn(true);
-        when(approvalService.wasApprovedByUserIdAndClientId(any(Long.class), any(String.class)))
+        when(approvalService.wasApprovedByUserIdAndClientId(any(String.class), any(String.class)))
                 .thenReturn(true);
     }
 
     @Test(expected = RequireApprovalException.class)
     public void shouldBeThrowRequireApprovalException_whenNeverApprove() {
-        when(approvalService.wasApprovedByUserIdAndClientId(any(Long.class), any(String.class)))
+        when(approvalService.wasApprovedByUserIdAndClientId(any(String.class), any(String.class)))
                 .thenReturn(false);
 
         AuthorizationRequest input = AuthorizationRequest.builder()

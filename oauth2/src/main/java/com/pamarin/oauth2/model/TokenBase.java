@@ -15,7 +15,6 @@ import lombok.Setter;
 @Builder
 public class TokenBase {
 
-    private Long userId;
+    private String userId;
 
-    private String username;
 }

@@ -31,7 +31,7 @@ public class AuditingEntity implements Serializable {
 
     @CreatedBy
     @Column(name = "created_user", nullable = false)
-    private Long createUser;
+    private String createUser;
 
     @LastModifiedDate
     @Column(name = "updated_date")
@@ -39,6 +39,6 @@ public class AuditingEntity implements Serializable {
 
     @LastModifiedBy
     @Column(name = "updated_user")
-    private Long updatedUser;
+    private String updatedUser;
 
 }

@@ -20,7 +20,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Builder
 public class DefaultUserSession implements UserSession {
 
-    private Long id;
+    private String id;
 
     private String username;
 
@@ -29,7 +29,7 @@ public class DefaultUserSession implements UserSession {
     private List<String> authorities;
 
     @Override
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

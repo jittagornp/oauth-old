@@ -40,7 +40,7 @@ public class ApprovalService_approvedClientByUserIdTest {
     @Test
     public void shouldBeOk() {
         OAuth2Approval approval = new OAuth2Approval();
-        approval.setId(new OAuth2Approval.PK(1L, "1234"));
+        approval.setId(new OAuth2Approval.PK("00000000000000000000000000000000", "1234"));
         when(approvalRepo.save(any(OAuth2Approval.class)))
                 .thenReturn(approval);
 
@@ -48,7 +48,7 @@ public class ApprovalService_approvedClientByUserIdTest {
                 .clientId("1234")
                 .scope("user:public_profile")
                 .build(),
-                any(Long.class)
+                any(String.class)
         );
         
         verify(approvalRepo).save(Mockito.any(OAuth2Approval.class));
