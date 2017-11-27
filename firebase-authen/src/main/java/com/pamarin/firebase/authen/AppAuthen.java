@@ -26,7 +26,7 @@ public class AppAuthen {
     }
 
     public void authen() throws IOException {
-        try (InputStream serviceAccount = getClass().getResourceAsStream("/pamarin-firebase-firebase-adminsdk-x7qja-4f2fa5fba3.json")) {
+        try (InputStream serviceAccount = getClass().getResourceAsStream("/pamarin-firebase-firebase-adminsdk-x7qja-c7069f15a6.json")) {
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .setDatabaseUrl("https://pamarin-firebase.firebaseio.com")
