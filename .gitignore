@@ -1,4 +1,11 @@
+/target
+/nbproject
+/node_modules
+/etc
+/.classpath
+/.settings
 /.project
+/bin
 
 /commons/target
 /commons/nbproject
