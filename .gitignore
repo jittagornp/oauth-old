@@ -1,7 +1,21 @@
+/.project
+
 /commons/target
 /commons/nbproject
+/commons/node_modules
+/commons/etc
+/commons/webpack
+/commons/webpack.cmd
+/commons/webpack-dev-server
+/commons/webpack-dev-server.cmd
+/commons/src/main/resources/static/assets/js/dist
+/commons/.classpath
+/commons/.settings
+/commons/.project
+/commons/bin
 
 /oauth2/target
+/oauth2/nbproject
 /oauth2/node_modules
 /oauth2/etc
 /oauth2/webpack
@@ -37,3 +51,4 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 /credential/target/
+/firebase-authen/target/
