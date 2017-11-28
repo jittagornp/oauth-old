@@ -18,7 +18,7 @@ public class SHA256CheckSumTest {
     private CheckSum checkSum;
 
     @Before
-    public void before() {
+    public void withImplementation() {
         checkSum = new SHA256CheckSum();
     }
 
