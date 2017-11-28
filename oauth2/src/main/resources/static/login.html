@@ -13,6 +13,51 @@ Copyright 2017 Pamarin.com
     </head>
     <body>
         <style>
+            .btn {
+                -moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+                -webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+                box-shadow:inset 0px 1px 0px 0px #ffffff;
+                background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffffff), color-stop(1, #f6f6f6));
+                background:-moz-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
+                background:-webkit-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
+                background:-o-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
+                background:-ms-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
+                background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
+                filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0);
+                background-color:#ffffff;
+                -moz-border-radius:6px;
+                -webkit-border-radius:6px;
+                border-radius:6px;
+                border:1px solid #0000009e;
+                display:inline-block;
+                cursor:pointer;
+                color:#666666;
+                font-family:Arial;
+                font-size:15px;
+                font-weight:bold;
+                padding:6px 24px;
+                text-decoration:none;
+                text-shadow:0px 1px 0px #ffffff;
+            }
+            .btn:hover {
+                background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #f6f6f6), color-stop(1, #ffffff));
+                background:-moz-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
+                background:-webkit-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
+                background:-o-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
+                background:-ms-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
+                background:linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
+                filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f6f6f6', endColorstr='#ffffff',GradientType=0);
+                background-color:#f6f6f6;
+            }
+            .btn:active {
+                position:relative;
+                top:1px;
+            }
+
+            body {
+                background-color: #f2f2f2;
+            }
+
             .alert{
                 padding: 10px;
                 margin-top: 15px;
@@ -21,24 +66,51 @@ Copyright 2017 Pamarin.com
                 max-width: 400px;
             }
 
-            .alert.info{
-                background-color: #daf3ff;
-            }
-
             .alert.warning{
-                background-color: #ffefc4;
-                color: #e69e2f;
+                background-color: #ffffff40;
+                color: #ffffff;
+                border-radius: 3px;
+                border: solid 1px #ffffff57;
+                font-size: 90%;
             }
 
             .login-container{
-                border: solid 1px #b9b9b9;
-                padding: 10px;
                 position: absolute;
                 left: 50%;
-                width: 350px;
-                margin-left: -175px;
-                top: 30%;
-                border-radius: 3px;
+                width: 365px;
+                margin-left: -183px;
+
+                border-radius: 5px;
+                box-shadow: 0 0 30px #00000042;
+                background-color: #fff; 
+
+                top: 50%;
+                -webkit-transform: translateY(-50%);
+                -ms-transform: translateY(-50%);
+                transform: translateY(-50%);
+            }
+
+            .login-header,
+            .login-body,
+            .login-footer{
+                padding: 2rem;
+            }
+
+            .login-header,
+            .login-body{
+                background: linear-gradient(to left, rgba(156, 229, 192, 0.74), rgba(100, 179, 244, 0.75));
+            }
+
+            .login-header{
+                border-radius: 5px 5px 0 0;
+                font-family: serif;
+                font-size: 20pt;
+                font-weight: bold;
+                text-align: center;
+                border-radius: 5px 5px 0 0;
+                font-family: serif;
+                color: #fff;
+                border-bottom: solid 1px #ffffff7a;
             }
 
             .login-container input[type=text],
@@ -46,19 +118,52 @@ Copyright 2017 Pamarin.com
                 width: 100%;
                 margin: 10px 0;
                 line-height: 24px;
-                padding: 0 8px;
+                padding: 3px 8px;
                 box-sizing: border-box;
+                border: 1px solid #fff;
+                border-radius: 3px;
             }
 
             .login-container button{
                 width: 100%;
                 line-height: 24px;
+                margin-top: 1rem;
             }
 
-            .login-header{
-                font-size: 16pt;
-                font-weight: bold;
-                margin-bottom: 15px;
+            .login-footer--left,
+            .login-footer--right{
+                float: left;
+                width: 50%;
+            }
+
+            .login-footer--left{
+                text-align: left;
+            }
+
+            .login-footer--right{
+                text-align: right; 
+            }
+
+            label{
+                line-height: 1.5rem;
+                color: #fff;
+            }
+
+            label.checkbox{
+                line-height: 1rem;
+            }
+
+            .clear{
+                clear: both;
+            }
+
+            a{
+                color: #009fff;
+                text-decoration: none;
+            }
+
+            a:hover{
+                text-decoration: underline;
             }
         </style>
         <div class="login-container">
@@ -66,15 +171,36 @@ Copyright 2017 Pamarin.com
                 Login
             </div>
             <div class="login-body">
-                <form id="login_form" th:attr="action=${processUrl}" method="post">
+                <form th:attr="action=${processUrl}" method="post">
                     <input th:attr="name=${csrfParam}" type="hidden" th:value="${csrfToken}"/>
-                    username <input id="login_username" name="username" type="text" required="true"/>
-                    password <input id="login_password" name="password" type="password" required="true"/>
-                    <button type="submit">login</button>
+                    <label>อีเมล</label>
+                    <input name="username" 
+                           type="text" 
+                           placeholder="Email"
+                           required="true"/>
+                    <label>รหัสผ่าน</label>
+                    <input name="password" 
+                           type="password" 
+                           placeholder="Password"
+                           required="true"/>
+                    <label class="checkbox">
+                        <input type="checkbox" name="rememberme"/>
+                        จำรหัสผ่านไว้
+                    </label>
+                    <button class="btn" type="submit">เข้าสู่ระบบ</button>
                 </form>
                 <div class="alert warning" style="margin-bottom: 0;" th:if="${error eq 'invalid_username_password'}">
-                    Invalid username or password
+                    อีเมลหรือรหัสผ่านไม่ถูกต้อง
                 </div>
+            </div>
+            <div class="login-footer">
+                <div class="login-footer--left">
+                    <a href="#">ลืมรหัสผ่าน</a>
+                </div>
+                <div class="login-footer--right">
+                    <a href="#">สมัครสมาชิก</a>
+                </div>
+                <div class="clear"></div>
             </div>
         </div>
     </body>
