@@ -74,7 +74,7 @@ Copyright 2017 Pamarin.com
                 font-size: 90%;
             }
 
-            .login-container{
+            .login{
                 position: absolute;
                 left: 50%;
                 width: 365px;
@@ -90,21 +90,21 @@ Copyright 2017 Pamarin.com
                 transform: translateY(-50%);
             }
 
-            .login-header,
-            .login-body,
+            .login__header,
+            .login__body,
             .login-footer{
                 padding: 2rem;
             }
 
-            .login-header,
-            .login-body{
+            .login__header,
+            .login__body{
                 background: linear-gradient(to left, rgba(156, 229, 192, 0.74), rgba(100, 179, 244, 0.75));
             }
 
-            .login-header{
+            .login__header{
                 border-radius: 5px 5px 0 0;
                 font-family: serif;
-                font-size: 20pt;
+                font-size: 16pt;
                 font-weight: bold;
                 text-align: center;
                 border-radius: 5px 5px 0 0;
@@ -113,8 +113,8 @@ Copyright 2017 Pamarin.com
                 border-bottom: solid 1px #ffffff7a;
             }
 
-            .login-container input[type=text],
-            .login-container input[type=password]{
+            .login input[type=text],
+            .login input[type=password]{
                 width: 100%;
                 margin: 10px 0;
                 line-height: 24px;
@@ -124,23 +124,23 @@ Copyright 2017 Pamarin.com
                 border-radius: 3px;
             }
 
-            .login-container button{
+            .login button{
                 width: 100%;
                 line-height: 24px;
                 margin-top: 1rem;
             }
 
-            .login-footer--left,
-            .login-footer--right{
+            .login__footer--left,
+            .login__footer--right{
                 float: left;
                 width: 50%;
             }
 
-            .login-footer--left{
+            .login__footer--left{
                 text-align: left;
             }
 
-            .login-footer--right{
+            .login__footer--right{
                 text-align: right; 
             }
 
@@ -166,11 +166,11 @@ Copyright 2017 Pamarin.com
                 text-decoration: underline;
             }
         </style>
-        <div class="login-container">
-            <div class="login-header">
+        <div class="login">
+            <div class="login__header">
                 Login
             </div>
-            <div class="login-body">
+            <div class="login__body">
                 <form th:attr="action=${processUrl}" method="post">
                     <input th:attr="name=${csrfParam}" type="hidden" th:value="${csrfToken}"/>
                     <label>อีเมล</label>
@@ -194,10 +194,10 @@ Copyright 2017 Pamarin.com
                 </div>
             </div>
             <div class="login-footer">
-                <div class="login-footer--left">
+                <div class="login__footer--left">
                     <a href="#">ลืมรหัสผ่าน</a>
                 </div>
-                <div class="login-footer--right">
+                <div class="login__footer--right">
                     <a href="#">สมัครสมาชิก</a>
                 </div>
                 <div class="clear"></div>
