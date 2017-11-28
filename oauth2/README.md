@@ -79,6 +79,7 @@ Enter password: ********
 
 - ตั้งชื่อเป็น ssid   
 - เก็บไว้ใน Redis  
+- [Session Management Cheat Sheet](https://www.owasp.org/index.php/Session_Management_Cheat_Sheet) 
 
 # Token  
 
