@@ -26,12 +26,10 @@ class DefaultLoginSession implements LoginSession {
     public void create(UserDetails userDetails) {
         SecurityContext context = new SecurityContextImpl();
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                userDetails.getUsername(),
-                userDetails.getPassword(),
+                userDetails,
+                null,
                 userDetails.getAuthorities()
         );
-
-        token.setDetails(userDetails);
         context.setAuthentication(token);
         SecurityContextHolder.setContext(context);
     }
@@ -50,16 +48,23 @@ class DefaultLoginSession implements LoginSession {
     @Override
     @SuppressWarnings("null")
     public UserDetails getUserDetails() {
+        Authentication authentication = getAuthentication();
+        if (!(authentication.getPrincipal() instanceof UserDetails)) {
+            LOG.debug("principal name => {}", authentication.getPrincipal().getClass().getName());
+            AuthenticationException.throwByMessage("Please login, it's not user details.");
+        }
+
+        return (UserDetails) authentication.getPrincipal();
+    }
+
+    @Override
+    public Authentication getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             AuthenticationException.throwByMessage("Please login.");
         }
-
-        if (!(authentication.getDetails() instanceof UserDetails)) {
-            AuthenticationException.throwByMessage("Please login, it's not user session.");
-        }
-
-        return (UserDetails) authentication.getDetails();
+        
+        return authentication;
     }
 
 }

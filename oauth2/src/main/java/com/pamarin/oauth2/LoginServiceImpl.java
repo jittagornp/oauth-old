@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.pamarin.oauth2.service.LoginService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -45,9 +47,29 @@ public class LoginServiceImpl implements LoginService {
             throw new InvalidUsernamePasswordException("Password not match.");
         }
 
-        loginSession.create(DefaultUserDetails.builder()
+        loginSession.create(convert(user));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        if (id == null) {
+            throw new UsernameNotFoundException("Require id.");
+        }
+
+        User user = userRepo.findOne(id);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found.");
+        }
+
+        return convert(user);
+    }
+    
+    private UserDetails convert(User user){
+        return DefaultUserDetails.builder()
                 .username(user.getId())
                 .password(user.getPassword())
-                .build());
+                .authorities(null)
+                .build();
     }
+
 }

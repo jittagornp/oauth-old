@@ -3,6 +3,9 @@
  */
 package com.pamarin.oauth2.config;
 
+import com.pamarin.oauth2.service.LoginService;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/19
@@ -17,6 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class SecurityConf extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private LoginService loginService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,7 +46,22 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                 )
                 .permitAll()
                 .anyRequest()
-                .authenticated();
-    }
+                .fullyAuthenticated()
+                .and()
+                .rememberMe()
+                .key("1111111111111")
+                .rememberMeServices(newRememberMeServices());
+    } 
 
+    @Bean
+    public PersistentTokenBasedRememberMeServices newRememberMeServices() {
+        PersistentTokenBasedRememberMeServices service =  new PersistentTokenBasedRememberMeServices(
+                "1111111111111",
+                loginService,
+                new InMemoryTokenRepositoryImpl()
+        );
+        service.setParameter("rememberme");
+        service.setCookieName("rmb");
+        return service; 
+    }
 }
