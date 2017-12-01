@@ -14,7 +14,7 @@ import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import com.pamarin.commons.security.UserSession;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,10 +41,10 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expires = now.plusMinutes(EXPIRES_MINUTE);
         String[] arr = new String[req.getScopes().size()];
-        UserSession session = loginSession.getUserSession();
+        UserDetails userDetails = loginSession.getUserDetails();
         String code = JWT.create()
-                .withSubject(session.getUsername())
-                .withIssuer(String.valueOf(session.getId()))
+                .withSubject(userDetails.getUsername())
+                .withIssuer(userDetails.getUsername())
                 .withIssuedAt(convert2Date(now))
                 .withExpiresAt(convert2Date(expires))
                 .withArrayClaim("scopes", req.getScopes().toArray(arr))

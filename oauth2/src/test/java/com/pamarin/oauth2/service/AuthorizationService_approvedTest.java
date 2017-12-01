@@ -7,7 +7,7 @@ import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.ClientDetails;
 import com.pamarin.commons.provider.HostUrlProvider;
-import com.pamarin.commons.security.UserSessionStub;
+import com.pamarin.commons.security.UserDetailsStub;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class AuthorizationService_approvedTest {
     public void initMocks() {
         MockitoAnnotations.initMocks(this);
         when(hostUrlProvider.provide()).thenReturn("http://localhost");
-        when(loginSession.getUserSession()).thenReturn(UserSessionStub.get());
+        when(loginSession.getUserDetails()).thenReturn(UserDetailsStub.get());
     }
 
     @Test

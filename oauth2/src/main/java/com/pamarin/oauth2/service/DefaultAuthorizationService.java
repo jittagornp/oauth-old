@@ -42,7 +42,7 @@ class DefaultAuthorizationService implements AuthorizationService {
 
     private boolean wasApprovedClient(String clientId) {
         return approvalService.wasApprovedByUserIdAndClientId(
-                loginSession.getUserSession().getId(),
+                loginSession.getUserDetails().getUsername(),
                 clientId
         );
     }
@@ -86,7 +86,7 @@ class DefaultAuthorizationService implements AuthorizationService {
     @Override
     public String approved(AuthorizationRequest req) {
         requestVerification.verify(req);
-        approvalService.approvedClientByUserId(req, loginSession.getUserSession().getId());
+        approvalService.approvedClientByUserId(req, loginSession.getUserDetails().getUsername());
         return hostUrlProvider.provide() + "/authorize?" + req.buildQuerystring();
     }
 

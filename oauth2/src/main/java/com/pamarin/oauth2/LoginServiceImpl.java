@@ -6,7 +6,7 @@ package com.pamarin.oauth2;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import com.pamarin.oauth2.repository.UserRepo;
-import com.pamarin.commons.security.DefaultUserSession;
+import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.commons.security.PasswordEncryption;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +45,9 @@ public class LoginServiceImpl implements LoginService {
             throw new InvalidUsernamePasswordException("Password not match.");
         }
 
-        loginSession.create(DefaultUserSession.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .password(null)
+        loginSession.create(DefaultUserDetails.builder()
+                .username(user.getId())
+                .password(user.getPassword())
                 .build());
     }
 }

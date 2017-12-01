@@ -17,7 +17,7 @@ public class ModifyUserAuditorAware implements AuditorAware<String> {
 
     @Override
     public String getCurrentAuditor() {
-        return loginSession.getUserSession().getId();
+        return loginSession.getUserDetails().getUsername();
     }
 
 }

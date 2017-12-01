@@ -5,12 +5,13 @@ package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.AuthenticationException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory; 
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,21 +23,23 @@ class DefaultLoginSession implements LoginSession {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultLoginSession.class);
 
     @Override
-    public void create(UserSession userSession) {
+    public void create(UserDetails userDetails) {
         SecurityContext context = new SecurityContextImpl();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(
-                userSession,
-                "",
-                userSession.getAuthorities()
-        ));
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                userDetails.getUsername(),
+                userDetails.getPassword(),
+                userDetails.getAuthorities()
+        );
 
+        token.setDetails(userDetails);
+        context.setAuthentication(token);
         SecurityContextHolder.setContext(context);
     }
 
     @Override
     public boolean wasCreated() {
         try {
-            getUserSession();
+            getUserDetails();
             return true;
         } catch (AuthenticationException ex) {
             LOG.warn(null, ex);
@@ -46,17 +49,17 @@ class DefaultLoginSession implements LoginSession {
 
     @Override
     @SuppressWarnings("null")
-    public UserSession getUserSession() {
+    public UserDetails getUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             AuthenticationException.throwByMessage("Please login.");
         }
 
-        if (!(authentication.getPrincipal() instanceof UserSession)) {
+        if (!(authentication.getDetails() instanceof UserDetails)) {
             AuthenticationException.throwByMessage("Please login, it's not user session.");
         }
 
-        return (UserSession) authentication.getPrincipal();
+        return (UserDetails) authentication.getDetails();
     }
 
 }

@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -35,7 +36,7 @@ public class LoginSession_getUserSessionTest {
         exception.expect(AuthenticationException.class);
         exception.expectMessage("Please login.");
 
-        loginSession.getUserSession();
+        loginSession.getUserDetails();
     }
 
     @Test
@@ -45,20 +46,16 @@ public class LoginSession_getUserSessionTest {
         exception.expect(AuthenticationException.class);
         exception.expectMessage("Please login, it's not user session.");
 
-        loginSession.getUserSession();
+        loginSession.getUserDetails();
     }
 
     @Test
     public void shouldBeOk() {
-        UserSession input = DefaultUserSession.builder()
-                .id("00000000000000000000000000000000")
-                .username("test")
-                .password(null)
-                .build();
+        UserDetails input = UserDetailsStub.get();
 
         loginSession.create(input);
-        UserSession output = loginSession.getUserSession();
-        UserSession expected = input;
+        UserDetails output = loginSession.getUserDetails();
+        UserDetails expected = input;
 
         assertThat(output).isEqualTo(expected);
     }

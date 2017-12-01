@@ -33,12 +33,7 @@ public class LoginSession_wasCreatedTest {
 
     @Test
     public void shouldBeTrue_whenLogedIn() {
-        loginSession.create(DefaultUserSession.builder()
-                .id("00000000000000000000000000000000")
-                .username("test")
-                .password(null)
-                .build());
-
+        loginSession.create(UserDetailsStub.get());
         boolean output = loginSession.wasCreated();
         boolean expected = true;
         assertThat(output).isEqualTo(expected);

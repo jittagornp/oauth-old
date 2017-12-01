@@ -12,15 +12,14 @@ import lombok.Builder;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/19
  */
 @Setter
 @Builder
-public class DefaultUserSession implements UserSession {
-
-    private String id;
+public class DefaultUserDetails implements UserDetails {
 
     private String username;
 
@@ -28,12 +27,7 @@ public class DefaultUserSession implements UserSession {
 
     private List<String> authorities;
 
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    private List<String> getAuthoritiesString() {
+    private List<String> authorities() {
         if (authorities == null) {
             authorities = new ArrayList<>();
         }
@@ -42,7 +36,7 @@ public class DefaultUserSession implements UserSession {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getAuthoritiesString().stream()
+        return authorities().stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
@@ -79,8 +73,8 @@ public class DefaultUserSession implements UserSession {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 17 * hash + Objects.hashCode(this.id);
+        int hash = 5;
+        hash = 89 * hash + Objects.hashCode(this.username);
         return hash;
     }
 
@@ -95,8 +89,8 @@ public class DefaultUserSession implements UserSession {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final DefaultUserSession other = (DefaultUserSession) obj;
-        if (!Objects.equals(this.id, other.id)) {
+        final DefaultUserDetails other = (DefaultUserDetails) obj;
+        if (!Objects.equals(this.username, other.username)) {
             return false;
         }
         return true;

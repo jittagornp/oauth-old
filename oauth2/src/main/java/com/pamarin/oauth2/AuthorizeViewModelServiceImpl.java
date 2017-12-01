@@ -44,7 +44,7 @@ public class AuthorizeViewModelServiceImpl implements AuthorizeViewModelService 
     }
 
     private String findUserName() {
-        return loginSession.getUserSession().getUsername();
+        return loginSession.getUserDetails().getUsername();
     }
 
     @SuppressWarnings("null")

@@ -7,7 +7,7 @@ import com.pamarin.oauth2.model.OAuth2RefreshToken;
 import com.pamarin.oauth2.repository.OAuth2AllowDomainRepo;
 import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.CsrfInterceptor;
-import com.pamarin.commons.security.UserSessionStub;
+import com.pamarin.commons.security.UserDetailsStub;
 import com.pamarin.commons.security.LoginSession;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -94,7 +94,7 @@ public class IntegrationTestBase {
 
     @Before
     public void mockLoginSession() {
-        when(loginSession.getUserSession()).thenReturn(UserSessionStub.get());
+        when(loginSession.getUserDetails()).thenReturn(UserDetailsStub.get());
     }
 
     @Before

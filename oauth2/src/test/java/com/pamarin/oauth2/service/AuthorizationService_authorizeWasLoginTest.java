@@ -8,7 +8,7 @@ import com.pamarin.oauth2.exception.RequireApprovalException;
 import com.pamarin.oauth2.model.AccessTokenResponse;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.AuthorizationResponse;
-import com.pamarin.commons.security.UserSessionStub;
+import com.pamarin.commons.security.UserDetailsStub;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class AuthorizationService_authorizeWasLoginTest {
     public void initMocks() {
         MockitoAnnotations.initMocks(this);
         when(loginSession.wasCreated()).thenReturn(true);
-        when(loginSession.getUserSession()).thenReturn(UserSessionStub.get());
+        when(loginSession.getUserDetails()).thenReturn(UserDetailsStub.get());
         when(responseTypeValidator.isValid(any(String.class))).thenReturn(true);
         when(approvalService.wasApprovedByUserIdAndClientId(any(String.class), any(String.class)))
                 .thenReturn(true);

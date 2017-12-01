@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import com.pamarin.commons.security.UserSession;
 import com.pamarin.oauth2.service.ApprovalService;
 import java.util.List;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -99,13 +99,13 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
 
     @Override
     public AccessTokenResponse generate(AuthorizationRequest req) {
-        UserSession userSession = loginSession.getUserSession();
+        UserDetails userDetails = loginSession.getUserDetails();
         return buildAccessTokenResponse(
                 TokenBase.builder()
-                        .userId(userSession.getId())
+                        .userId(userDetails.getUsername())
                         .build(),
                 approvalService.findScopeByUserIdAndClientId(
-                        userSession.getId(),
+                        userDetails.getUsername(),
                         req.getClientId()
                 )
         );

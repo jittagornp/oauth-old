@@ -59,3 +59,4 @@
 hs_err_pid*
 /credential/target/
 /firebase-authen/target/
+/firebase-authen/src/main/resources/pamarin-firebase-firebase-adminsdk-x7qja-c7069f15a6.json
