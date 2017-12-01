@@ -6,6 +6,7 @@ package com.pamarin.oauth2.config;
 import com.pamarin.oauth2.service.LoginService;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +30,9 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private LoginService loginService;
+
+    @Value("${server.hostUrl}")
+    private String hostUrl;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -64,8 +68,9 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                 loginService,
                 newPersistentTokenRepository()
         );
-        service.setParameter("rememberme");
+        service.setParameter("remember-me");
         service.setCookieName("rmbm");
+        service.setUseSecureCookie(hostUrl.startsWith("https://"));
         return service;
     }
 
