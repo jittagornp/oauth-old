@@ -13,8 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/19
@@ -22,6 +24,8 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 @Configuration
 @EnableWebSecurity
 public class SecurityConf extends WebSecurityConfigurerAdapter {
+
+    private static final String REMEMBER_ME_KEY = UUID.randomUUID().toString();
 
     @Autowired
     private LoginService loginService;
@@ -49,19 +53,24 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                 .fullyAuthenticated()
                 .and()
                 .rememberMe()
-                .key("1111111111111")
+                .key(REMEMBER_ME_KEY)
                 .rememberMeServices(newRememberMeServices());
-    } 
+    }
 
     @Bean
-    public PersistentTokenBasedRememberMeServices newRememberMeServices() {
-        PersistentTokenBasedRememberMeServices service =  new PersistentTokenBasedRememberMeServices(
-                "1111111111111",
+    public RememberMeServices newRememberMeServices() {
+        PersistentTokenBasedRememberMeServices service = new PersistentTokenBasedRememberMeServices(
+                REMEMBER_ME_KEY,
                 loginService,
-                new InMemoryTokenRepositoryImpl()
+                newPersistentTokenRepository()
         );
         service.setParameter("rememberme");
-        service.setCookieName("rmb");
-        return service; 
+        service.setCookieName("rmbm");
+        return service;
+    }
+
+    @Bean
+    public PersistentTokenRepository newPersistentTokenRepository() {
+        return new InMemoryTokenRepositoryImpl();
     }
 }
