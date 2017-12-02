@@ -20,11 +20,17 @@ public class DefaultBase64RSAEncryption implements Base64RSAEncryption {
 
     @Override
     public String encrypt(String data, RSAPrivateKey privateKey) {
+        if (data == null) {
+            throw new IllegalArgumentException("Requires data.");
+        }
         return Base64.getEncoder().encodeToString(rsaEncryption.encrypt(data.getBytes(), privateKey));
     }
 
     @Override
     public String decrypt(String data, RSAPublicKey publicKey) {
+        if (data == null) {
+            throw new IllegalArgumentException("Requires data.");
+        }
         return new String(rsaEncryption.decrypt(Base64.getDecoder().decode(data), publicKey));
     }
 

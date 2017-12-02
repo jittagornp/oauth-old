@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class Base64RSAEncryptionTest extends IntegrationTestBase {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(Base64RSAEncryptionTest.class);
 
     @Autowired
@@ -27,6 +27,18 @@ public class Base64RSAEncryptionTest extends IntegrationTestBase {
 
     @Autowired
     private RSAKeyPairsStub keyPairs;
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldBeThrowIllegalArgumentException_whenDataIsNull_onEncrypt() {
+        String input = null;
+        String output = rsaEncryption.encrypt(input, keyPairs.getPrivateKey());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldBeThrowIllegalArgumentException_whenDataIsNull_onDecrypt() {
+        String input = null;
+        String output = rsaEncryption.decrypt(input, keyPairs.getPublicKey());
+    }
 
     @Test
     public void shouldBeOk() {
