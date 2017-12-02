@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/13
  */
-public abstract class ClassPathDERFileKeyPairsAdapter implements KeyPairs {
+public abstract class ClassPathDERFileRSAKeyPairsAdapter implements RSAKeyPairs {
 
     @Autowired
     private RSAPrivateKeyReader privateKeyReader;
@@ -22,22 +22,22 @@ public abstract class ClassPathDERFileKeyPairsAdapter implements KeyPairs {
 
     private RSAPublicKey publicKey;
 
-    protected abstract String getPrivateKey();
+    protected abstract String getPrivateKeyPath();
 
-    protected abstract String getPublicKey();
+    protected abstract String getPublicKeyPath();
 
     @Override
-    public RSAPrivateKey getRSAPrivateKey() {
+    public RSAPrivateKey getPrivateKey() {
         if (privateKey == null) {
-            privateKey = privateKeyReader.readFromDERFile(getClass().getResourceAsStream(getPrivateKey()));
+            privateKey = privateKeyReader.readFromDERFile(getClass().getResourceAsStream(getPrivateKeyPath()));
         }
         return privateKey;
     }
 
     @Override
-    public RSAPublicKey getRSAPublicKey() {
+    public RSAPublicKey getPublicKey() {
         if (publicKey == null) {
-            publicKey = publicKeyReader.readFromDERFile(getClass().getResourceAsStream(getPublicKey()));
+            publicKey = publicKeyReader.readFromDERFile(getClass().getResourceAsStream(getPublicKeyPath()));
         }
         return publicKey;
     }

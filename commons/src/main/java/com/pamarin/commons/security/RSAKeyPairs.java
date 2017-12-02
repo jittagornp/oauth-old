@@ -9,10 +9,10 @@ import java.security.interfaces.RSAPublicKey;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/13
  */
-public interface KeyPairs {
+public interface RSAKeyPairs {
 
-    RSAPrivateKey getRSAPrivateKey();
+    RSAPrivateKey getPrivateKey();
 
-    RSAPublicKey getRSAPublicKey();
+    RSAPublicKey getPublicKey();
 
 }

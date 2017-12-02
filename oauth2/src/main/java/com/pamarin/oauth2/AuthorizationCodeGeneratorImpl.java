@@ -7,7 +7,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.AuthorizationResponse;
-import com.pamarin.commons.security.KeyPairs;
 import com.pamarin.oauth2.service.AuthorizationCodeGenerator;
 import com.pamarin.commons.security.LoginSession;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import com.pamarin.commons.security.RSAKeyPairs;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -30,10 +30,10 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
 
     @Autowired
     @Qualifier("autorizationCodeKeyPairs")
-    private KeyPairs keyPairs;
+    private RSAKeyPairs keyPairs;
 
     private Algorithm getAlgorithm() {
-        return Algorithm.RSA256(keyPairs.getRSAPublicKey(), keyPairs.getRSAPrivateKey());
+        return Algorithm.RSA256(keyPairs.getPublicKey(), keyPairs.getPrivateKey());
     }
 
     @Override

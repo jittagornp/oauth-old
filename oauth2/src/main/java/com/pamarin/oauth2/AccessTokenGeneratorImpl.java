@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.commons.security.KeyPairs;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
@@ -30,6 +29,7 @@ import java.util.List;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
+import com.pamarin.commons.security.RSAKeyPairs;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -57,13 +57,13 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
 
     @Autowired
     @Qualifier("accessTokenKeyPairs")
-    private KeyPairs keyPairs;
+    private RSAKeyPairs keyPairs;
 
     @Autowired
     private ApprovalService approvalService;
 
     private Algorithm getAlgorithm() {
-        return Algorithm.RSA256(keyPairs.getRSAPublicKey(), keyPairs.getRSAPrivateKey());
+        return Algorithm.RSA256(keyPairs.getPublicKey(), keyPairs.getPrivateKey());
     }
 
     private String signToken(TokenBase base, List<String> scopes, int expiresMinute) {
