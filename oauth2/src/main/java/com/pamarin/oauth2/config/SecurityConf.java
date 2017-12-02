@@ -47,6 +47,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         "/authorize",
                         "/token",
                         "/login",
+                        "/userDetails",
                         "/",
                         "/code/callback",
                         "/assets/**",
