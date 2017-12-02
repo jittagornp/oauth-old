@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -25,39 +26,12 @@ public class HttpBasicAuthenParserTest {
     @Before
     public void before() {
         parser = new DefaultHttpBasicAuthenParser();
-    }
 
-    @Test
-    public void shouldBeRequiredAuthorization_whenInputIsNull() {
-
-        exception.expect(InvalidHttpBasicAuthenException.class);
-        exception.expectMessage("Required authorization.");
-
-        String input = null;
-        Output output = parser.parse(input);
-
-    }
-
-    @Test
-    public void shouldBeRequiredAuthorization_whenInputIsEmptyString() {
-
-        exception.expect(InvalidHttpBasicAuthenException.class);
-        exception.expectMessage("Required authorization.");
-
-        String input = "";
-        Output output = parser.parse(input);
-
-    }
-
-    @Test
-    public void shouldBeInvalidCredentialValue_whenInputIsXXX() {
-
-        exception.expect(InvalidHttpBasicAuthenException.class);
-        exception.expectMessage("Invalid Credential value (Required Basic Authen).");
-
-        String input = "XXX";
-        Output output = parser.parse(input);
-
+        ReflectionTestUtils.setField(
+                parser,
+                "parser",
+                new DefaultHttpAuthorizationParser()
+        );
     }
 
     @Test
@@ -92,7 +66,7 @@ public class HttpBasicAuthenParserTest {
         Output output = parser.parse(input);
 
     }
-    
+
     @Test
     public void shouldBeInvalidCredentialValue_whenInputIsBasicDGVzdDoxMjM0OjU2Nzg() {
 
@@ -114,8 +88,8 @@ public class HttpBasicAuthenParserTest {
         assertThat(output.getUsername()).isEqualTo(expected.getUsername());
         assertThat(output.getPassword()).isEqualTo(expected.getPassword());
     }
-    
-     @Test
+
+    @Test
     public void shouldBeOk_whenInputIsBasicDGVzdDowMDAw_caseInsensitive() {
 
         String input = "basic dGVzdDowMDAw";

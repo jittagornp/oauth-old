@@ -5,11 +5,10 @@ package com.pamarin.commons.util;
 
 import com.pamarin.commons.exception.InvalidHttpBasicAuthenException;
 import java.nio.charset.Charset;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
 import static org.springframework.util.StringUtils.hasText;
@@ -23,19 +22,12 @@ class DefaultHttpBasicAuthenParser implements HttpBasicAuthenParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultHttpBasicAuthenParser.class);
 
+    @Autowired
+    private HttpAuthorizationParser parser;
+    
     @Override
     public Output parse(String authorization) {
-        if (!hasText(authorization)) {
-            throw new InvalidHttpBasicAuthenException("Required authorization.");
-        }
-
-        Pattern pattern = Pattern.compile("^basic\\s(.*?)$", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(authorization);
-        while (matcher.find()) {
-            return convert(matcher.group(1));
-        }
-
-        throw new InvalidHttpBasicAuthenException("Invalid Credential value (Required Basic Authen).");
+        return convert(parser.parse("basic", authorization));
     }
 
     private Output convert(String credential) {
