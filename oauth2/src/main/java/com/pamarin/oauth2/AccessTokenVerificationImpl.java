@@ -3,9 +3,12 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.commons.exception.AuthenticationException;
+import com.pamarin.commons.exception.RSAEncryptionException;
 import com.pamarin.commons.security.Base64RSAEncryption;
 import com.pamarin.commons.security.RSAKeyPairs;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import org.apache.commons.lang.StringUtils;
@@ -30,16 +33,24 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
     private Base64RSAEncryption base64RSAEncryption;
 
     @Override
+    @SuppressWarnings("null")
     public Output verify(String accessToken) {
-        String id = base64RSAEncryption.decrypt(accessToken, keyPairs.getPublicKey());
-        OAuth2AccessToken token = accessTokenRepo.findById(id);
-        return Output.builder()
-                .id(StringUtils.split(token.getId(), ":")[1])
-                .issuedAt(token.getIssuedAt())
-                .expiresAt(token.getExpiresAt())
-                .userId(token.getUserId())
-                .clientId(token.getClientId())
-                .build();
+        try {
+            String id = base64RSAEncryption.decrypt(accessToken, keyPairs.getPublicKey());
+            OAuth2AccessToken token = accessTokenRepo.findById(id);
+            if (token == null) {
+                AuthenticationException.throwByMessage("Access token not found.");
+            }
+            return Output.builder()
+                    .id(StringUtils.split(token.getId(), ":")[1])
+                    .issuedAt(token.getIssuedAt())
+                    .expiresAt(token.getExpiresAt())
+                    .userId(token.getUserId())
+                    .clientId(token.getClientId())
+                    .build();
+        } catch (RSAEncryptionException ex) {
+            throw new InvalidTokenException("Invalid to decrypt access token.", ex);
+        }
     }
 
 }
