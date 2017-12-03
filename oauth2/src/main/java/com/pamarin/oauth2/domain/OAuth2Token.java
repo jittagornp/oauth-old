@@ -6,7 +6,7 @@ package com.pamarin.oauth2.domain;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03
  */
-public interface IOAuth2Token extends Cloneable{
+public interface OAuth2Token extends Cloneable{
 
     String getId();
     
@@ -23,6 +23,8 @@ public interface IOAuth2Token extends Cloneable{
     int getExpireMinutes();
     
     void setExpireMinutes(int minutes);
+    
+    String getUserId();
     
     Object clone() throws CloneNotSupportedException;
 

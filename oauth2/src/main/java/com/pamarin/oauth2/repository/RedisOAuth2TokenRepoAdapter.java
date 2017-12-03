@@ -5,7 +5,6 @@ package com.pamarin.oauth2.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pamarin.oauth2.domain.IOAuth2Token;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -15,14 +14,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import com.pamarin.oauth2.domain.OAuth2Token;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03
  * @param <TOKEN>
  */
-public abstract class RedisOAuth2TokenRepo<TOKEN extends IOAuth2Token> implements OAuth2TokenRepo<TOKEN> {
+public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> implements OAuth2TokenRepo<TOKEN> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisOAuth2TokenRepo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisOAuth2TokenRepoAdapter.class);
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -35,13 +35,17 @@ public abstract class RedisOAuth2TokenRepo<TOKEN extends IOAuth2Token> implement
     protected abstract String getTokenProfix();
 
     protected abstract int getExpiresMinutes();
+    
+    private String randomId(){
+        return UUID.randomUUID().toString().replace("-", "");
+    }
 
     @Override
     public TOKEN save(TOKEN token) {
         try {
             TOKEN clone = (TOKEN) token.clone();
             if (clone.getId() == null) {
-                clone.setId(UUID.randomUUID().toString().replace("-", ""));
+                clone.setId(clone.getUserId() + ":" + randomId());
             }
 
             clone.setExpireMinutes(getExpiresMinutes());

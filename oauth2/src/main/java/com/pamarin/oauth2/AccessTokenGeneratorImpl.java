@@ -66,9 +66,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
                 .clientId(base.getClientId())
                 .build()
         );
-        String token =  base64RSAEncryption.encrypt(accessToken.getId(), keyPairs.getPrivateKey());
+        String encryptedToken =  base64RSAEncryption.encrypt(accessToken.getId(), keyPairs.getPrivateKey());
         return AccessTokenResponse.builder()
-                .accessToken(token)
+                .accessToken(encryptedToken)
                 .expiresIn(accessToken.getExpireMinutes() * 60L)
                 .refreshToken(refreshToken)
                 .tokenType("bearer")

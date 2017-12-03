@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class OAuth2AccessToken implements IOAuth2Token {
+public class OAuth2AccessToken implements OAuth2Token {
 
     private String id;
 
