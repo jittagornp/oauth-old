@@ -7,7 +7,9 @@ import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.commons.exception.InvalidCsrfTokenException;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +40,23 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private AuthenticityToken authenticityToken;
 
+    private List<String> ignorePaths;
+
+    public void setIgnorePaths(String... ignorePaths) {
+        this.ignorePaths = Arrays.asList(ignorePaths);
+    }
+
+    private List<String> getIgnorePaths() {
+        if (ignorePaths == null) {
+            ignorePaths = new ArrayList<>();
+        }
+        return ignorePaths;
+    }
+
+    private boolean isIgnorePath(String path) {
+        return getIgnorePaths().contains(path);
+    }
+
     private boolean checkCsrf(String httpMethod) {
         Pattern pattern = Pattern.compile("[POST|PUT|DELETE|PATCH]+", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(httpMethod).matches();
@@ -45,7 +64,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest httpReq, HttpServletResponse httpResp, Object handler) throws Exception {
-        if (!checkCsrf(httpReq.getMethod())) {
+        if (isIgnorePath(httpReq.getServletPath()) || !checkCsrf(httpReq.getMethod())) {
             return true;
         }
 

@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -15,21 +16,36 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class OAuth2UserDetails {
+public class OAuth2Session {
 
     private String id;
+    
+    private long issuedAt;
+    
+    private long expiresAt;
 
-    private String name;
-
-    private List<String> authorities;
+    private User user;
 
     private Client client;
 
-    public List<String> getAuthorities() {
-        if (authorities == null) {
-            authorities = new ArrayList<>();
+    @Getter
+    @Setter
+    @Builder
+    public static class User {
+
+        private String id;
+
+        private String name;
+
+        private List<String> authorities;
+
+        public List<String> getAuthorities() {
+            if (authorities == null) {
+                authorities = new ArrayList<>();
+            }
+            return authorities;
         }
-        return authorities;
+
     }
 
     @Getter

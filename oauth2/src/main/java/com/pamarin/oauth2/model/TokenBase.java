@@ -16,5 +16,7 @@ import lombok.Setter;
 public class TokenBase {
 
     private String userId;
+    
+    private String clientId;
 
 }

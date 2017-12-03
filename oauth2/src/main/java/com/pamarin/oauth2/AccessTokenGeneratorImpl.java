@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import com.pamarin.oauth2.service.ApprovalService;
-import java.util.List;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,36 +57,32 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     @Qualifier("accessTokenKeyPairs")
     private RSAKeyPairs keyPairs;
 
-    @Autowired
-    private ApprovalService approvalService;
-
     private Algorithm getAlgorithm() {
         return Algorithm.RSA256(keyPairs.getPublicKey(), keyPairs.getPrivateKey());
     }
 
-    private String signToken(TokenBase base, List<String> scopes, int expiresMinute) {
+    private String signToken(TokenBase base, int expiresMinute) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expires = now.plusMinutes(expiresMinute);
-        String[] arr = new String[scopes.size()];
         return JWT.create()
-                .withIssuer(String.valueOf(base.getUserId()))
+                .withSubject(base.getClientId())
+                .withIssuer(base.getUserId())
                 .withIssuedAt(convert2Date(now))
                 .withExpiresAt(convert2Date(expires))
-                .withArrayClaim("scopes", scopes.toArray(arr))
                 .sign(getAlgorithm());
     }
 
-    private AccessTokenResponse buildAccessTokenResponse(TokenBase base, List<String> scopes, String refreshToken) {
+    private AccessTokenResponse buildAccessTokenResponse(TokenBase base, String refreshToken) {
         return AccessTokenResponse.builder()
-                .accessToken(signToken(base, scopes, EXPIRES_MINUTES))
+                .accessToken(signToken(base, EXPIRES_MINUTES))
                 .expiresIn(EXPIRES_MINUTES * 60L)
                 .refreshToken(refreshToken)
                 .tokenType("bearer")
                 .build();
     }
 
-    private AccessTokenResponse buildAccessTokenResponse(TokenBase base, List<String> scopes) {
-        return buildAccessTokenResponse(base, scopes, generateRefreshToken(base).getId());
+    private AccessTokenResponse buildAccessTokenResponse(TokenBase base) {
+        return buildAccessTokenResponse(base, generateRefreshToken(base).getId());
     }
 
     private OAuth2RefreshToken generateRefreshToken(TokenBase base) {
@@ -100,15 +94,10 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     @Override
     public AccessTokenResponse generate(AuthorizationRequest req) {
         UserDetails userDetails = loginSession.getUserDetails();
-        return buildAccessTokenResponse(
-                TokenBase.builder()
+        return buildAccessTokenResponse(TokenBase.builder()
+                        .clientId(req.getClientId())
                         .userId(userDetails.getUsername())
-                        .build(),
-                approvalService.findScopeByUserIdAndClientId(
-                        userDetails.getUsername(),
-                        req.getClientId()
-                )
-        );
+                        .build());
     }
 
     @Override
@@ -116,12 +105,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         clientVerification.verifyClientIdAndClientSecret(req.getClientId(), req.getClientSecret());
         try {
             TokenBase authCode = authorizationCodeVerification.verify(req.getCode());
-            return buildAccessTokenResponse(authCode,
-                    approvalService.findScopeByUserIdAndClientId(
-                            authCode.getUserId(),
-                            req.getClientId()
-                    )
-            );
+            return buildAccessTokenResponse(authCode);
         } catch (TokenExpiredException ex) {
             LOG.warn(null, ex);
             throw new UnauthorizedClientException(ex);
@@ -138,12 +122,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         //update refresh token expires time
         refreshTokenRepo.save(refreshToken);
         return buildAccessTokenResponse(TokenBase.builder()
+                .clientId(req.getClientId())
                 .userId(refreshToken.getUserId())
                 .build(),
-                approvalService.findScopeByUserIdAndClientId(
-                        refreshToken.getUserId(),
-                        req.getClientId()
-                ),
                 refreshToken.getId()
         );
     }

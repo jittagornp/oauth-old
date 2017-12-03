@@ -43,7 +43,7 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
         String[] arr = new String[req.getScopes().size()];
         UserDetails userDetails = loginSession.getUserDetails();
         String code = JWT.create()
-                .withSubject(userDetails.getUsername())
+                .withSubject(req.getClientId())
                 .withIssuer(userDetails.getUsername())
                 .withIssuedAt(convert2Date(now))
                 .withExpiresAt(convert2Date(expires))
