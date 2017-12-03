@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.service;
 
-import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

@@ -9,6 +9,8 @@ import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.UserDetailsStub;
 import com.pamarin.commons.security.LoginSession;
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +29,8 @@ import com.pamarin.oauth2.repository.OAuth2ScopeRepo;
 import com.pamarin.oauth2.service.AuthorizeViewModelService;
 import com.pamarin.oauth2.service.AuthorizeViewModelService.Model;
 import com.pamarin.oauth2.service.AuthorizeViewModelService.Scope;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -67,6 +71,9 @@ public class IntegrationTestBase {
 
     @MockBean
     private AuthorizeViewModelService authorizeViewModelService;
+
+    @MockBean
+    private OAuth2AccessTokenRepo accessTokenRepo;
 
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()
@@ -122,6 +129,20 @@ public class IntegrationTestBase {
                         .clientName("test client")
                         .userName("test")
                         .scopes(Arrays.asList(Scope.builder().id("user:public_profile").description("โปรไฟล์สาธารณะ").build()))
+                        .build());
+    }
+
+    @Before
+    public void mockOAuth2AccessTokenRepo() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expires = now.plusMinutes(30);
+        when(accessTokenRepo.save(any(OAuth2AccessToken.class)))
+                .thenReturn(OAuth2AccessToken.builder()
+                        .id("abcdefghijklmnopqrstuvwxyz")
+                        .userId(UUID.randomUUID().toString())
+                        .clientId(UUID.randomUUID().toString())
+                        .issuedAt(Timestamp.valueOf(now).getTime())
+                        .expiresAt(Timestamp.valueOf(expires).getTime())
                         .build());
     }
 }

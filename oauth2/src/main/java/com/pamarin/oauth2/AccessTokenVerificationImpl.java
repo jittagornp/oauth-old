@@ -3,10 +3,13 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.commons.security.Base64RSAEncryption;
+import com.pamarin.commons.security.RSAKeyPairs;
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,16 +18,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccessTokenVerificationImpl implements AccessTokenVerification {
 
+    @Autowired
+    @Qualifier("accessTokenKeyPairs")
+    private RSAKeyPairs keyPairs;
+
+    @Autowired
+    private OAuth2AccessTokenRepo accessTokenRepo;
+
+    @Autowired
+    private Base64RSAEncryption base64RSAEncryption;
+
     @Override
     public Output verify(String accessToken) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expires = now.plusMinutes(30);
+        String id = base64RSAEncryption.decrypt(accessToken, keyPairs.getPublicKey());
+        OAuth2AccessToken token = accessTokenRepo.findById(id);
         return Output.builder()
-                .id(UUID.randomUUID().toString())
-                .issuedAt(Timestamp.valueOf(now).getTime())
-                .expiresAt(Timestamp.valueOf(expires).getTime())
-                .userId(UUID.randomUUID().toString())
-                .clientId(UUID.randomUUID().toString())
+                .id(token.getId())
+                .issuedAt(token.getIssuedAt())
+                .expiresAt(token.getExpiresAt())
+                .userId(token.getUserId())
+                .clientId(token.getClientId())
                 .build();
     }
 

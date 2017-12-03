@@ -3,9 +3,8 @@
  */
 package com.pamarin.oauth2;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.pamarin.commons.security.Base64RSAEncryption;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.AccessTokenResponse;
 import com.pamarin.oauth2.model.AuthorizationRequest;
@@ -17,8 +16,6 @@ import com.pamarin.oauth2.service.AccessTokenGenerator;
 import com.pamarin.oauth2.service.ClientVerification;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.service.TokenVerification;
-import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
-import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +25,8 @@ import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import com.pamarin.commons.security.RSAKeyPairs;
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -37,8 +36,6 @@ import com.pamarin.commons.security.RSAKeyPairs;
 class AccessTokenGeneratorImpl implements AccessTokenGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenGeneratorImpl.class);
-
-    private static final int EXPIRES_MINUTES = 15;
 
     @Autowired
     private LoginSession loginSession;
@@ -57,25 +54,22 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     @Qualifier("accessTokenKeyPairs")
     private RSAKeyPairs keyPairs;
 
-    private Algorithm getAlgorithm() {
-        return Algorithm.RSA256(keyPairs.getPublicKey(), keyPairs.getPrivateKey());
-    }
+    @Autowired
+    private OAuth2AccessTokenRepo accessTokenRepo;
 
-    private String signToken(TokenBase base, int expiresMinute) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expires = now.plusMinutes(expiresMinute);
-        return JWT.create()
-                .withSubject(base.getClientId())
-                .withIssuer(base.getUserId())
-                .withIssuedAt(convert2Date(now))
-                .withExpiresAt(convert2Date(expires))
-                .sign(getAlgorithm());
-    }
+    @Autowired
+    private Base64RSAEncryption base64RSAEncryption;
 
     private AccessTokenResponse buildAccessTokenResponse(TokenBase base, String refreshToken) {
+        OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
+                .userId(base.getUserId())
+                .clientId(base.getClientId())
+                .build()
+        );
+        String token =  base64RSAEncryption.encrypt(accessToken.getId(), keyPairs.getPrivateKey());
         return AccessTokenResponse.builder()
-                .accessToken(signToken(base, EXPIRES_MINUTES))
-                .expiresIn(EXPIRES_MINUTES * 60L)
+                .accessToken(token)
+                .expiresIn(accessToken.getExpireMinutes() * 60L)
                 .refreshToken(refreshToken)
                 .tokenType("bearer")
                 .build();
@@ -95,9 +89,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     public AccessTokenResponse generate(AuthorizationRequest req) {
         UserDetails userDetails = loginSession.getUserDetails();
         return buildAccessTokenResponse(TokenBase.builder()
-                        .clientId(req.getClientId())
-                        .userId(userDetails.getUsername())
-                        .build());
+                .clientId(req.getClientId())
+                .userId(userDetails.getUsername())
+                .build());
     }
 
     @Override
