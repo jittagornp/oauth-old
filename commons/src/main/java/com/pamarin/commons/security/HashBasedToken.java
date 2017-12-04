@@ -4,27 +4,15 @@
 package com.pamarin.commons.security;
 
 import java.time.LocalDateTime;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/04
  */
 public interface HashBasedToken {
 
-    String hash(Credential credential, LocalDateTime expires);
+    String hash(UserDetails userDetails, LocalDateTime expires);
 
-    boolean matches(String token, Credential credential);
-
-    @Getter
-    @Setter
-    @Builder
-    public static class Credential {
-
-        private String username;
-
-        private String password;
-
-    }
+    boolean matches(String token, UserDetailsService service);
 }

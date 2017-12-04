@@ -3,12 +3,12 @@
  */
 package com.pamarin.commons.security;
 
-import com.pamarin.commons.security.HashBasedToken.Credential;
 import java.time.LocalDateTime;
 import java.time.Month;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/04
@@ -30,7 +30,7 @@ public class HashBasedToken_hashTest {
     @Test
     public void shouldBeOk() {
         LocalDateTime expires = LocalDateTime.of(2100, Month.JANUARY, 1, 0, 0);
-        Credential credential = Credential.builder()
+        UserDetails credential = DefaultUserDetails.builder()
                 .username("b98e21b4-ce2a-11e7-abc4-cec278b6b50a")
                 .password("$2a$10$2SLqTL7.Ug9cyfRPFwxQeemMA4SeB9MymLjRl4RGR0h7aHwLDy7qC")
                 .build();
