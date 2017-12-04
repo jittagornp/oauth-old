@@ -49,13 +49,11 @@ public class DefaultHashBasedToken implements HashBasedToken {
     @Override
     public String hash(UserDetails userDetails, LocalDateTime expires) {
         long timpstamp = convert2Date(expires).getTime();
-        String plain = userDetails.getUsername() + ":"
+        return base64Encode(
+                userDetails.getUsername() + ":"
                 + timpstamp + ":"
-                + hash(userDetails, timpstamp);
-        String signature = base64Encode(plain);
-        LOG.debug("plain => {}", plain);
-        LOG.debug("signature => {}", signature);
-        return signature;
+                + hash(userDetails, timpstamp)
+        );
     }
 
     private String base64Encode(String text) {
