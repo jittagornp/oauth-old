@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/04
@@ -81,8 +82,11 @@ public class DefaultHashBasedToken implements HashBasedToken {
             return false;
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(arr[0]);
-        if (userDetails == null) {
+        UserDetails userDetails;
+        try {
+            userDetails = userDetailsService.loadUserByUsername(arr[0]);
+        } catch (UsernameNotFoundException ex) {
+            LOG.warn("user not found", ex);
             return false;
         }
 
@@ -99,7 +103,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
     }
 
     private boolean wasExpires(long timpstamp) {
-        return timpstamp > convert2Date(LocalDateTime.now()).getTime();
+        return timpstamp < convert2Date(LocalDateTime.now()).getTime();
     }
 
 }
