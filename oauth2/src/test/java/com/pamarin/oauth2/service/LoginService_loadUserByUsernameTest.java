@@ -35,9 +35,9 @@ public class LoginService_loadUserByUsernameTest {
     @Before
     public void before() {
         MockitoAnnotations.initMocks(this);
-        when(userRepo.findByUsername("test"))
+        when(userRepo.findOne("1111"))
                 .thenReturn(null);
-        when(userRepo.findByUsername("root"))
+        when(userRepo.findOne("2222"))
                 .thenReturn(new User());
     }
 
@@ -58,14 +58,14 @@ public class LoginService_loadUserByUsernameTest {
         exception.expect(UsernameNotFoundException.class);
         exception.expectMessage("User not found.");
 
-        String input = "test";
+        String input = "1111";
         UserDetails output = loginService.loadUserByUsername(input);
 
     }
     
     @Test
     public void shouldBeOk() {
-        String input = "root";
+        String input = "2222";
         UserDetails output = loginService.loadUserByUsername(input);
         assertThat(output).isNotNull();
     }
