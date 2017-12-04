@@ -3,6 +3,7 @@
  */
 package com.pamarin.commons.security;
 
+import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
 import static java.security.MessageDigest.isEqual;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -48,7 +49,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
      */
     @Override
     public String hash(UserDetails userDetails, LocalDateTime expires) {
-        long timpstamp = Timestamp.valueOf(expires).getTime();
+        long timpstamp = convert2Date(expires).getTime();
         return base64Encode(
                 userDetails.getUsername() + ":"
                 + timpstamp + ":"
@@ -99,7 +100,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
     }
 
     private boolean wasExpires(long timpstamp) {
-        return timpstamp > Timestamp.valueOf(LocalDateTime.now()).getTime();
+        return timpstamp > convert2Date(LocalDateTime.now()).getTime();
     }
 
 }
