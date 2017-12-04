@@ -24,7 +24,7 @@ public class HashBasedToken_matchesTest {
 
     @Test
     public void shouldBeFalse_whenCantDecodeBase64Token() {
-        String input = "xyz";
+        String input = "dGVzdA=";
         boolean output = hashBasedToken.matches(input, null);
         boolean expected = false;
         assertThat(output).isEqualTo(expected);
