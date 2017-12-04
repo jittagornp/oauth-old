@@ -50,6 +50,8 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
                     .build();
         } catch (RSAEncryptionException ex) {
             throw new InvalidTokenException("Invalid to decrypt access token.", ex);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new InvalidTokenException("Invalid access token id.", ex);
         }
     }
 
