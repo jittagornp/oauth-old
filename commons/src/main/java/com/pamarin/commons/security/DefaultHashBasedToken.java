@@ -4,9 +4,7 @@
 package com.pamarin.commons.security;
 
 import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
-import java.security.MessageDigest;
 import static java.security.MessageDigest.isEqual;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -14,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.codec.Hex;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/04
@@ -25,27 +22,18 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
     private final String key;
 
-    public DefaultHashBasedToken(String key) {
+    private final CheckSum checkSum;
+
+    public DefaultHashBasedToken(String key, CheckSum checkSum) {
         this.key = key;
-    }
-
-    private String hash(String data) {
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("No SHA-256 algorithm available!");
-        }
-
-        return new String(Hex.encode(digest.digest(data.getBytes())));
-//DigestUtils.
+        this.checkSum = checkSum;
     }
 
     private String hash(UserDetails userDetails, long expiresTimpstamp) {
-        return hash(userDetails.getUsername() + ":"
+        return checkSum.hash((userDetails.getUsername() + ":"
                 + expiresTimpstamp + ":"
                 + userDetails.getPassword() + ":"
-                + this.key);
+                + this.key).getBytes());
     }
 
     /*

@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,7 +27,7 @@ public class SHA256CheckSum implements CheckSum {
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return Base64.getEncoder().encodeToString(digest.digest(data));
+            return new String(Hex.encode(digest.digest(data)));
         } catch (NoSuchAlgorithmException ex) {
             LOG.warn(null, ex);
             return null;

@@ -26,14 +26,14 @@ public class SHA256CheckSumTest {
     public void hashHelloWorld() {
         byte[] input = "Hello World".getBytes();
         String output = checkSum.hash(input);
-        String expected = "pZGm1Av0IEBKARczz7exkNYsZb8LzaMrV7J32a2fFG4=";
+        String expected = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e";
         assertThat(output).isEqualTo(expected);
     }
 
     @Test
     public void matchesHellWorld() {
         byte[] input1 = "Hello World".getBytes();
-        String input2 = "pZGm1Av0IEBKARczz7exkNYsZb8LzaMrV7J32a2fFG4=";
+        String input2 = "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e";
         boolean output = checkSum.matches(input1, input2);
         boolean expected = true;
         assertThat(output).isEqualTo(expected);
@@ -44,7 +44,7 @@ public class SHA256CheckSumTest {
         try (InputStream inputStream = getClass().getResourceAsStream("/key/public-key.pub")) {
             byte[] input = IOUtils.toByteArray(inputStream);
             String output = checkSum.hash(input);
-            String expected = "2ejvfRlzCxFJB85pJj0tKtTsG4S4kdWt7/irDf6ie1I=";
+            String expected = "d9e8ef7d19730b114907ce69263d2d2ad4ec1b84b891d5adeff8ab0dfea27b52";
             assertThat(output).isEqualTo(expected);
         }
     }
@@ -53,7 +53,7 @@ public class SHA256CheckSumTest {
     public void matchesPublicKey() throws IOException {
         try (InputStream inputStream = getClass().getResourceAsStream("/key/public-key.pub")) {
             byte[] input1 = IOUtils.toByteArray(inputStream);
-            String input2 = "2ejvfRlzCxFJB85pJj0tKtTsG4S4kdWt7/irDf6ie1I=";
+            String input2 = "d9e8ef7d19730b114907ce69263d2d2ad4ec1b84b891d5adeff8ab0dfea27b52";
             boolean output = checkSum.matches(input1, input2);
             boolean expected = true;
             assertThat(output).isEqualTo(expected);
