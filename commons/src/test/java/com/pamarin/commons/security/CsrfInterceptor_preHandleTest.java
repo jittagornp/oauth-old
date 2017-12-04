@@ -1,7 +1,6 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.InvalidCsrfTokenException;
@@ -39,6 +38,8 @@ public class CsrfInterceptor_preHandleTest {
     @Before
     public void before() {
         interceptor = new CsrfInterceptor();
+        interceptor.setIgnorePaths("/token");
+
         httpReq = mock(HttpServletRequest.class);
         httpResp = mock(HttpServletResponse.class);
         authenticityToken = mock(AuthenticityToken.class);
@@ -51,6 +52,14 @@ public class CsrfInterceptor_preHandleTest {
                 "authenticityToken",
                 authenticityToken
         );
+    }
+
+    @Test
+    public void shouldBeTrue_whenPathIsToken() throws Exception {
+        when(httpReq.getServletPath()).thenReturn("/token");
+        boolean output = interceptor.preHandle(httpReq, httpResp, null);
+        boolean expected = true;
+        assertThat(output).isEqualTo(expected);
     }
 
     @Test
