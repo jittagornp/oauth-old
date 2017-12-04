@@ -24,7 +24,7 @@ public class HashBasedToken_matchesTest {
 
     @Test
     public void shouldBeFalse_whenCantDecodeBase64Token() {
-        String input = "2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOjQxMDI0MTk2MDAwMDA6MDliNzhjZTBiZTI3Y2ZmZDc4NTA1OWM0NmI3N2EzNDJjOTM2ODU0NjdjZmM1Y2E4NzA4Yzc2NjM4MWNh";
+        String input = "xyz";
         boolean output = hashBasedToken.matches(input, null);
         boolean expected = false;
         assertThat(output).isEqualTo(expected);
