@@ -25,7 +25,6 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
     private final String key;
 
-
     public DefaultHashBasedToken(String key) {
         this.key = key;
     }
@@ -39,6 +38,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
         }
 
         return new String(Hex.encode(digest.digest(data.getBytes())));
+//DigestUtils.
     }
 
     private String hash(UserDetails userDetails, long expiresTimpstamp) {
@@ -61,11 +61,13 @@ public class DefaultHashBasedToken implements HashBasedToken {
     @Override
     public String hash(UserDetails userDetails, LocalDateTime expires) {
         long timpstamp = convert2Date(expires).getTime();
-        return base64Encode(
-                userDetails.getUsername() + ":"
+        String plain = userDetails.getUsername() + ":"
                 + timpstamp + ":"
-                + hash(userDetails, timpstamp)
-        );
+                + hash(userDetails, timpstamp);
+        String signature = base64Encode(plain);
+        LOG.debug("plain => {}", plain);
+        LOG.debug("signature => {}", signature);
+        return signature;
     }
 
     private String base64Encode(String text) {
