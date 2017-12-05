@@ -4,7 +4,6 @@
 package com.pamarin.commons.security;
 
 import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
-import static java.security.MessageDigest.isEqual;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -43,8 +42,8 @@ public class DefaultHashBasedToken implements HashBasedToken {
         this.secureRandom = new SecureRandom();
     }
 
-    private String hash(String oneTimePad, UserDetails userDetails, long expiresTimpstamp) {
-        return checkSum.hash(new StringBuilder()
+    private String rawData(String oneTimePad, UserDetails userDetails, long expiresTimpstamp) {
+        return new StringBuilder()
                 .append(oneTimePad)
                 .append(SEPARATOR)
                 .append(userDetails.getUsername())
@@ -54,7 +53,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
                 .append(userDetails.getPassword())
                 .append(SEPARATOR)
                 .append(this.privateKey)
-                .toString().getBytes());
+                .toString();
     }
 
     //https://www.wikiwand.com/en/One-time_pad
@@ -85,7 +84,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
                 .append(SEPARATOR)
                 .append(timpstamp)
                 .append(SEPARATOR)
-                .append(hash(oneTimePad, userDetails, timpstamp))
+                .append(checkSum.hash(rawData(oneTimePad, userDetails, timpstamp).getBytes()))
                 .toString());
     }
 
@@ -139,7 +138,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
             return false;
         }
 
-        return isEqual(hashValue.getBytes(), hash(oneTimePad, userDetails, timpstamp).getBytes());
+        return checkSum.matches(rawData(oneTimePad, userDetails, timpstamp).getBytes(), hashValue);
     }
 
     private boolean wasExpires(long timpstamp) {
