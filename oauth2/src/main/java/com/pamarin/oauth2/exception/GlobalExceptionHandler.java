@@ -134,6 +134,13 @@ public class GlobalExceptionHandler {
         ErrorResponse.unauthorizedClient()
                 .returnError(request, response);
     }
+    
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(InvalidTokenException.class)
+    public void unauthorizedClient(InvalidTokenException ex, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        ErrorResponse.unauthorizedClient()
+                .returnError(request, response);
+    }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(InvalidCsrfTokenException.class)
