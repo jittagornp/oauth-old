@@ -35,8 +35,8 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
     private UserRepo userRepo;
 
     private UserDetailsService userDetailsService(TokenBase base) {
-        return id -> {
-            OAuth2RefreshToken refreshToken = refreshTokenRepo.findById(id);
+        return username -> {
+            OAuth2RefreshToken refreshToken = refreshTokenRepo.findById(username);
             if (refreshToken == null) {
                 throw new UsernameNotFoundException("Not found refresh token");
             }
@@ -50,7 +50,7 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
             base.setClientId(refreshToken.getClientId());
             base.setUserId(refreshToken.getUserId());
             return DefaultUserDetails.builder()
-                    .username(id)
+                    .username(username)
                     .password(user.getPassword())
                     .build();
         };
