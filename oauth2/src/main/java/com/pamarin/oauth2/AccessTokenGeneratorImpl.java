@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pamarin.commons.security.RSAKeyPairs;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
+import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
 
@@ -58,6 +59,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     private Base64RSAEncryption base64RSAEncryption;
 
     @Autowired
+    private OAuth2RefreshTokenRepo refreshTokenRepo;
+
+    @Autowired
     private RefreshTokenGenerator refreshTokenGenerator;
 
     @Autowired
@@ -65,10 +69,12 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
 
     private AccessTokenResponse buildAccessTokenResponse(TokenBase base) {
         OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
+                .id(base.getId())
                 .userId(base.getUserId())
                 .clientId(base.getClientId())
                 .build()
         );
+        base.setId(accessToken.getId());
         String encryptedToken = base64RSAEncryption.encrypt(accessToken.getId(), keyPairs.getPrivateKey());
         return AccessTokenResponse.builder()
                 .accessToken(encryptedToken)
@@ -103,7 +109,14 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     public AccessTokenResponse generate(RefreshAccessTokenRequest req) {
         clientVerification.verifyClientIdAndClientSecret(req.getClientId(), req.getClientSecret());
         TokenBase base = refreshTokenVerification.verify(req.getRefreshToken());
+        revokeToken(base.getId());
+        base.setId(null);
         base.setClientId(req.getClientId());
         return buildAccessTokenResponse(base);
+    }
+
+    private void revokeToken(String tokenId) {
+        refreshTokenRepo.deleteById(tokenId);
+        accessTokenRepo.deleteById(tokenId);
     }
 }

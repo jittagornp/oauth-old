@@ -36,6 +36,7 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
 
     private OAuth2RefreshToken generateRefreshToken(TokenBase base) {
         return refreshTokenRepo.save(OAuth2RefreshToken.builder()
+                .id(base.getId())
                 .userId(base.getUserId())
                 .clientId(base.getClientId())
                 .build());

@@ -11,7 +11,6 @@ import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,7 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
                 AuthenticationException.throwByMessage("Access token not found.");
             }
             return Output.builder()
-                    .id(StringUtils.split(token.getId(), ":")[1])
+                    .id(token.getId())
                     .issuedAt(token.getIssuedAt())
                     .expiresAt(token.getExpiresAt())
                     .userId(token.getUserId())
@@ -50,8 +49,6 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
                     .build();
         } catch (RSAEncryptionException ex) {
             throw new InvalidTokenException("Invalid to decrypt access token.", ex);
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            throw new InvalidTokenException("Invalid access token id.", ex);
         }
     }
 

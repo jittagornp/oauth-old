@@ -14,6 +14,8 @@ import lombok.Setter;
 @Setter
 @Builder
 public class TokenBase {
+    
+    private String id;
 
     private String userId;
     
