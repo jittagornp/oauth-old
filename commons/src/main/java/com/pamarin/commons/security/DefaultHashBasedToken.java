@@ -5,6 +5,7 @@ package com.pamarin.commons.security;
 
 import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
 import static java.security.MessageDigest.isEqual;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -23,25 +24,43 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
     private static final String SEPARATOR = ":";
 
+    private int padLength;
+
     private final String key;
 
     private final CheckSum checkSum;
 
+    private final SecureRandom secureRandom;
+
     public DefaultHashBasedToken(String key, CheckSum checkSum) {
-        this.key = key;
-        this.checkSum = checkSum;
+        this(key, checkSum, 32);
     }
 
-    private String hash(UserDetails userDetails, long expiresTimpstamp) {
-        return checkSum.hash((userDetails.getUsername() + SEPARATOR
+    public DefaultHashBasedToken(String key, CheckSum checkSum, int padLength) {
+        this.key = key;
+        this.checkSum = checkSum;
+        this.padLength = padLength;
+        this.secureRandom = new SecureRandom();
+    }
+
+    private String hash(String oneTimePad, UserDetails userDetails, long expiresTimpstamp) {
+        return checkSum.hash((oneTimePad + SEPARATOR
+                + userDetails.getUsername() + SEPARATOR
                 + expiresTimpstamp + SEPARATOR
                 + userDetails.getPassword() + SEPARATOR
                 + this.key).getBytes());
     }
 
-    /*
-    token = base64(username + ":" + expirationTime + ":" + checksum.hash(username + ":" + expirationTime + ":" password + ":" + key))
+    private String randomOneTimePad() {
+        byte[] bytes = new byte[padLength];
+        secureRandom.nextBytes(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
+    }
 
+    /*
+    token = base64(oneTimePad + ":" + username + ":" + expirationTime + ":" + checksum.hash(padding + ":" + username + ":" + expirationTime + ":" password + ":" + key))
+
+    oneTimePad:        Random one time token 
     username:          As identifiable to the UserDetailsService
     password:          That matches the one in the retrieved UserDetails
     expirationTime:    The date and time when the token expires,
@@ -52,10 +71,12 @@ public class DefaultHashBasedToken implements HashBasedToken {
     @Override
     public String hash(UserDetails userDetails, LocalDateTime expires) {
         long timpstamp = convert2Date(expires).getTime();
+        String oneTimePad = randomOneTimePad();
         return base64Encode(
-                userDetails.getUsername() + SEPARATOR
+                oneTimePad + SEPARATOR
+                + userDetails.getUsername() + SEPARATOR
                 + timpstamp + SEPARATOR
-                + hash(userDetails, timpstamp)
+                + hash(oneTimePad, userDetails, timpstamp)
         );
     }
 
@@ -80,13 +101,18 @@ public class DefaultHashBasedToken implements HashBasedToken {
         }
 
         String[] arr = StringUtils.split(decoded, SEPARATOR);
-        if (arr.length != 3) {
+        if (arr.length != 4) {
             return false;
         }
 
+        String oneTimePad = arr[0];
+        String username = arr[1];
+        String expires = arr[2];
+        String hash = arr[3];
+
         long timpstamp;
         try {
-            timpstamp = Long.parseLong(arr[1]);
+            timpstamp = Long.parseLong(expires);
         } catch (NumberFormatException ex) {
             LOG.warn("Can't parse expirationTime.", ex);
             return false;
@@ -98,13 +124,13 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
         UserDetails userDetails;
         try {
-            userDetails = userDetailsService.loadUserByUsername(arr[0]);
+            userDetails = userDetailsService.loadUserByUsername(username);
         } catch (UsernameNotFoundException ex) {
             LOG.warn("user not found", ex);
             return false;
         }
 
-        return isEqual(arr[2].getBytes(), hash(userDetails, timpstamp).getBytes());
+        return isEqual(hash.getBytes(), hash(oneTimePad, userDetails, timpstamp).getBytes());
     }
 
     private boolean wasExpires(long timpstamp) {

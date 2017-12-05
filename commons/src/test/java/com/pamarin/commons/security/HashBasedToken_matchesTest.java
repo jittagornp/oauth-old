@@ -3,6 +3,7 @@
  */
 package com.pamarin.commons.security;
 
+import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,8 +32,24 @@ public class HashBasedToken_matchesTest {
     }
 
     @Test
-    public void shouldBeFalse_whenTokenArrayNotSize3() {
+    public void shouldBeFalse_whenTokenArrayNotSize4() {
         String input = "Yjk4ZTIxYjQtY2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOjQxMDI0MTk2MDAwMDA=";
+        boolean output = hashBasedToken.matches(input, null);
+        boolean expected = false;
+        assertThat(output).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldBeFalse_whenCantParseExpirationTime() {
+        String input = "N2NmYzVjYTg3MDhjOmI5OGUyMWI0LWNlMmEtMTFlNy1hYmM0LWNlYzI3OGI2YjUwYTp4eXo6MDliNzhjZTBiZTI3Y2ZmZDc4NTA1OWM0NmI3N2EzNDJjOTM2ODU0NjdjZmM1Y2E4NzA4Yzc2NjM4MWNhZmEzYQ==";
+        boolean output = hashBasedToken.matches(input, null);
+        boolean expected = false;
+        assertThat(output).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldBeFalse_whenTokenExpired() {
+        String input = "N2NmYzVjYTg3MDhjOmI5OGUyMWI0LWNlMmEtMTFlNy1hYmM0LWNlYzI3OGI2YjUwYTowOjA5Yjc4Y2UwYmUyN2NmZmQ3ODUwNTljNDZiNzdhMzQyYzkzNjg1NDY3Y2ZjNWNhODcwOGM3NjYzODFjYWZhM2E=";
         boolean output = hashBasedToken.matches(input, null);
         boolean expected = false;
         assertThat(output).isEqualTo(expected);
@@ -41,7 +58,7 @@ public class HashBasedToken_matchesTest {
     @Test
     public void shouldBeFalse_whenNotFoundUser() {
 
-        String input = "Yjk4ZTIxYjQtY2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOjQxMDI0MTk2MDAwMDA6MDliNzhjZTBiZTI3Y2ZmZDc4NTA1OWM0NmI3N2EzNDJjOTM2ODU0NjdjZmM1Y2E4NzA4Yzc2NjM4MWNhZmEzYQ==";
+        String input = "N2NmYzVjYTg3MDhjOmI5OGUyMWI0LWNlMmEtMTFlNy1hYmM0LWNlYzI3OGI2YjUwYTp4eXo6MDliNzhjZTBiZTI3Y2ZmZDc4NTA1OWM0NmI3N2EzNDJjOTM2ODU0NjdjZmM1Y2E4NzA4Yzc2NjM4MWNhZmEzYQ==";
         boolean output = hashBasedToken.matches(input, username -> {
             throw new UsernameNotFoundException("Not found user.");
         });
@@ -50,9 +67,8 @@ public class HashBasedToken_matchesTest {
     }
 
     @Test
-    public void shouldBeFalse_whenCantParseExpirationTime() {
-
-        String input = "Yjk4ZTIxYjQtY2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOnh5ejowOWI3OGNlMGJlMjdjZmZkNzg1MDU5YzQ2Yjc3YTM0MmM5MzY4NTQ2N2NmYzVjYTg3MDhjNzY2MzgxY2FmYTNh";
+    public void shouldBeFalse_whenInvalidToken(){
+        String input = "WDVjdEh3b2VzTGF4aDVrYzA2aSt5UEtRVVBrN28yWTV3ZTY5ZUN2SHpyMD06Yjk4ZTIxYjQtY2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOjQ2NjgxNTgzODM2OTE6ZjVlZjIwNDIwOGE0NjkxZWNlN2RhMWY5N2ZmMzUwYTA4YzMwZA==";
         boolean output = hashBasedToken.matches(input, username -> DefaultUserDetails.builder()
                 .username("b98e21b4-ce2a-11e7-abc4-cec278b6b50a")
                 .password("$2a$10$2SLqTL7.Ug9cyfRPFwxQeemMA4SeB9MymLjRl4RGR0h7aHwLDy7qC")
@@ -62,23 +78,11 @@ public class HashBasedToken_matchesTest {
         assertThat(output).isEqualTo(expected);
     }
     
-    @Test
-    public void shouldBeFalse_whenTokenExpired() {
-
-        String input = "Yjk4ZTIxYjQtY2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOjk0NjY1OTYwMDAwMDo4NDBmZDljOTBhZGU4YzE4YmVjYjY0MTc3OWY2N2M3NTczMjI1OGViYWNhYWZhNGFiNzBjZDdhZjRmM2RlNThh";
-        boolean output = hashBasedToken.matches(input, username -> DefaultUserDetails.builder()
-                .username("b98e21b4-ce2a-11e7-abc4-cec278b6b50a")
-                .password("$2a$10$2SLqTL7.Ug9cyfRPFwxQeemMA4SeB9MymLjRl4RGR0h7aHwLDy7qC")
-                .build()
-        );
-        boolean expected = false;
-        assertThat(output).isEqualTo(expected);
-    }
     
     @Test
     public void shouldBeTrue_whenValidToken() {
 
-        String input = "Yjk4ZTIxYjQtY2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOjQxMDI0MTk2MDAwMDA6MDliNzhjZTBiZTI3Y2ZmZDc4NTA1OWM0NmI3N2EzNDJjOTM2ODU0NjdjZmM1Y2E4NzA4Yzc2NjM4MWNhZmEzYQ==";
+        String input = "WDVjdEh3b2VzTGF4aDVrYzA2aSt5UEtRVVBrN28yWTV3ZTY5ZUN2SHpyMD06Yjk4ZTIxYjQtY2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOjQ2NjgxNTgzODM2OTE6ZjVlZjIwNDIwOGE0NjkxZWNlN2RhMWY5N2ZmMzUwYTA4YzMwZDBiOThjNmFjNDQyMzkwN2VkMDY5NmI4MTJjOQ==";
         boolean output = hashBasedToken.matches(input, username -> DefaultUserDetails.builder()
                 .username("b98e21b4-ce2a-11e7-abc4-cec278b6b50a")
                 .password("$2a$10$2SLqTL7.Ug9cyfRPFwxQeemMA4SeB9MymLjRl4RGR0h7aHwLDy7qC")

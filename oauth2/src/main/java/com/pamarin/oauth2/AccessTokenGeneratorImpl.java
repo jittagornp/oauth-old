@@ -4,7 +4,8 @@
 package com.pamarin.oauth2;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.pamarin.commons.security.Base64RSAEncryption;
+import com.pamarin.commons.security.DefaultUserDetails;
+import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.AccessTokenResponse;
 import com.pamarin.oauth2.model.AuthorizationRequest;
@@ -22,12 +23,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
-import com.pamarin.commons.security.RSAKeyPairs;
+import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
+import java.util.Date;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -49,14 +51,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     private ClientVerification clientVerification;
 
     @Autowired
-    @Qualifier("accessTokenKeyPairs")
-    private RSAKeyPairs keyPairs;
-
-    @Autowired
     private OAuth2AccessTokenRepo accessTokenRepo;
-
-    @Autowired
-    private Base64RSAEncryption base64RSAEncryption;
 
     @Autowired
     private OAuth2RefreshTokenRepo refreshTokenRepo;
@@ -67,17 +62,25 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     @Autowired
     private RefreshTokenVerification refreshTokenVerification;
 
+    @Autowired
+    private HashBasedToken hashBasedToken;
+
     private AccessTokenResponse buildAccessTokenResponse(TokenBase base) {
         OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
-                .id(base.getId())
                 .userId(base.getUserId())
                 .clientId(base.getClientId())
                 .build()
         );
+        String token = hashBasedToken.hash(
+                DefaultUserDetails.builder()
+                        .username(accessToken.getId())
+                        .password(accessToken.getId())
+                        .build(),
+                convert2LocalDateTime(new Date(accessToken.getExpiresAt()))
+        );
         base.setId(accessToken.getId());
-        String encryptedToken = base64RSAEncryption.encrypt(accessToken.getId(), keyPairs.getPrivateKey());
         return AccessTokenResponse.builder()
-                .accessToken(encryptedToken)
+                .accessToken(token)
                 .expiresIn(accessToken.getExpireMinutes() * 60L)
                 .refreshToken(refreshTokenGenerator.generate(base))
                 .tokenType("bearer")

@@ -7,7 +7,6 @@ import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.commons.security.SHA256CheckSum;
 import com.pamarin.oauth2.service.LoginService;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
@@ -33,6 +31,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     private static final String REMEMBER_ME_KEY = "u-)'y<+35xmDbpP.";
     
     private static final String HASHBASED_KEY = "u-)'y<+35xmDbpP.";
+    private static final int HASHBASED_PAD_LENGTH = 11;
 
     @Autowired
     private LoginService loginService;
@@ -70,15 +69,6 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     @Bean
     public RememberMeServices newRememberMeServices() {
-//        PersistentTokenBasedRememberMeServices service = new PersistentTokenBasedRememberMeServices(
-//                REMEMBER_ME_KEY,
-//                loginService,
-//                newPersistentTokenRepository()
-//        );
-//        service.setParameter("remember-me");
-//        service.setCookieName("rmbm");
-//        service.setUseSecureCookie(hostUrl.startsWith("https://"));
-//        return service;
         TokenBasedRememberMeServices service = new TokenBasedRememberMeServices(
                 REMEMBER_ME_KEY, 
                 loginService
@@ -96,6 +86,10 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     
     @Bean
     public HashBasedToken newHashBasedToken(){
-        return new DefaultHashBasedToken(HASHBASED_KEY, new SHA256CheckSum());
+        return new DefaultHashBasedToken(
+                HASHBASED_KEY, 
+                new SHA256CheckSum(),
+                HASHBASED_PAD_LENGTH
+        );
     }
 }
