@@ -83,10 +83,9 @@ Enter password: ********
 
 # Token  
 
-- Authorization Code + Access Token เป็น Stateless Sign/Verify ด้วย JWT โดยใช้ RSA Algorithm https://github.com/auth0/java-jwt  
-- Authorization Code จะหมดอายุภายใน 5 นาที  
-- Access Token จะหมดอายุภายใน 15 นาที
-- Refresh Token เป็น Stateful เก็บไว้ใน Redis และจะหมดอายุภายใน 8 ชั่วโมง ถ้าไม่ได้ใช้  
+- Authorization Code เป็น Stateless Sign/Verify ด้วย JWT โดยใช้ RSA Algorithm https://github.com/auth0/java-jwt และจะหมดอายุภายใน 1 นาที  
+- Access Token เป็น Stateful เก็บไว้ใน Redis และใช้ Hash-Based Token ในการ generate ซึ่งจะหมดอายุภายใน 30 นาที
+- Refresh Token เป็น Stateful เก็บไว้ใน Redis และใช้ Hash-Based Token ในการ generate ซึ่งจะหมดอายุภายใน 2 สัปดาห์ ถ้าไม่ได้ใช้  
 
 # วิธีการ Generate Key Pairs (public key/private key)
 ในกรณีที่ต้องการ generate key pairs ใหม่ https://github.com/jittagornp/guideline/blob/master/how_to_generate_keypairs.md  
