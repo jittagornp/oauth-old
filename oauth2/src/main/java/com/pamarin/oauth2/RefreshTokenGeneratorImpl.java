@@ -15,12 +15,14 @@ import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/05
  */
-@Component
+@Service
+@Transactional
 public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
 
     @Autowired
