@@ -23,7 +23,7 @@ import com.pamarin.commons.security.RSAKeyPairs;
 @Component
 public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerator {
 
-    private static final int EXPIRES_MINUTE = 5;
+    private static final int EXPIRES_MINUTE = 1;
 
     @Autowired
     private LoginSession loginSession;
