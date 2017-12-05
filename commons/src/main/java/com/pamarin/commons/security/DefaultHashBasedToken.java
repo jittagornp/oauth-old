@@ -26,7 +26,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
     private int padLength;
 
-    private final String key;
+    private final String privateKey;
 
     private final CheckSum checkSum;
 
@@ -36,8 +36,8 @@ public class DefaultHashBasedToken implements HashBasedToken {
         this(key, checkSum, 32);
     }
 
-    public DefaultHashBasedToken(String key, CheckSum checkSum, int padLength) {
-        this.key = key;
+    public DefaultHashBasedToken(String privateKey, CheckSum checkSum, int padLength) {
+        this.privateKey = privateKey;
         this.checkSum = checkSum;
         this.padLength = padLength;
         this.secureRandom = new SecureRandom();
@@ -48,7 +48,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
                 + userDetails.getUsername() + SEPARATOR
                 + expiresTimpstamp + SEPARATOR
                 + userDetails.getPassword() + SEPARATOR
-                + this.key).getBytes());
+                + this.privateKey).getBytes());
     }
 
     private String randomOneTimePad() {
@@ -58,14 +58,14 @@ public class DefaultHashBasedToken implements HashBasedToken {
     }
 
     /*
-    token = base64(oneTimePad + ":" + username + ":" + expirationTime + ":" + checksum.hash(oneTimePad + ":" + username + ":" + expirationTime + ":" password + ":" + key))
+    token = base64(oneTimePad + ":" + username + ":" + expirationTime + ":" + checksum.hash(oneTimePad + ":" + username + ":" + expirationTime + ":" password + ":" + privateKey))
 
     oneTimePad:        Random one time token 
     username:          As identifiable to the UserDetailsService
     password:          That matches the one in the retrieved UserDetails
     expirationTime:    The date and time when the token expires,
                        expressed in milliseconds
-    key:               A private key to prevent modification of the token
+    privateKey:        A private key to prevent modification of the token
       
      */
     @Override
