@@ -3,13 +3,14 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.model.OAuth2RefreshToken;
+import com.pamarin.oauth2.domain.OAuth2RefreshToken;
 import com.pamarin.oauth2.repository.OAuth2AllowDomainRepo;
 import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.UserDetailsStub;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +33,7 @@ import com.pamarin.oauth2.service.AuthorizeViewModelService.Scope;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -79,8 +81,19 @@ public class IntegrationTestBase {
         return OAuth2RefreshToken.builder()
                 .id(UUID.randomUUID().toString().replace("-", ""))
                 .userId("00000000000000000000000000000000")
-                .username("test")
+                .clientId("00000000000000000000000000000000")
                 .build();
+    }
+
+    @Before
+    public void mockUserRepo() {
+        UserDetails userDetails = UserDetailsStub.get();
+        User user = new User();
+        user.setId(userDetails.getUsername());
+        user.setUsername(userDetails.getUsername());
+        user.setPassword(userDetails.getPassword());
+        when(userRepo.findOne(any(String.class)))
+                .thenReturn(user);
     }
 
     @Before

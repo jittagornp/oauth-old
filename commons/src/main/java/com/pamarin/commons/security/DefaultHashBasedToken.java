@@ -21,6 +21,8 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultHashBasedToken.class);
 
+    private static final String SEPARATOR = ":";
+
     private final String key;
 
     private final CheckSum checkSum;
@@ -31,9 +33,9 @@ public class DefaultHashBasedToken implements HashBasedToken {
     }
 
     private String hash(UserDetails userDetails, long expiresTimpstamp) {
-        return checkSum.hash((userDetails.getUsername() + ":"
-                + expiresTimpstamp + ":"
-                + userDetails.getPassword() + ":"
+        return checkSum.hash((userDetails.getUsername() + SEPARATOR
+                + expiresTimpstamp + SEPARATOR
+                + userDetails.getPassword() + SEPARATOR
                 + this.key).getBytes());
     }
 
@@ -51,8 +53,8 @@ public class DefaultHashBasedToken implements HashBasedToken {
     public String hash(UserDetails userDetails, LocalDateTime expires) {
         long timpstamp = convert2Date(expires).getTime();
         return base64Encode(
-                userDetails.getUsername() + ":"
-                + timpstamp + ":"
+                userDetails.getUsername() + SEPARATOR
+                + timpstamp + SEPARATOR
                 + hash(userDetails, timpstamp)
         );
     }
@@ -77,8 +79,20 @@ public class DefaultHashBasedToken implements HashBasedToken {
             return false;
         }
 
-        String[] arr = StringUtils.split(decoded, ":");
+        String[] arr = StringUtils.split(decoded, SEPARATOR);
         if (arr.length != 3) {
+            return false;
+        }
+
+        long timpstamp;
+        try {
+            timpstamp = Long.parseLong(arr[1]);
+        } catch (NumberFormatException ex) {
+            LOG.warn("Can't parse expirationTime.", ex);
+            return false;
+        }
+
+        if (wasExpires(timpstamp)) {
             return false;
         }
 
@@ -90,16 +104,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
             return false;
         }
 
-        try {
-            long timpstamp = Long.parseLong(arr[1]);
-            if (wasExpires(timpstamp)) {
-                return false;
-            }
-            return isEqual(arr[2].getBytes(), hash(userDetails, timpstamp).getBytes());
-        } catch (NumberFormatException ex) {
-            LOG.warn("Can't parse expirationTime.", ex);
-            return false;
-        }
+        return isEqual(arr[2].getBytes(), hash(userDetails, timpstamp).getBytes());
     }
 
     private boolean wasExpires(long timpstamp) {

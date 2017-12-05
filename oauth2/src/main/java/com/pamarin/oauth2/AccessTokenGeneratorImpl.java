@@ -10,7 +10,7 @@ import com.pamarin.oauth2.model.AccessTokenResponse;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.CodeAccessTokenRequest;
 import com.pamarin.oauth2.model.RefreshAccessTokenRequest;
-import com.pamarin.oauth2.model.OAuth2RefreshToken;
+import com.pamarin.oauth2.domain.OAuth2RefreshToken;
 import com.pamarin.oauth2.model.TokenBase;
 import com.pamarin.oauth2.service.AccessTokenGenerator;
 import com.pamarin.oauth2.service.ClientVerification;
@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pamarin.commons.security.RSAKeyPairs;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
+import com.pamarin.oauth2.service.RefreshTokenGenerator;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -59,6 +60,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
 
     @Autowired
     private Base64RSAEncryption base64RSAEncryption;
+    
+    @Autowired
+    private RefreshTokenGenerator refreshTokenGenerator;
 
     private AccessTokenResponse buildAccessTokenResponse(TokenBase base, String refreshToken) {
         OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
@@ -76,13 +80,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     }
 
     private AccessTokenResponse buildAccessTokenResponse(TokenBase base) {
-        return buildAccessTokenResponse(base, generateRefreshToken(base).getId());
-    }
-
-    private OAuth2RefreshToken generateRefreshToken(TokenBase base) {
-        return refreshTokenRepo.save(OAuth2RefreshToken.builder()
-                .userId(base.getUserId())
-                .build());
+        return buildAccessTokenResponse(base, refreshTokenGenerator.generate(base));
     }
 
     @Override

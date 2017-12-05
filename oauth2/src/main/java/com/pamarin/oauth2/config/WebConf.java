@@ -6,6 +6,7 @@ package com.pamarin.oauth2.config;
 import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.DefaultAuthenticityToken;
+import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.repository.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import java.util.concurrent.TimeUnit;

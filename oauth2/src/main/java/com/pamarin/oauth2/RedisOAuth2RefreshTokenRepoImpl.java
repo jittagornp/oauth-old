@@ -5,7 +5,7 @@ package com.pamarin.oauth2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pamarin.oauth2.model.OAuth2RefreshToken;
+import com.pamarin.oauth2.domain.OAuth2RefreshToken;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;

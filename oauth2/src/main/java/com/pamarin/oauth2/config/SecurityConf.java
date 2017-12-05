@@ -3,6 +3,9 @@
  */
 package com.pamarin.oauth2.config;
 
+import com.pamarin.commons.security.DefaultHashBasedToken;
+import com.pamarin.commons.security.HashBasedToken;
+import com.pamarin.commons.security.SHA256CheckSum;
 import com.pamarin.oauth2.service.LoginService;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +30,9 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 @EnableWebSecurity
 public class SecurityConf extends WebSecurityConfigurerAdapter {
 
-    private static final String REMEMBER_ME_KEY = UUID.randomUUID().toString();
+    private static final String REMEMBER_ME_KEY = "u-)'y<+35xmDbpP.";
+    
+    private static final String HASHBASED_KEY = "u-)'y<+35xmDbpP.";
 
     @Autowired
     private LoginService loginService;
@@ -87,5 +92,10 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     @Bean
     public PersistentTokenRepository newPersistentTokenRepository() {
         return new InMemoryTokenRepositoryImpl();
+    }
+    
+    @Bean
+    public HashBasedToken newHashBasedToken(){
+        return new DefaultHashBasedToken(HASHBASED_KEY, new SHA256CheckSum());
     }
 }
