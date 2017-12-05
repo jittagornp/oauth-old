@@ -58,7 +58,7 @@ public class HashBasedToken_matchesTest {
     @Test
     public void shouldBeFalse_whenNotFoundUser() {
 
-        String input = "N2NmYzVjYTg3MDhjOmI5OGUyMWI0LWNlMmEtMTFlNy1hYmM0LWNlYzI3OGI2YjUwYTp4eXo6MDliNzhjZTBiZTI3Y2ZmZDc4NTA1OWM0NmI3N2EzNDJjOTM2ODU0NjdjZmM1Y2E4NzA4Yzc2NjM4MWNhZmEzYQ==";
+        String input = "WDVjdEh3b2VzTGF4aDVrYzA2aSt5UEtRVVBrN28yWTV3ZTY5ZUN2SHpyMD06Yjk4ZTIxYjQtY2UyYS0xMWU3LWFiYzQtY2VjMjc4YjZiNTBhOjQ2NjgxNTgzODM2OTE6ZjVlZjIwNDIwOGE0NjkxZWNlN2RhMWY5N2ZmMzUwYTA4YzMwZDBiOThjNmFjNDQyMzkwN2VkMDY5NmI4MTJjOQ==";
         boolean output = hashBasedToken.matches(input, username -> {
             throw new UsernameNotFoundException("Not found user.");
         });
