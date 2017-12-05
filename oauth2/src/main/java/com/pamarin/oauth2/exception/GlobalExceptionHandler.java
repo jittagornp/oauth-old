@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.exception;
 
+import com.pamarin.commons.exception.AuthenticationException;
 import com.pamarin.commons.exception.InvalidCsrfTokenException;
 import com.pamarin.oauth2.model.ErrorResponse;
 import java.io.IOException;
@@ -119,11 +120,18 @@ public class GlobalExceptionHandler {
         ErrorResponse.unauthorizedClient()
                 .returnError(request, response);
     }
-    
+
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(InvalidClientIdAndClientSecretException.class)
     public void invalidCsrfToken(InvalidClientIdAndClientSecretException ex, HttpServletRequest request, HttpServletResponse response) throws IOException {
-         ErrorResponse.unauthorizedClient()
+        ErrorResponse.unauthorizedClient()
+                .returnError(request, response);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(AuthenticationException.class)
+    public void unauthorizedClient(AuthenticationException ex, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        ErrorResponse.unauthorizedClient()
                 .returnError(request, response);
     }
 
