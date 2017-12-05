@@ -26,6 +26,8 @@ public class OAuth2AccessToken implements OAuth2Token {
     private String clientId;
     
     private int expireMinutes; 
+    
+    private String secretKey;
 
     @Override
     public Object clone() throws CloneNotSupportedException {

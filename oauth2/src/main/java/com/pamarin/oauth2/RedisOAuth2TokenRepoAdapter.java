@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import com.pamarin.oauth2.domain.OAuth2Token;
 import com.pamarin.oauth2.repository.OAuth2TokenRepo;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03
@@ -25,11 +27,15 @@ public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> imp
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisOAuth2TokenRepoAdapter.class);
 
+    private static final int SECRET_KEY_SIZE = 21;
+    
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
+    
+    private final SecureRandom secureRandom = new SecureRandom();
 
     protected abstract Class<TOKEN> getTokenClass();
 
@@ -60,6 +66,15 @@ public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> imp
             clone.setExpiresAt(Timestamp.valueOf(expires).getTime());
         }
     }
+    
+    private void setSecretKeyIfNotPresent(TOKEN clone){
+        if(clone.getSecretKey() == null){
+            byte[] bytes = new byte[SECRET_KEY_SIZE];
+            secureRandom.nextBytes(bytes);
+            String secret = Base64.getEncoder().encodeToString(bytes);
+            clone.setSecretKey(secret);
+        }
+    }
 
     @Override
     public TOKEN save(TOKEN token) {
@@ -67,6 +82,7 @@ public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> imp
             TOKEN clone = (TOKEN) token.clone();
             setIdIfNotPresent(clone);
             setExpirationTimeIfNotPresent(clone);
+            setSecretKeyIfNotPresent(clone);
             String key = makeKey(clone.getId());
             String value = objectMapper.writeValueAsString(clone);
             LOG.debug("Redis set \"{}\" = {}", key, value);

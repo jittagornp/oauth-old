@@ -3,28 +3,21 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.commons.exception.AuthenticationException;
-import com.pamarin.commons.exception.RSAEncryptionException;
-import com.pamarin.commons.security.Base64RSAEncryption;
 import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
-import com.pamarin.commons.security.RSAKeyPairs;
 import com.pamarin.commons.security.SHA256CheckSum;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification.Output;
-import java.security.interfaces.RSAPublicKey;
 import java.time.LocalDateTime;
-import java.time.Month;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -61,6 +54,7 @@ public class AccessTokenVerificationTest {
         when(accessTokenRepo.findById("999999"))
                 .thenReturn(OAuth2AccessToken.builder()
                         .id("999999")
+                        .secretKey("999999")
                         .build());
     }
 

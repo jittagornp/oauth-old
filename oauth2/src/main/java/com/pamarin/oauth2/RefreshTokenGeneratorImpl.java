@@ -53,7 +53,7 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
         return hashBasedToken.hash(
                 DefaultUserDetails.builder()
                         .username(refreshToken.getId())
-                        .password(user.getPassword())
+                        .password(user.getPassword() + refreshToken.getSecretKey())
                         .build(),
                 convert2LocalDateTime(new Date(refreshToken.getExpiresAt()))
         );

@@ -74,7 +74,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         String token = hashBasedToken.hash(
                 DefaultUserDetails.builder()
                         .username(accessToken.getId())
-                        .password(accessToken.getId())
+                        .password(accessToken.getSecretKey())
                         .build(),
                 convert2LocalDateTime(new Date(accessToken.getExpiresAt()))
         );

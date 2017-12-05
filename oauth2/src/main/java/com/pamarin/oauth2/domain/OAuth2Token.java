@@ -24,6 +24,10 @@ public interface OAuth2Token extends Cloneable{
     
     void setExpireMinutes(int minutes);
     
+    void setSecretKey(String secretKey);
+    
+    String getSecretKey();
+    
     String getUserId();
     
     Object clone() throws CloneNotSupportedException;

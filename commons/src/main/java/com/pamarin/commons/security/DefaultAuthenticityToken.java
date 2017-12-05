@@ -3,7 +3,6 @@
  */
 package com.pamarin.commons.security;
 
-import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.util.ByteUtils;
 import java.security.MessageDigest;
 import java.util.Base64;

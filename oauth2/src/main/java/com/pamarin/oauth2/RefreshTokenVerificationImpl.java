@@ -51,8 +51,8 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
             base.setClientId(refreshToken.getClientId());
             base.setUserId(refreshToken.getUserId());
             return DefaultUserDetails.builder()
-                    .username(id)
-                    .password(user.getPassword())
+                    .username(refreshToken.getId())
+                    .password(user.getPassword() + refreshToken.getSecretKey())
                     .build();
         };
     }

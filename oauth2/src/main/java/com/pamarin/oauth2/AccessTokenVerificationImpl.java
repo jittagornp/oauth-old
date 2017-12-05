@@ -39,8 +39,8 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
             output.setUserId(token.getUserId());
             output.setClientId(token.getClientId());
             return DefaultUserDetails.builder()
-                    .username(id)
-                    .password(id)
+                    .username(token.getId())
+                    .password(token.getSecretKey())
                     .build();
         };
     }

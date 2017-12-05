@@ -31,7 +31,6 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     private static final String REMEMBER_ME_KEY = "u-)'y<+35xmDbpP.";
     
     private static final String HASHBASED_KEY = "u-)'y<+35xmDbpP.";
-    private static final int HASHBASED_PAD_LENGTH = 11;
 
     @Autowired
     private LoginService loginService;
@@ -88,8 +87,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     public HashBasedToken newHashBasedToken(){
         return new DefaultHashBasedToken(
                 HASHBASED_KEY, 
-                new SHA256CheckSum(),
-                HASHBASED_PAD_LENGTH
+                new SHA256CheckSum()
         );
     }
 }
