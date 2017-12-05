@@ -58,7 +58,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
     }
 
     /*
-    token = base64(oneTimePad + ":" + username + ":" + expirationTime + ":" + checksum.hash(padding + ":" + username + ":" + expirationTime + ":" password + ":" + key))
+    token = base64(oneTimePad + ":" + username + ":" + expirationTime + ":" + checksum.hash(oneTimePad + ":" + username + ":" + expirationTime + ":" password + ":" + key))
 
     oneTimePad:        Random one time token 
     username:          As identifiable to the UserDetailsService
