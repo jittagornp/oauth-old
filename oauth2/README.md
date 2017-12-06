@@ -13,6 +13,9 @@ Implement ตาม Spec `RFC6749` : https://tools.ietf.org/html/rfc6749
 - [Bearer Token Usage](https://tools.ietf.org/html/rfc6750) - RFC 6750
 - [Threat Model and Security Considerations](https://tools.ietf.org/html/rfc6819) - RFC 6819 
 
+# บทความ
+ผมเขียนบทความไว้ที่ [Best Practice ในการทำ OAuth 2.0 Access Token & Refresh Token](https://medium.com/@jittagornp/best-practice-%E0%B9%83%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%97%E0%B8%B3-oauth2-access-token-refresh-token-457ae3bee4b7)  
+
 # Requires
 - Java 8+ http://www.oracle.com/technetwork/java/javase/downloads/index.html 
 - Apache Maven 3.0.4+ https://maven.apache.org/ 
