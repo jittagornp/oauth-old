@@ -5,7 +5,7 @@ package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.HashBasedToken;
-import com.pamarin.commons.security.SHA256CheckSum;
+import com.pamarin.commons.security.SHA384CheckSum;
 import com.pamarin.oauth2.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,7 +87,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     public HashBasedToken newHashBasedToken(){
         return new DefaultHashBasedToken(
                 HASHBASED_KEY, 
-                new SHA256CheckSum()
+                new SHA384CheckSum()
         );
     }
 }

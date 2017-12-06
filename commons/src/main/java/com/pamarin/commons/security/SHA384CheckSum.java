@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/29
  */
-@Component("sha256CheckSum")
-public class SHA256CheckSum implements CheckSum {
+@Component("sha384CheckSum")
+public class SHA384CheckSum implements CheckSum {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SHA256CheckSum.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SHA384CheckSum.class);
 
     @Override
     public String hash(byte[] data) {
@@ -26,7 +26,7 @@ public class SHA256CheckSum implements CheckSum {
         }
 
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance("SHA-384");
             return new String(Hex.encode(digest.digest(data)));
         } catch (NoSuchAlgorithmException ex) {
             LOG.warn(null, ex);

@@ -25,7 +25,7 @@ public class HashBasedToken_hashTest {
 
     @Before
     public void withImplementation() {
-        hashBasedToken = new DefaultHashBasedToken(HASHBASED_KEY, new SHA256CheckSum());
+        hashBasedToken = new DefaultHashBasedToken(HASHBASED_KEY, new SHA384CheckSum());
     }
 
     /*

@@ -6,7 +6,7 @@ package com.pamarin.oauth2;
 import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
-import com.pamarin.commons.security.SHA256CheckSum;
+import com.pamarin.commons.security.SHA384CheckSum;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
@@ -42,7 +42,7 @@ public class AccessTokenVerificationTest {
     @Before
     public void initMocks() {
         MockitoAnnotations.initMocks(this);
-        hashBasedToken = new DefaultHashBasedToken("abcd", new SHA256CheckSum());
+        hashBasedToken = new DefaultHashBasedToken("abcd", new SHA384CheckSum());
         ReflectionTestUtils.setField(
                 verification,
                 "hashBasedToken",

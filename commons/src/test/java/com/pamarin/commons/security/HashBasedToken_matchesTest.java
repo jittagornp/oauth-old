@@ -20,7 +20,7 @@ public class HashBasedToken_matchesTest {
 
     @Before
     public void withImplementation() {
-        hashBasedToken = new DefaultHashBasedToken(HASHBASED_KEY, new SHA256CheckSum());
+        hashBasedToken = new DefaultHashBasedToken(HASHBASED_KEY, new SHA384CheckSum());
     }
 
     @Test
