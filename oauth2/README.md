@@ -98,6 +98,9 @@ Generate csrf token ด้วยวิธีเดียวกับที่ Ra
 
 verfiy token ด้วยวิธี Synchronizer (CSRF) Tokens และ Double Submit Cookie ตาม [Cross-Site Request Forgery (CSRF) Prevention Cheat Sheet](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet)  
 
+# Postman สำหรับทดสอบ
+https://www.getpostman.com/collections/5171a08ffd87ea6ced39 
+
 # Reference
 
 - https://oauth.net/2/  
