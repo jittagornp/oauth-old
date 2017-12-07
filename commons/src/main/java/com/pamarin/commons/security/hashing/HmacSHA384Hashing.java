@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.codec.Hex;
 
 /**
+ * HMAC
+ * https://www.wikiwand.com/en/Hash-based_message_authentication_code
+ * 
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/07
  */
 public class HmacSHA384Hashing implements Hashing {
