@@ -3,10 +3,17 @@
  */
 package com.pamarin.commons.util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+ *
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/19
  */
 public class CookieSpecBuilder {
@@ -22,6 +29,8 @@ public class CookieSpecBuilder {
     private String sameSite;
 
     private Boolean secure;
+
+    private LocalDateTime expires;
 
     public CookieSpecBuilder(String key, String value) {
         this.key = key;
@@ -59,21 +68,34 @@ public class CookieSpecBuilder {
         return this;
     }
 
+    public CookieSpecBuilder setExpires(LocalDateTime expires) {
+        this.expires = expires;
+        return this;
+    }
+
     public String build() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(String.format("%s=%s;", key, value));
+        List<String> builder = new ArrayList<>();
+        builder.add(String.format("%s=%s", key, value));
         if (hasText(path)) {
-            builder.append(String.format(" Path=%s;", path));
+            builder.add(String.format("Path=%s", path));
         }
         if (Objects.equals(Boolean.TRUE, httpOnly)) {
-            builder.append(" HttpOnly;");
+            builder.add("HttpOnly");
         }
         if (hasText(sameSite)) {
-            builder.append(String.format(" SameSite=%s;", sameSite));
+            builder.add(String.format("SameSite=%s", sameSite));
         }
         if (Objects.equals(Boolean.TRUE, secure)) {
-            builder.append(" Secure;");
+            builder.add("Secure");
         }
-        return builder.toString();
+        if (expires != null) {
+            builder.add(String.format("Expires=%s", makeExpires()));
+        }
+        return builder.stream().collect(Collectors.joining("; "));
+    }
+
+    private String makeExpires() {
+        //Wed, 21 Oct 2015 07:28:00 GMT 
+        return expires.format(DateTimeFormatter.ofPattern("E, dd MMM yyyy HH:mm:ss 'GMT'"));
     }
 }
