@@ -28,10 +28,21 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
     private final Hashing hashing;
 
+    /**
+     * for hmac algorithm such as hmacsha384
+     * 
+     * @param hashing 
+     */
     public DefaultHashBasedToken(Hashing hashing) {
         this(null, hashing);
     }
 
+    /**
+     * for normal algorithm such as sha384
+     * 
+     * @param privateKey
+     * @param hashing 
+     */
     public DefaultHashBasedToken(String privateKey, Hashing hashing) {
         this.privateKey = privateKey;
         this.hashing = hashing;
