@@ -32,10 +32,10 @@ public class SourceTokenInterceptor extends HandlerInterceptorAdapter {
     public void postHandle(HttpServletRequest httpReq, HttpServletResponse httpResp, Object handler, ModelAndView modelAndView) throws Exception {
         if (!hasSourceCookie(httpReq)) {
             httpResp.setHeader("Set-Cookie", new CookieSpecBuilder(COOKIE_NAME, makeToken())
-                    .setPath(httpReq.getRequestURI())
+                    .setPath("/")
                     .setSecure(hostUrl.startsWith("https://"))
                     .sameSiteStrict()
-                    .setExpires(LocalDateTime.now().plusYears(1))
+                    .setExpires(LocalDateTime.now().plusYears(100))
                     .build());
         }
     }
