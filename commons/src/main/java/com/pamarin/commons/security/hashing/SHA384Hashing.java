@@ -1,23 +1,20 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.commons.security;
+package com.pamarin.commons.security.hashing;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.codec.Hex;
-import org.springframework.stereotype.Component;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/29
  */
-@Component("sha384CheckSum")
-public class SHA384CheckSum implements CheckSum {
+public class SHA384Hashing implements Hashing {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SHA384CheckSum.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SHA384Hashing.class);
 
     @Override
     public String hash(byte[] data) {

@@ -3,6 +3,7 @@
  */
 package com.pamarin.commons.security;
 
+import com.pamarin.commons.security.hashing.SHA384Hashing;
 import java.time.LocalDateTime;
 import java.time.Month;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +26,7 @@ public class HashBasedToken_hashTest {
 
     @Before
     public void withImplementation() {
-        hashBasedToken = new DefaultHashBasedToken(HASHBASED_KEY, new SHA384CheckSum());
+        hashBasedToken = new DefaultHashBasedToken(HASHBASED_KEY, new SHA384Hashing());
     }
 
     /*

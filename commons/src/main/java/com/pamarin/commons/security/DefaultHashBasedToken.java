@@ -3,6 +3,7 @@
  */
 package com.pamarin.commons.security;
 
+import com.pamarin.commons.security.hashing.Hashing;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/04
@@ -24,24 +26,29 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
     private final String privateKey;
 
-    private final CheckSum checkSum;
+    private final Hashing hashing;
 
+    public DefaultHashBasedToken(Hashing hashing) {
+        this(null, hashing);
+    }
 
-    public DefaultHashBasedToken(String privateKey, CheckSum checkSum) {
+    public DefaultHashBasedToken(String privateKey, Hashing hashing) {
         this.privateKey = privateKey;
-        this.checkSum = checkSum;
+        this.hashing = hashing;
     }
 
     private String rawSignature(UserDetails userDetails, long expiresTimpstamp) {
-        return new StringBuilder()
+        StringBuilder builder = new StringBuilder()
                 .append(userDetails.getUsername())
                 .append(SEPARATOR)
                 .append(expiresTimpstamp)
                 .append(SEPARATOR)
                 .append(userDetails.getPassword())
-                .append(SEPARATOR)
-                .append(this.privateKey)
-                .toString();
+                .append(SEPARATOR);
+        if (hasText(this.privateKey)) {
+            builder.append(this.privateKey);
+        }
+        return builder.toString();
     }
 
     /*
@@ -61,7 +68,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
                 .append(SEPARATOR)
                 .append(timpstamp)
                 .append(SEPARATOR)
-                .append(checkSum.hash(rawSignature(userDetails, timpstamp).getBytes()))
+                .append(hashing.hash(rawSignature(userDetails, timpstamp).getBytes()))
                 .toString());
     }
 
@@ -114,7 +121,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
             return false;
         }
 
-        return checkSum.matches(rawSignature(userDetails, timpstamp).getBytes(), signature);
+        return hashing.matches(rawSignature(userDetails, timpstamp).getBytes(), signature);
     }
 
     private boolean wasExpires(long timpstamp) {

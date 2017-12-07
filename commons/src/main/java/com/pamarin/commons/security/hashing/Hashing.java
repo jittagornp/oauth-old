@@ -1,12 +1,12 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.commons.security;
+package com.pamarin.commons.security.hashing;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/29
  */
-public interface CheckSum {
+public interface Hashing {
 
     String hash(byte[] data);
 

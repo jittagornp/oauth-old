@@ -5,7 +5,7 @@ package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.HashBasedToken;
-import com.pamarin.commons.security.SHA384CheckSum;
+import com.pamarin.commons.security.hashing.HmacSHA384Hashing;
 import com.pamarin.oauth2.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +29,7 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     private static final String REMEMBER_ME_KEY = "u-)'y<+35xmDbpP.";
-    
+
     private static final String HASHBASED_KEY = "u-)'y<+35xmDbpP.";
 
     @Autowired
@@ -69,7 +69,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     @Bean
     public RememberMeServices newRememberMeServices() {
         TokenBasedRememberMeServices service = new TokenBasedRememberMeServices(
-                REMEMBER_ME_KEY, 
+                REMEMBER_ME_KEY,
                 loginService
         );
         service.setParameter("remember-me");
@@ -82,12 +82,9 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     public PersistentTokenRepository newPersistentTokenRepository() {
         return new InMemoryTokenRepositoryImpl();
     }
-    
+
     @Bean
-    public HashBasedToken newHashBasedToken(){
-        return new DefaultHashBasedToken(
-                HASHBASED_KEY, 
-                new SHA384CheckSum()
-        );
+    public HashBasedToken newHashBasedToken() {
+        return new DefaultHashBasedToken(new HmacSHA384Hashing(HASHBASED_KEY));
     }
 }
