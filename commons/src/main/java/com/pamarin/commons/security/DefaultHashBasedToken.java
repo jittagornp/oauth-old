@@ -4,7 +4,6 @@
 package com.pamarin.commons.security;
 
 import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +32,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
         this.checkSum = checkSum;
     }
 
-    private String rawData(UserDetails userDetails, long expiresTimpstamp) {
+    private String rawSignature(UserDetails userDetails, long expiresTimpstamp) {
         return new StringBuilder()
                 .append(userDetails.getUsername())
                 .append(SEPARATOR)
@@ -62,7 +61,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
                 .append(SEPARATOR)
                 .append(timpstamp)
                 .append(SEPARATOR)
-                .append(checkSum.hash(rawData(userDetails, timpstamp).getBytes()))
+                .append(checkSum.hash(rawSignature(userDetails, timpstamp).getBytes()))
                 .toString());
     }
 
@@ -93,7 +92,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
 
         String username = arr[0];
         String expires = arr[1];
-        String hashValue = arr[2];
+        String signature = arr[2];
 
         long timpstamp;
         try {
@@ -115,7 +114,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
             return false;
         }
 
-        return checkSum.matches(rawData(userDetails, timpstamp).getBytes(), hashValue);
+        return checkSum.matches(rawSignature(userDetails, timpstamp).getBytes(), signature);
     }
 
     private boolean wasExpires(long timpstamp) {
