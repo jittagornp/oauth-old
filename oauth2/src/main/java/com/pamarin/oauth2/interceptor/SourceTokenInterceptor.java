@@ -30,7 +30,7 @@ public class SourceTokenInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public void postHandle(HttpServletRequest httpReq, HttpServletResponse httpResp, Object handler, ModelAndView modelAndView) throws Exception {
-        if (!hasSourceCookie(httpReq)) {
+        if (modelAndView != null && !hasSourceCookie(httpReq)) {
             httpResp.setHeader("Set-Cookie", new CookieSpecBuilder(COOKIE_NAME, makeToken())
                     .setPath("/")
                     .setSecure(hostUrl.startsWith("https://"))
