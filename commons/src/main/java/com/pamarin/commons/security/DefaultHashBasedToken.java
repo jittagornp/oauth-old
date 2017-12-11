@@ -63,7 +63,7 @@ public class DefaultHashBasedToken implements HashBasedToken {
     }
 
     /*
-    token = base64(username + ":" + expirationTime + ":" + checksum.hash(username + ":" + expirationTime + ":" password + ":" + privateKey))
+    token = base64(username + ":" + expirationTime + ":" + hashing.hash(username + ":" + expirationTime + ":" password + ":" + privateKey))
 
     username:          As identifiable to the UserDetailsService
     password:          That matches the one in the retrieved UserDetails
