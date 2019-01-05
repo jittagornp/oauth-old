@@ -20,20 +20,21 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @Profile("!test") //inactive for test profile
 public class RedisConf {
     
-    @NotBlank
-    @Value("${spring.redis.host}")
-    private String host; 
-    
-    @NotNull
-    @Value("${spring.redis.port}")
-    private Integer port;
+//    @NotBlank
+//    @Value("${spring.redis.host}")
+//    private String host; 
+//    
+//    @NotNull
+//    @Value("${spring.redis.port}")
+//    private Integer port;
 
-    @Bean
-    public RedisConnectionFactory jedisConnectionFactory() {
-        JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
-        jedisConFactory.setHostName(host);
-        jedisConFactory.setPort(port);
-        return jedisConFactory;
-    }
+//    @Bean
+//    public RedisConnectionFactory jedisConnectionFactory() {
+//        JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
+//        //jedisConFactory.setHostName(host);
+//        //jedisConFactory.setPort(port);
+//        jedisConFactory.se
+//        return jedisConFactory;
+//    }
 
 }
