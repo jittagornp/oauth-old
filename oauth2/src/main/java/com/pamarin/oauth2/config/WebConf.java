@@ -5,8 +5,9 @@ package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.security.CsrfInterceptor;
+import com.pamarin.commons.security.SessionCookieSerializer;
 import com.pamarin.commons.security.DefaultAuthenticityToken;
-import com.pamarin.commons.security.HashBasedToken;
+import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.oauth2.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.RedisOAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.interceptor.SourceTokenInterceptor;
@@ -18,7 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.session.web.http.CookieSerializer;
-import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -61,13 +61,13 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
-        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setCookieName("user_session");
-        serializer.setCookiePath("/");
-        serializer.setUseSecureCookie(hostUrl.startsWith("https://"));
-        serializer.setUseBase64Encoding(true);
-        serializer.setUseHttpOnlyCookie(true);
-        return serializer;
+        return new SessionCookieSerializer(
+                new CookieSpecBuilder("user_session")
+                        .setHttpOnly(true)
+                        .setSecure(hostUrl.startsWith("https://"))
+                        .setPath("/")
+                        .sameSiteStrict()
+        );
     }
 
     @Override
