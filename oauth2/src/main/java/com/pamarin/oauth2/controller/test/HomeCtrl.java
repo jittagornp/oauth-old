@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Pamarin.com
  */
-package com.pamarin.oauth2.controller;
+package com.pamarin.oauth2.controller.test;
 
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.view.ModelAndViewBuilder;
