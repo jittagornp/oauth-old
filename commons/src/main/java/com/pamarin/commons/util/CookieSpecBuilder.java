@@ -6,6 +6,7 @@ package com.pamarin.commons.util;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ public class CookieSpecBuilder {
 
     private final String key;
 
-    private final String value;
+    private String value;
 
     private String path = "/";
 
@@ -32,9 +33,25 @@ public class CookieSpecBuilder {
 
     private LocalDateTime expires;
 
+    private boolean encodeBase64Value = false;
+
+    public CookieSpecBuilder(String key) {
+        this(key, null);
+    }
+
     public CookieSpecBuilder(String key, String value) {
         this.key = key;
         this.value = value;
+    }
+
+    public CookieSpecBuilder setValue(String value) {
+        this.value = value;
+        return this;
+    }
+
+    public CookieSpecBuilder encodeBase64Value() {
+        this.encodeBase64Value = true;
+        return this;
     }
 
     public CookieSpecBuilder setPath(String path) {
@@ -75,20 +92,20 @@ public class CookieSpecBuilder {
 
     public String build() {
         List<String> builder = new ArrayList<>();
-        builder.add(String.format("%s=%s", key, value));
-        if (hasText(path)) {
-            builder.add(String.format("Path=%s", path));
+        builder.add(String.format("%s=%s", getKey(), getValue()));
+        if (hasText(getPath())) {
+            builder.add(String.format("Path=%s", getPath()));
         }
-        if (Objects.equals(Boolean.TRUE, httpOnly)) {
+        if (Objects.equals(Boolean.TRUE, getHttpOnly())) {
             builder.add("HttpOnly");
         }
-        if (hasText(sameSite)) {
-            builder.add(String.format("SameSite=%s", sameSite));
+        if (hasText(getSameSite())) {
+            builder.add(String.format("SameSite=%s", getSameSite()));
         }
-        if (Objects.equals(Boolean.TRUE, secure)) {
+        if (Objects.equals(Boolean.TRUE, getSecure())) {
             builder.add("Secure");
         }
-        if (expires != null) {
+        if (getExpires() != null) {
             builder.add(String.format("Expires=%s", makeExpires()));
         }
         return builder.stream().collect(Collectors.joining("; "));
@@ -96,6 +113,39 @@ public class CookieSpecBuilder {
 
     private String makeExpires() {
         //Wed, 21 Oct 2015 07:28:00 GMT 
-        return expires.format(DateTimeFormatter.ofPattern("E, dd MMM yyyy HH:mm:ss 'GMT'"));
+        return getExpires().format(DateTimeFormatter.ofPattern("E, dd MMM yyyy HH:mm:ss 'GMT'"));
     }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return isEncodeBase64Value() ? Base64.getEncoder().encodeToString(value.getBytes()) : value;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public Boolean getHttpOnly() {
+        return httpOnly;
+    }
+
+    public String getSameSite() {
+        return sameSite;
+    }
+
+    public Boolean getSecure() {
+        return secure;
+    }
+
+    public LocalDateTime getExpires() {
+        return expires;
+    }
+
+    public boolean isEncodeBase64Value() {
+        return encodeBase64Value;
+    }
+
 }
