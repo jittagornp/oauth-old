@@ -62,7 +62,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Bean
     public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setCookieName("ssid");
+        serializer.setCookieName("user_session");
         serializer.setCookiePath("/");
         serializer.setUseSecureCookie(hostUrl.startsWith("https://"));
         serializer.setUseBase64Encoding(true);
