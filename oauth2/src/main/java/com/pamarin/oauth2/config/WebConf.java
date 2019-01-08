@@ -62,7 +62,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Bean
     public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
         return new SessionCookieSerializer(
-                new CookieSpecBuilder("user_session")
+                new CookieSpecBuilder("user-session")
                         .setHttpOnly(true)
                         .setSecure(hostUrl.startsWith("https://"))
                         .setPath("/")

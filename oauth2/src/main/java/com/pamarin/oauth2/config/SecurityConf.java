@@ -6,6 +6,7 @@ package com.pamarin.oauth2.config;
 import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.commons.security.hashing.HmacSHA384Hashing;
+import com.pamarin.oauth2.CustomTokenBasedRememberMeServices;
 import com.pamarin.oauth2.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,12 +69,12 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     @Bean
     public RememberMeServices newRememberMeServices() {
-        TokenBasedRememberMeServices service = new TokenBasedRememberMeServices(
+        TokenBasedRememberMeServices service = new CustomTokenBasedRememberMeServices(
                 REMEMBER_ME_KEY,
                 loginService
         );
         service.setParameter("remember-me");
-        service.setCookieName("rmbm");
+        service.setCookieName("remember-me");
         service.setUseSecureCookie(hostUrl.startsWith("https://"));
         return service;
     }
