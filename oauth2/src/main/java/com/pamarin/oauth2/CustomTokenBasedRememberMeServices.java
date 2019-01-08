@@ -26,7 +26,7 @@ public class CustomTokenBasedRememberMeServices extends TokenBasedRememberMeServ
         String cookieValue = encodeCookie(tokens);
         httpResp.addHeader("Set-Cookie", new CookieSpecBuilder(getCookieName(), cookieValue)
                 .sameSiteStrict()
-                .setExpires(DateConverterUtils.convert2LocalDateTime(new Date(maxAge)))
+                //.setExpires(DateConverterUtils.convert2LocalDateTime(new Date(maxAge)))
                 .setHttpOnly(true)
                 .setPath("/")
                 .setSecure(httpReq.isSecure())
