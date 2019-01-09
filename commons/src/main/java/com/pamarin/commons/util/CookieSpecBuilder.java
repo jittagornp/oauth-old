@@ -35,6 +35,8 @@ public class CookieSpecBuilder {
 
     private boolean encodeBase64Value = false;
 
+    private int maxAge;
+
     public CookieSpecBuilder(String key) {
         this(key, null);
     }
@@ -90,6 +92,11 @@ public class CookieSpecBuilder {
         return this;
     }
 
+    public CookieSpecBuilder setMaxAge(int maxAge) {
+        this.maxAge = maxAge;
+        return this;
+    }
+
     public String build() {
         List<String> builder = new ArrayList<>();
         builder.add(String.format("%s=%s", getKey(), getValue()));
@@ -104,6 +111,9 @@ public class CookieSpecBuilder {
         }
         if (Objects.equals(Boolean.TRUE, getSecure())) {
             builder.add("Secure");
+        }
+        if (getMaxAge() > 0) {
+            builder.add(String.format("Max-Age=%s", getMaxAge()));
         }
         if (getExpires() != null) {
             builder.add(String.format("Expires=%s", makeExpires()));
@@ -146,6 +156,10 @@ public class CookieSpecBuilder {
 
     public boolean isEncodeBase64Value() {
         return encodeBase64Value;
+    }
+
+    public int getMaxAge() {
+        return maxAge;
     }
 
 }

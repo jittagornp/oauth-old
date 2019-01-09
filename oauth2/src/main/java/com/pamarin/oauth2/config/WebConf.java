@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -61,13 +62,14 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
-        return new SessionCookieSerializer(
-                new CookieSpecBuilder("user-session")
-                        .setHttpOnly(true)
-                        .setSecure(hostUrl.startsWith("https://"))
-                        .setPath("/")
-                        .sameSiteStrict()
-        );
+//        return new SessionCookieSerializer(
+//                new CookieSpecBuilder("user-session")
+//                        .setHttpOnly(true)
+//                        .setSecure(hostUrl.startsWith("https://"))
+//                        .setPath("/")
+//                        .sameSiteStrict()
+//        );
+        return new DefaultCookieSerializer();
     }
 
     @Override

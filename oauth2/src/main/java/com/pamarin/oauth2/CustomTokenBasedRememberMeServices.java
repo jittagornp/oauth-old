@@ -4,8 +4,6 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.commons.util.CookieSpecBuilder;
-import com.pamarin.commons.util.DateConverterUtils;
-import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,7 +24,7 @@ public class CustomTokenBasedRememberMeServices extends TokenBasedRememberMeServ
         String cookieValue = encodeCookie(tokens);
         httpResp.addHeader("Set-Cookie", new CookieSpecBuilder(getCookieName(), cookieValue)
                 .sameSiteStrict()
-                .setExpires(DateConverterUtils.convert2LocalDateTime(new Date(Long.parseLong(tokens[1]))))
+                .setMaxAge(maxAge)
                 .setHttpOnly(true)
                 .setPath("/")
                 .setSecure(httpReq.isSecure())
