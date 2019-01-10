@@ -29,7 +29,11 @@ public class SessionCookieSerializer implements CookieSerializer {
 
     @Override
     public void writeCookieValue(CookieValue cookieValue) {
-        cookieValue.getResponse().addHeader("Set-Cookie", cookieSpecBuilder.setValue(cookieValue.getCookieValue()).build());
+        cookieValue.getResponse().addHeader("Set-Cookie", 
+                cookieSpecBuilder.setValue(cookieValue.getCookieValue())
+                        .setMaxAge(-1)
+                        .build()
+        );
     }
 
     @Override
