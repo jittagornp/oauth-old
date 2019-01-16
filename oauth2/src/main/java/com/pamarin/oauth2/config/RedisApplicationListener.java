@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.web.session.HttpSessionCreatedEvent;
 import org.springframework.security.web.session.HttpSessionDestroyedEvent;
@@ -20,6 +21,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  * @author jitta
  */
 @EnableRedisHttpSession
+@Profile("!test") //inactive for test profile
 public class RedisApplicationListener implements ApplicationListener<ApplicationEvent> {
     
     private static final Logger LOG = LoggerFactory.getLogger(RedisApplicationListener.class);
