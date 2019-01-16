@@ -37,6 +37,9 @@ import org.springframework.web.servlet.resource.VersionResourceResolver;
 @EnableWebMvc
 public class WebConf extends WebMvcConfigurerAdapter {
 
+    @Value("${spring.session.timeout}")
+    private Integer sessionTimeout;
+
     @Bean
     public ResourceUrlEncodingFilter resourceUrlEncodingFilter() {
         return new ResourceUrlEncodingFilter();
@@ -67,6 +70,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
                         .setHttpOnly(true)
                         .setSecure(hostUrl.startsWith("https://"))
                         .setPath("/")
+                        .setMaxAge(sessionTimeout)
                         .sameSiteStrict()
         );
 //        return new DefaultCookieSerializer();
