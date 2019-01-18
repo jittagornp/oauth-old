@@ -10,6 +10,7 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.session.web.http.CookieSerializer;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  *
@@ -17,20 +18,23 @@ import org.springframework.session.web.http.CookieSerializer;
  */
 public class SessionCookieSerializer implements CookieSerializer {
 
-    private final CookieSpecBuilder cookieSpecBuilder;
+    private String cookieName = "user-session";
 
-    public SessionCookieSerializer(CookieSpecBuilder cookieSpecBuilder) {
-        if(!cookieSpecBuilder.isEncodeBase64Value()){
-           cookieSpecBuilder.encodeBase64Value(); 
-        }
-        
-        this.cookieSpecBuilder = cookieSpecBuilder;
-    }
+    private int cookieMaxAge = -1;
+
+    private boolean secure;
 
     @Override
     public void writeCookieValue(CookieValue cookieValue) {
-        cookieValue.getResponse().addHeader("Set-Cookie", 
-                cookieSpecBuilder.setValue(cookieValue.getCookieValue())
+        cookieValue.getResponse().addHeader("Set-Cookie",
+                new CookieSpecBuilder(cookieName)
+                        .encodeBase64Value()
+                        .setHttpOnly(true)
+                        .setSecure(secure)
+                        .setPath("/")
+                        .sameSiteStrict()
+                        .setValue(cookieValue.getCookieValue())
+                        .setMaxAge(hasText(cookieValue.getCookieValue()) ? cookieMaxAge : -1)
                         .build()
         );
     }
@@ -41,7 +45,7 @@ public class SessionCookieSerializer implements CookieSerializer {
         List<String> matchingCookieValues = new ArrayList<>();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (this.cookieSpecBuilder.getKey().equals(cookie.getName())) {
+                if (this.cookieName.equals(cookie.getName())) {
                     String sessionId = base64Decode(cookie.getValue());
                     if (sessionId == null) {
                         continue;
@@ -51,6 +55,18 @@ public class SessionCookieSerializer implements CookieSerializer {
             }
         }
         return matchingCookieValues;
+    }
+
+    public void setCookieName(String cookieName) {
+        this.cookieName = cookieName;
+    }
+
+    public void setSecure(boolean secure) {
+        this.secure = secure;
+    }
+
+    public void setCookieMaxAge(int cookieMaxAge) {
+        this.cookieMaxAge = cookieMaxAge;
     }
 
     private String base64Decode(String base64Value) {

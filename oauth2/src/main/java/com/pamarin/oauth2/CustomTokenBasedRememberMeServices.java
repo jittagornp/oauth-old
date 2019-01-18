@@ -14,6 +14,8 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
  * @author jitta
  */
 public class CustomTokenBasedRememberMeServices extends TokenBasedRememberMeServices {
+    
+    public boolean useSecureCookie = false;
 
     public CustomTokenBasedRememberMeServices(String key, UserDetailsService userDetailsService) {
         super(key, userDetailsService);
@@ -27,8 +29,15 @@ public class CustomTokenBasedRememberMeServices extends TokenBasedRememberMeServ
                 .setMaxAge(maxAge)
                 .setHttpOnly(true)
                 .setPath("/")
-                .setSecure(httpReq.isSecure())
+                .setSecure(useSecureCookie)
                 .build());
     }
 
+    @Override
+    public void setUseSecureCookie(boolean useSecureCookie) {
+        super.setUseSecureCookie(useSecureCookie);
+        this.useSecureCookie = useSecureCookie;
+    }
+
+    
 }

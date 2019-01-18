@@ -19,8 +19,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/19
@@ -77,12 +80,13 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
         service.setCookieName("remember-me");
         service.setUseSecureCookie(hostUrl.startsWith("https://"));
         return service;
+//        return new PersistentTokenBasedRememberMeServices(hostUrl, loginService, tokenRepository);
     }
-
-    @Bean
-    public PersistentTokenRepository newPersistentTokenRepository() {
-        return new InMemoryTokenRepositoryImpl();
-    }
+//
+//    @Bean
+//    public PersistentTokenRepository newPersistentTokenRepository() {
+//        return new JdbcTokenRepositoryImpl()
+//    }
 
     @Bean
     public HashBasedToken newHashBasedToken() {
