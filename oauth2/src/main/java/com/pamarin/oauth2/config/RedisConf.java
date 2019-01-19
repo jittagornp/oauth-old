@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.session.data.redis.RedisOperationsSessionRepository;
@@ -19,6 +21,7 @@ import org.springframework.util.ReflectionUtils;
  */
 @Configuration
 @EnableRedisHttpSession
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Profile("!test") //inactive for test profile
 public class RedisConf {
 
