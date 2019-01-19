@@ -3,7 +3,6 @@
  */
 package com.pamarin.commons.security;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
