@@ -4,8 +4,11 @@
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.AuthenticationException;
+import com.pamarin.commons.provider.HttpServletRequestProvider;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,8 +22,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 class DefaultLoginSession implements LoginSession {
+    
+    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultLoginSession.class);
+
+    @Autowired
+    private HttpServletRequestProvider httpServletRequestProvider;
 
     @Override
     public void create(UserDetails userDetails) {
@@ -32,6 +40,8 @@ class DefaultLoginSession implements LoginSession {
         );
         context.setAuthentication(token);
         SecurityContextHolder.setContext(context);
+        HttpSession session = httpServletRequestProvider.provide().getSession(true);
+        session.setAttribute(SPRING_SECURITY_CONTEXT, context);
     }
 
     @Override
@@ -63,7 +73,7 @@ class DefaultLoginSession implements LoginSession {
         if (authentication == null) {
             AuthenticationException.throwByMessage("Please login.");
         }
-        
+
         return authentication;
     }
 
