@@ -68,8 +68,14 @@ class DefaultLoginSession implements LoginSession {
     }
 
     @Override
+    @SuppressWarnings("null")
     public Authentication getAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //SecurityContext context = SecurityContextHolder.getContext();
+        SecurityContext context = (SecurityContext) httpServletRequestProvider.provide().getSession().getAttribute(SPRING_SECURITY_CONTEXT);
+        if(context == null){
+            AuthenticationException.throwByMessage("Please login.");
+        }
+        Authentication authentication = context.getAuthentication();
         if (authentication == null) {
             AuthenticationException.throwByMessage("Please login.");
         }
