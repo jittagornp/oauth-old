@@ -8,7 +8,7 @@ import com.pamarin.oauth2.model.OAuth2Session;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +24,7 @@ public class SessionEndpointCtrl {
     @Autowired
     private AccessTokenVerification accessTokenVerification;
 
-    @GetMapping("/session")
+    @PostMapping("/session")
     public OAuth2Session getSession(@RequestHeader("Authorization") String authorization) {
         String accessToken = httpAuthorizeBearerParser.parse(authorization);
         AccessTokenVerification.Output output = accessTokenVerification.verify(accessToken);

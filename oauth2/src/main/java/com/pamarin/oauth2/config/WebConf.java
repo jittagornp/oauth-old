@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.config;
 
+import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.SessionCookieSerializer;
@@ -13,6 +14,7 @@ import com.pamarin.oauth2.interceptor.SourceTokenInterceptor;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,9 +41,17 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;
 
+    @Autowired
+    private HostUrlProvider hostUrlProvider;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/authorize").allowedOrigins("*").allowCredentials(true);
+        registry.addMapping("/authorize").allowedOrigins("*");
+        registry.addMapping("/session").allowedOrigins("*");
+        registry.addMapping("/token").allowedOrigins("*");
+        registry.addMapping("/logout").allowedOrigins("*");
+        registry.addMapping("/login").allowedOrigins(hostUrlProvider.provide());
+        registry.addMapping("/login/*").allowedOrigins(hostUrlProvider.provide());
     }
 
     @Bean
