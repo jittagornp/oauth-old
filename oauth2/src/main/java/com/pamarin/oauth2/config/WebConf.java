@@ -67,14 +67,14 @@ public class WebConf extends WebMvcConfigurerAdapter {
         return new RestTemplate();
     }
 
-    @Bean
-    public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
-        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer();
-        cookieSerializer.setCookieMaxAge(sessionTimeout);
-        cookieSerializer.setCookieName("user-session");
-        cookieSerializer.setSecure(hostUrl.startsWith("https://"));
-        return cookieSerializer;
-    }
+//    @Bean
+//    public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
+//        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer();
+//        cookieSerializer.setCookieMaxAge(sessionTimeout);
+//        cookieSerializer.setCookieName("user-session");
+//        cookieSerializer.setSecure(hostUrl.startsWith("https://"));
+//        return cookieSerializer;
+//    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
