@@ -63,8 +63,9 @@ class DefaultLoginSession implements LoginSession {
     @SuppressWarnings("null")
     public UserDetails getUserDetails() {
         Authentication authentication = getAuthentication();
-        if (!(authentication.getPrincipal() instanceof UserDetails)) {
-            LOG.debug("principal name => {}", authentication.getPrincipal().getClass().getName());
+        if (!(authentication.getPrincipal() instanceof UserDetails)) { 
+            LOG.debug("principal class name => {}", authentication.getPrincipal().getClass().getName());
+            LOG.debug("principal value => {}", authentication.getPrincipal());
             AuthenticationException.throwByMessage("Please login, it's not user details.");
         }
 
