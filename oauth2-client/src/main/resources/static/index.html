@@ -8,8 +8,8 @@ and open the template in the editor.
     <head>
         <title>OAuth2 Client</title>
         <meta name="og:title" content="OAuth2 Client">
-        <meta name="description" content="Demo การ Login ด้วย OAuth2">
-        <meta name="og:description" content="Demo การ Login ด้วย OAuth2">
+        <meta name="description" content="Demo การ Login ข้าม Domain Name ด้วย OAuth2">
+        <meta name="og:description" content="Demo การ Login ข้าม Domain Name ด้วย OAuth2">
         <meta name="og:image" content="http://stormpath.com/wp-content/uploads/2016/04/what-is-oauth.jpg"/>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@ and open the template in the editor.
             ตัวอย่างการ Login ข้ามระบบ ข้าม Domain Name เหมือนที่ Google, Facebook ใช้ ด้วย OAuth2
         </p>
         <p>
-            จะทำการ Login และ Get Token จาก Domain <span th:text="${serverDomain}"></span>
+            จะทำการ Login และ Get Token จาก Domain <span th:text="${serverDomain}" style="color : blue;"></span>
         </p>
         <br/>
         <button onclick="location.href='/authorize'">Get Token</button>
