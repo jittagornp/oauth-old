@@ -32,7 +32,7 @@ public class SessionCookieSerializer implements CookieSerializer {
                         .setHttpOnly(true)
                         .setSecure(secure)
                         .setPath("/")
-                        .sameSiteStrict()
+                        //.sameSiteStrict()
                         .setValue(cookieValue.getCookieValue())
                         .setMaxAge(hasText(cookieValue.getCookieValue()) ? cookieMaxAge : -1)
                         .build()
