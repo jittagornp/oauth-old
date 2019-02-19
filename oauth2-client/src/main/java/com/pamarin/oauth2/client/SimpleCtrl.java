@@ -86,6 +86,7 @@ public class SimpleCtrl {
 
         return new ModelAndViewBuilder()
                 .setName("code")
+                .addAttribute("serverDomain", oauth2HostUrl)
                 .addAttribute("code", code)
                 .addAttribute("response", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(response.getBody()))
                 .build();
