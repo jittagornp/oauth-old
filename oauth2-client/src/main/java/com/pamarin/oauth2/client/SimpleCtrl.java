@@ -109,7 +109,7 @@ public class SimpleCtrl {
                 .setName("code")
                 .addAttribute("code", code)
                 .addAttribute("response", writter.writeValueAsString(respBody))
-                .addAttribute("session", writter.writeValueAsString(session.getBody()))
+                .addAttribute("loginSession", writter.writeValueAsString(session.getBody()))
                 .build();
     }
 
