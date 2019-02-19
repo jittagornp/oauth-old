@@ -25,7 +25,6 @@ public class CustomTokenBasedRememberMeServices extends TokenBasedRememberMeServ
     protected void setCookie(String[] tokens, int maxAge, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String cookieValue = encodeCookie(tokens);
         httpResp.addHeader("Set-Cookie", new CookieSpecBuilder(getCookieName(), cookieValue)
-                .sameSiteStrict()
                 .setMaxAge(maxAge)
                 .setHttpOnly(true)
                 .setPath("/")
