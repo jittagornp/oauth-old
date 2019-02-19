@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -37,6 +38,11 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/authorize").allowedOrigins("*").allowCredentials(true);
+    }
 
     @Bean
     public ResourceUrlEncodingFilter resourceUrlEncodingFilter() {
@@ -63,7 +69,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
-        SessionCookieSerializer cookieSerializer =  new SessionCookieSerializer();
+        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer();
         cookieSerializer.setCookieMaxAge(sessionTimeout);
         cookieSerializer.setCookieName("user-session");
         cookieSerializer.setSecure(hostUrl.startsWith("https://"));
