@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +30,9 @@ class DefaultLoginSession implements LoginSession {
 
     @Autowired
     private HttpServletRequestProvider httpServletRequestProvider;
+//    
+//    @Autowired
+//    private SecurityContextRepository securityContextRepository;
 
     @Override
     public void create(UserDetails userDetails) {

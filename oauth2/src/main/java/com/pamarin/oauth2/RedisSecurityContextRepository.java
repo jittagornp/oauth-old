@@ -35,7 +35,7 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 
     //protected final Log logger = LogFactory.getLog(this.getClass());
     
-    private static final Logger logger = LoggerFactory.getLogger(RedisSecurityContextRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisSecurityContextRepository.class);
 
     private SecurityContextDao securityContextDao;
     /**
@@ -50,6 +50,7 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 
     @Override
     public SecurityContext loadContext(HttpRequestResponseHolder requestResponseHolder) {
+        LOG.debug("load context");
         HttpServletRequest request = requestResponseHolder.getRequest();
         HttpServletResponse response = requestResponseHolder.getResponse();
         HttpSession httpSession = request.getSession(false);
@@ -58,8 +59,8 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
         SecurityContext context = readSecurityContextFromRedis(securityContextId);
 
         if (context == null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No SecurityContext was available. A new one will be created.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No SecurityContext was available. A new one will be created.");
             }
             context = SecurityContextHolder.createEmptyContext();
         }
@@ -187,8 +188,8 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 
             // See SEC-776
             if (authentication == null || authenticationTrustResolver.isAnonymous(authentication)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("SecurityContext is empty or anonymous - context will not be stored. ");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("SecurityContext is empty or anonymous - context will not be stored. ");
                 }
 
                 // SEC-1587 A non-anonymous context may still be in the session
@@ -211,8 +212,8 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
                     httpSession.setAttribute(SECURITY_CONTEXT_ID, securityContextId);
                     securityContextDao.saveSecurityContext(securityContextId, context);
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("SecurityContext stored: '" + context + "'");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("SecurityContext stored: '" + context + "'");
                     }
                 }
                 // Atualiza o tempo de expiração do SecurityContext no Redis
@@ -223,8 +224,8 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 
         private HttpSession createNewSessionIfAllowed(SecurityContext context) {
             if (httpSessionExistedAtStartOfRequest) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("HttpSession is now null, but was not null at start of request; "
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("HttpSession is now null, but was not null at start of request; "
                             + "session was invalidated, so do not create a new session");
                 }
 
@@ -232,8 +233,8 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
             }
 
             if (!allowSessionCreation) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("The HttpSession is currently null, and the "
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("The HttpSession is currently null, and the "
                             + HttpSessionSecurityContextRepository.class.getSimpleName()
                             + " is prohibited from creating an HttpSession "
                             + "(because the allowSessionCreation property is false) - SecurityContext thus not "
@@ -245,8 +246,8 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
             // Generate a HttpSession only if we need to
 
             if (contextObject.equals(context)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("HttpSession is null, but SecurityContext has not changed from default empty context: ' "
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("HttpSession is null, but SecurityContext has not changed from default empty context: ' "
                             + context
                             + "'; not creating HttpSession or storing SecurityContext");
                 }
@@ -254,15 +255,15 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
                 return null;
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("HttpSession being created as SecurityContext is non-default");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("HttpSession being created as SecurityContext is non-default");
             }
 
             try {
                 return request.getSession(true);
             } catch (IllegalStateException e) {
                 // Response must already be committed, therefore can't create a new session
-                logger.warn("Failed to create a session, as response has been committed. Unable to store"
+                LOG.warn("Failed to create a session, as response has been committed. Unable to store"
                         + " SecurityContext.");
             }
 

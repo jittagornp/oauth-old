@@ -53,11 +53,11 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers("/assets/**", "/favicon.ico");
     }
-    
-    @Bean
-    public SecurityContextRepository newSecurityContextRepository(){
-        return new RedisSecurityContextRepository();
-    }
+//    
+//    @Bean
+//    public SecurityContextRepository newSecurityContextRepository(){
+//        return new RedisSecurityContextRepository();
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -82,11 +82,11 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                 .and()
                 .rememberMe()
                 .key(REMEMBER_ME_KEY)
-                .rememberMeServices(newRememberMeServices())
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .addLogoutHandler(newLogoutHandler());
+                .rememberMeServices(newRememberMeServices());
+//                .and()
+//                .logout()
+//                .logoutUrl("/logout")
+//                .addLogoutHandler(newLogoutHandler());
     }
 
     @Bean
@@ -101,11 +101,11 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
         return service;
 //        return new PersistentTokenBasedRememberMeServices(hostUrl, loginService, tokenRepository);
     }
-    
-    @Bean
-    public LogoutHandler newLogoutHandler(){
-        return new RedisLogoutHandler();
-    }
+//    
+//    @Bean
+//    public LogoutHandler newLogoutHandler(){
+//        return new RedisLogoutHandler();
+//    }
 //
 //    @Bean
 //    public PersistentTokenRepository newPersistentTokenRepository() {
