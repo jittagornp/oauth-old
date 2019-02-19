@@ -54,12 +54,12 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                 .antMatchers("/assets/**", "/favicon.ico");
     }
 
-    
-    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
+                .anyRequest()
+                .fullyAuthenticated()
                 .antMatchers(
                         "/authorize",
                         "/token",
@@ -71,8 +71,6 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         "/favicon.ico"
                 )
                 .permitAll()
-                .anyRequest()
-                .fullyAuthenticated()
                 .and()
                 .rememberMe()
                 .key(REMEMBER_ME_KEY)
