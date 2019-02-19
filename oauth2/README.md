@@ -18,7 +18,8 @@ Implement ตาม Spec `RFC6749` : https://tools.ietf.org/html/rfc6749
 
 # DEMO
 
-> https://oauth2-pamarin.herokuapp.com/ 
+> Server : https://oauth2-pamarin.herokuapp.com/  
+> Client : https://oauth2-client-pamarin.herokuapp.com/  
 
 # Requires
 - Java 8+ http://www.oracle.com/technetwork/java/javase/downloads/index.html 
