@@ -40,8 +40,8 @@ class DefaultLoginSession implements LoginSession {
         );
         context.setAuthentication(token);
         SecurityContextHolder.setContext(context);
-        HttpSession session = httpServletRequestProvider.provide().getSession(true);
-        session.setAttribute(SPRING_SECURITY_CONTEXT, context);
+        //HttpSession session = httpServletRequestProvider.provide().getSession(true);
+        //session.setAttribute(SPRING_SECURITY_CONTEXT, context);
     }
 
     @Override
@@ -70,8 +70,8 @@ class DefaultLoginSession implements LoginSession {
     @Override
     @SuppressWarnings("null")
     public Authentication getAuthentication() {
-        //SecurityContext context = SecurityContextHolder.getContext();
-        SecurityContext context = (SecurityContext) httpServletRequestProvider.provide().getSession().getAttribute(SPRING_SECURITY_CONTEXT);
+        SecurityContext context = SecurityContextHolder.getContext();
+        //SecurityContext context = (SecurityContext) httpServletRequestProvider.provide().getSession().getAttribute(SPRING_SECURITY_CONTEXT);
         if(context == null){
             AuthenticationException.throwByMessage("Please login.");
         }
