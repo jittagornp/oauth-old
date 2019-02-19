@@ -95,7 +95,10 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Bean
     public CsrfInterceptor newCsrfInterceptor() {
         CsrfInterceptor interceptor = new CsrfInterceptor();
-        interceptor.setIgnorePaths("/token");
+        interceptor.setIgnorePaths(
+                "/token",
+                "/session"
+        );
         return interceptor;
     }
 
