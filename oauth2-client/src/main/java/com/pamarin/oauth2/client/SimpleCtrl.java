@@ -116,7 +116,7 @@ public class SimpleCtrl {
     private ResponseEntity<Map> getSession(String accessToken) {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-        headers.add("Authorization", "Basic " + accessToken);
+        headers.add("Authorization", "Bearer " + accessToken);
 
         //MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(null, headers);
