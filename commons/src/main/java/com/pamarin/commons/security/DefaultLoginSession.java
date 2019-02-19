@@ -43,6 +43,8 @@ class DefaultLoginSession implements LoginSession {
                 userDetails.getAuthorities()
         );
         context.setAuthentication(token);
+        SecurityContextHolder.clearContext();
+        httpServletRequestProvider.provide().getSession(true);
         SecurityContextHolder.setContext(context);
         //HttpSession session = httpServletRequestProvider.provide().getSession(true);
         //session.setAttribute(SPRING_SECURITY_CONTEXT, context);
