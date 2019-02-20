@@ -48,9 +48,4 @@ public class RedisConf {
         sessionRepository.setRedisFlushMode("on-save".equals(flushMode) ? RedisFlushMode.ON_SAVE : RedisFlushMode.IMMEDIATE);
         return sessionRepository;
     }
-//
-//    @Bean
-//    public LettuceConnectionFactory connectionFactory() {
-//        return new LettuceConnectionFactory();
-//    }
 }
