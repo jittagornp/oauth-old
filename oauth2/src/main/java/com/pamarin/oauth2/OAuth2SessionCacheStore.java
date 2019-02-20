@@ -23,4 +23,9 @@ public class OAuth2SessionCacheStore extends RedisCacheStoreAdaptor<OAuth2Sessio
         return 3;
     }
 
+    @Override
+    protected Class<OAuth2Session> getTypeClass() {
+        return OAuth2Session.class;
+    }
+
 }
