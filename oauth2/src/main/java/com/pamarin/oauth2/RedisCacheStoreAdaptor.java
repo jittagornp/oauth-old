@@ -51,7 +51,10 @@ public abstract class RedisCacheStoreAdaptor<T> implements CacheStore<T> {
         try {
             String fullKey = makeKey(key);
             String value = redisTemplate.opsForValue().get(fullKey);
-            LOG.debug("Redis get \"{}\" = {}", key, value);
+            LOG.debug("Redis get \"{}\" = {}", fullKey, value);
+            if(value == null){
+                return null;
+            }
             return objectMapper.readValue(value, getTypeClass());
         } catch (IOException ex) {
             throw new RuntimeException("Can't parse JSON string to object", ex);
