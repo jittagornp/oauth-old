@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class OAuth2Session {
+public class OAuth2Session implements Serializable {
 
     private String id;
     
@@ -31,7 +32,7 @@ public class OAuth2Session {
     @Getter
     @Setter
     @Builder
-    public static class User {
+    public static class User implements Serializable {
 
         private String id;
 
@@ -51,7 +52,7 @@ public class OAuth2Session {
     @Getter
     @Setter
     @Builder
-    public static class Client {
+    public static class Client implements Serializable {
 
         private String id;
 

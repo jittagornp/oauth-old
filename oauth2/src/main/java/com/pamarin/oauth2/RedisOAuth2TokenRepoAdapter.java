@@ -27,7 +27,7 @@ public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> imp
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisOAuth2TokenRepoAdapter.class);
 
-    private static final int SECRET_KEY_SIZE = 21;
+    private static final int SECRET_KEY_SIZE = 7;
     
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
