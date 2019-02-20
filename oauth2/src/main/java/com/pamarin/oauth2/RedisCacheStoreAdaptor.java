@@ -39,7 +39,7 @@ public abstract class RedisCacheStoreAdaptor<T> implements CacheStore<T> {
         try {
             String fullKey = makeKey(key);
             String json = objectMapper.writeValueAsString(value);
-            LOG.debug("Redis set \"{}\" = {}", key, json);
+            LOG.debug("Redis set \"{}\" = {}", fullKey, json);
             redisTemplate.opsForValue().set(fullKey, json, getExpiresMinutes(), TimeUnit.MINUTES);
         } catch (JsonProcessingException ex) {
             throw new RuntimeException("Can't parse object to JSON string", ex);
