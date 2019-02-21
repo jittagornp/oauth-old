@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.domain.OAuth2Client;
 import com.pamarin.oauth2.model.OAuth2Session;
 import com.pamarin.oauth2.repository.OAuth2ClientRepo;

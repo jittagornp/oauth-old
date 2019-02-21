@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,7 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  */
 public abstract class RedisCacheStoreAdaptor<T> implements CacheStore<T> {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(RedisCacheStoreAdaptor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisCacheStoreAdaptor.class);
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;

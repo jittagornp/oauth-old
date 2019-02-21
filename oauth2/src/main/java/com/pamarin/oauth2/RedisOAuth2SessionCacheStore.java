@@ -3,15 +3,14 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.model.OAuth2Session;
-import org.springframework.stereotype.Service;
 
 /**
  *
  * @author jitta
  */
-@Service
-public class OAuth2SessionCacheStore extends RedisCacheStoreAdaptor<OAuth2Session> {
+public class RedisOAuth2SessionCacheStore extends RedisCacheStoreAdaptor<OAuth2Session> implements OAuth2SessionCacheStore {
 
     @Override
     protected String getPrefix() {

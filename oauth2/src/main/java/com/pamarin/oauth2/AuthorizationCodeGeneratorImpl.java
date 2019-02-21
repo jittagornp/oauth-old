@@ -5,6 +5,7 @@ package com.pamarin.oauth2;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.AuthorizationResponse;
 import com.pamarin.oauth2.service.AuthorizationCodeGenerator;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import com.pamarin.commons.security.RSAKeyPairs;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -32,8 +35,17 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
     @Qualifier("autorizationCodeKeyPairs")
     private RSAKeyPairs keyPairs;
 
+    @Autowired
+    private HttpServletRequestProvider httpServletRequestProvider;
+
     private Algorithm getAlgorithm() {
         return Algorithm.RSA256(keyPairs.getPublicKey(), keyPairs.getPrivateKey());
+    }
+
+    private String getSessionId() {
+        HttpServletRequest httpReq = httpServletRequestProvider.provide();
+        HttpSession session = httpReq == null ? null : httpReq.getSession();
+        return session == null ? null : session.getId();
     }
 
     @Override
@@ -48,6 +60,7 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
                 .withIssuedAt(convert2Date(now))
                 .withExpiresAt(convert2Date(expires))
                 .withArrayClaim("scopes", req.getScopes().toArray(arr))
+                .withClaim("session", getSessionId())
                 .sign(getAlgorithm());
         return AuthorizationResponse.builder()
                 .code(code)

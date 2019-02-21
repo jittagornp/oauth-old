@@ -10,6 +10,8 @@ import com.pamarin.commons.security.SessionCookieSerializer;
 import com.pamarin.commons.security.DefaultAuthenticityToken;
 import com.pamarin.oauth2.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.RedisOAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.RedisOAuth2SessionCacheStore;
+import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.interceptor.SourceTokenInterceptor;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
@@ -120,5 +122,10 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Bean
     public OAuth2RefreshTokenRepo newOAuth2RefreshTokenRepo() {
         return new RedisOAuth2RefreshTokenRepo();
+    }
+
+    @Bean
+    public OAuth2SessionCacheStore newOAuth2SessionCacheStore() {
+        return new RedisOAuth2SessionCacheStore();
     }
 }

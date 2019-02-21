@@ -81,6 +81,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
         service.setParameter("remember-me");
         service.setCookieName("remember-me");
         service.setUseSecureCookie(hostUrl.startsWith("https://"));
+        //service.setTokenValiditySeconds(0);
         return service;
     }
 
