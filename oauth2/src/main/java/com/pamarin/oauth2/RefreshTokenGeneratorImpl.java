@@ -39,6 +39,7 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
                 .id(base.getId())
                 .userId(base.getUserId())
                 .clientId(base.getClientId())
+                .sessionId(base.getSessionId())
                 .build());
     }
 

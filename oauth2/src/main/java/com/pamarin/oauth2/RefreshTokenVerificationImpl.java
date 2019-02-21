@@ -50,6 +50,7 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
             base.setId(id);
             base.setClientId(refreshToken.getClientId());
             base.setUserId(refreshToken.getUserId());
+            base.setSessionId(refreshToken.getSessionId());
             return DefaultUserDetails.builder()
                     .username(refreshToken.getId())
                     .password(user.getPassword() + refreshToken.getSecretKey())

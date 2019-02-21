@@ -4,8 +4,12 @@
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.AuthenticationException;
+import com.pamarin.commons.provider.HttpServletRequestProvider;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -21,6 +25,9 @@ import org.springframework.stereotype.Component;
 class DefaultLoginSession implements LoginSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultLoginSession.class);
+
+    @Autowired
+    private HttpServletRequestProvider httpServletRequestProvider;
 
     @Override
     public void create(UserDetails userDetails) {
@@ -50,7 +57,7 @@ class DefaultLoginSession implements LoginSession {
     @SuppressWarnings("null")
     public UserDetails getUserDetails() {
         Authentication authentication = getAuthentication();
-        if (!(authentication.getPrincipal() instanceof UserDetails)) { 
+        if (!(authentication.getPrincipal() instanceof UserDetails)) {
             LOG.debug("principal class name => {}", authentication.getPrincipal().getClass().getName());
             LOG.debug("principal value => {}", authentication.getPrincipal());
             AuthenticationException.throwByMessage("Please login, it's not user details.");
@@ -63,7 +70,7 @@ class DefaultLoginSession implements LoginSession {
     @SuppressWarnings("null")
     public Authentication getAuthentication() {
         SecurityContext context = SecurityContextHolder.getContext();
-        if(context == null){
+        if (context == null) {
             AuthenticationException.throwByMessage("Please login.");
         }
         Authentication authentication = context.getAuthentication();
@@ -74,4 +81,12 @@ class DefaultLoginSession implements LoginSession {
         return authentication;
     }
 
+    @Override
+    public String getSessionId() {
+        HttpServletRequest httpReq = httpServletRequestProvider.provide();
+        HttpSession session = httpReq == null ? null : httpReq.getSession();
+        return session == null ? null : session.getId();
+    }
+
 }
+ 

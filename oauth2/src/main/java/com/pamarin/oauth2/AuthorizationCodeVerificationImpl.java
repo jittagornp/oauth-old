@@ -31,6 +31,7 @@ public class AuthorizationCodeVerificationImpl implements TokenVerification {
         return TokenBase.builder()
                 .clientId(decoded.getSubject())
                 .userId(decoded.getIssuer())
+                .sessionId(decoded.getClaim("session").asString())
                 .build();
     }
 }

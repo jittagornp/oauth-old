@@ -19,4 +19,6 @@ public interface LoginSession {
     UserDetails getUserDetails();
 
     Authentication getAuthentication();
+     
+    String getSessionId();
 }

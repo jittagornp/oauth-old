@@ -20,5 +20,7 @@ public class TokenBase {
     private String userId;
     
     private String clientId;
+    
+    private String sessionId;
 
 }

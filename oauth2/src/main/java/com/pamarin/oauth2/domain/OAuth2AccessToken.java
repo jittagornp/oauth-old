@@ -28,6 +28,8 @@ public class OAuth2AccessToken implements OAuth2Token {
     private int expireMinutes; 
     
     private String secretKey;
+    
+    private String sessionId;
 
     @Override
     public Object clone() throws CloneNotSupportedException {

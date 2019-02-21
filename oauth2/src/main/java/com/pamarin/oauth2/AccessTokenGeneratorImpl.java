@@ -73,6 +73,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
                 .userId(base.getUserId())
                 .clientId(base.getClientId())
+                .sessionId(base.getSessionId())
                 .build()
         );
         String token = hashBasedToken.hash(
@@ -97,6 +98,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         return buildAccessTokenResponse(TokenBase.builder()
                 .clientId(req.getClientId())
                 .userId(userDetails.getUsername())
+                .sessionId(loginSession.getSessionId())
                 .build());
     }
 
