@@ -46,7 +46,7 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
         if (session == null) {
             OAuth2Client client = clientRepo.findOne(output.getClientId());
             session = OAuth2Session.builder()
-                    .id(output.getId())
+                    .id(output.getSessionId())
                     .issuedAt(output.getIssuedAt())
                     .expiresAt(output.getExpiresAt())
                     .user(
@@ -62,7 +62,7 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
                             .scopes(client == null ? null : clientScopeRepo.findScopeByClientId(client.getId()))
                             .build()
                     )
-                    .session(output.getSessionId())
+                    .token(output.getId())
                     .build();
             cacheStore.cache(output.getId(), session);
         }
