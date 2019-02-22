@@ -49,7 +49,7 @@ public class DefaultAESEncryption implements AESEncryption {
     }
 
     private SecretKeySpec makeSecretKeySpec(String key) throws UnsupportedEncodingException {
-        return new SecretKeySpec(getKeyFixed(key).getBytes("UTF-8"), ALGORITHM);
+        return new SecretKeySpec(getKeyFixed(key).getBytes(), ALGORITHM);
     }
 
     @Override
