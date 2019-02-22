@@ -28,7 +28,7 @@ public class OAuth2Session implements Serializable {
 
     private Client client;
     
-    private String token;
+    private String session;
 
     @Getter
     @Setter
