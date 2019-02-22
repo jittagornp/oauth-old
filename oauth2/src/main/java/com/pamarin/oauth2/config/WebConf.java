@@ -42,6 +42,9 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;
+    
+    @Value("${spring.session.secretKey}")
+    private String secretKey;
 
     @Autowired
     private HostUrlProvider hostUrlProvider;
@@ -81,7 +84,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
-        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer();
+        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer(secretKey);
         cookieSerializer.setCookieMaxAge(sessionTimeout);
         cookieSerializer.setCookieName("user-session");
         cookieSerializer.setSecure(hostUrl.startsWith("https://"));

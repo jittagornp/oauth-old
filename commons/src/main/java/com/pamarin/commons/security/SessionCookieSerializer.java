@@ -24,16 +24,27 @@ public class SessionCookieSerializer implements CookieSerializer {
 
     private boolean secure;
 
+    private final Base64AESEncryption aesEncryption = new DefaultBase64AESEncryption(DefaultAESEncryption.withKeyLength16());
+
+    private final String secretKey;
+
+    public SessionCookieSerializer(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
     @Override
     public void writeCookieValue(CookieValue cookieValue) {
+        String value = cookieValue.getCookieValue();
+        boolean hasValue = hasText(value);
+        int maxAge = hasValue ? cookieMaxAge : -1;
+        String token = hasValue ? aesEncryption.encrypt(value, secretKey) : null;
         cookieValue.getResponse().addHeader("Set-Cookie",
                 new CookieSpecBuilder(cookieName)
-                        .encodeBase64Value()
                         .setHttpOnly(true)
                         .setSecure(secure)
                         .setPath("/")
-                        .setValue(cookieValue.getCookieValue())
-                        .setMaxAge(hasText(cookieValue.getCookieValue()) ? cookieMaxAge : -1)
+                        .setValue(token)
+                        .setMaxAge(maxAge)
                         .build()
         );
     }
@@ -45,11 +56,10 @@ public class SessionCookieSerializer implements CookieSerializer {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (this.cookieName.equals(cookie.getName())) {
-                    String sessionId = base64Decode(cookie.getValue());
-                    if (sessionId == null) {
+                    if (!hasText(cookie.getValue())) {
                         continue;
                     }
-                    matchingCookieValues.add(sessionId);
+                    matchingCookieValues.add(aesEncryption.decrypt(cookie.getValue(), secretKey));
                 }
             }
         }
@@ -66,14 +76,6 @@ public class SessionCookieSerializer implements CookieSerializer {
 
     public void setCookieMaxAge(int cookieMaxAge) {
         this.cookieMaxAge = cookieMaxAge;
-    }
-
-    private String base64Decode(String base64Value) {
-        try {
-            return new String(Base64.getDecoder().decode(base64Value));
-        } catch (Exception e) {
-            return null;
-        }
     }
 
 }

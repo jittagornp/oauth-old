@@ -9,8 +9,8 @@ package com.pamarin.commons.security;
  */
 public interface AESEncryption {
 
-    byte[] encrypt(byte[] data, String key);
+    byte[] encrypt(byte[] data, String secretKey);
 
-    byte[] decrypt(byte[] data, String key);
+    byte[] decrypt(byte[] data, String secretKey);
 
 }

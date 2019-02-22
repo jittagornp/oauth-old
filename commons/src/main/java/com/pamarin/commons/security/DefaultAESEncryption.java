@@ -18,7 +18,6 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author jitta
  */
-//@Component
 public class DefaultAESEncryption implements AESEncryption {
 
     private static final String ALGORITHM = "AES";
@@ -41,22 +40,22 @@ public class DefaultAESEncryption implements AESEncryption {
         return new DefaultAESEncryption(32);
     }
 
-    private String getKeyFixed(String key) {
-        if (key.length() > keyLength) {
-            key = key.substring(0, keyLength);
+    private String getFixedKey(String secretKey) {
+        if (secretKey.length() > keyLength) {
+            secretKey = secretKey.substring(0, keyLength);
         }
-        return StringUtils.rightPad(key, keyLength);
+        return StringUtils.rightPad(secretKey, keyLength);
     }
 
-    private SecretKeySpec makeSecretKeySpec(String key) throws UnsupportedEncodingException {
-        return new SecretKeySpec(getKeyFixed(key).getBytes(), ALGORITHM);
+    private SecretKeySpec makeSecretKeySpec(String secretKey) throws UnsupportedEncodingException {
+        return new SecretKeySpec(getFixedKey(secretKey).getBytes(), ALGORITHM);
     }
 
     @Override
-    public byte[] encrypt(byte[] data, String key) {
+    public byte[] encrypt(byte[] data, String secretKey) {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, makeSecretKeySpec(key));
+            cipher.init(Cipher.ENCRYPT_MODE, makeSecretKeySpec(secretKey));
             return cipher.doFinal(data);
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             throw new AESEncryptionException(ex);
@@ -64,10 +63,10 @@ public class DefaultAESEncryption implements AESEncryption {
     }
 
     @Override
-    public byte[] decrypt(byte[] data, String key) {
+    public byte[] decrypt(byte[] data, String secretKey) {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, makeSecretKeySpec(key));
+            cipher.init(Cipher.DECRYPT_MODE, makeSecretKeySpec(secretKey));
             return cipher.doFinal(data);
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             throw new AESEncryptionException(ex);
