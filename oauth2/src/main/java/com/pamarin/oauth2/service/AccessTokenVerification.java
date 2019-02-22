@@ -28,6 +28,8 @@ public interface AccessTokenVerification {
         private String userId;
 
         private String clientId;
+        
+        private String sessionId;
 
     }
 }

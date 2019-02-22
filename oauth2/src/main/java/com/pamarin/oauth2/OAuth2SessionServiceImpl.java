@@ -62,6 +62,7 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
                             .scopes(client == null ? null : clientScopeRepo.findScopeByClientId(client.getId()))
                             .build()
                     )
+                    .session(output.getSessionId())
                     .build();
             cacheStore.cache(output.getId(), session);
         }

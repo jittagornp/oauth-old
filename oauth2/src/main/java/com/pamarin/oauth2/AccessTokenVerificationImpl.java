@@ -38,6 +38,7 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
             output.setExpiresAt(token.getExpiresAt());
             output.setUserId(token.getUserId());
             output.setClientId(token.getClientId());
+            output.setSessionId(token.getSessionId());
             return DefaultUserDetails.builder()
                     .username(token.getId())
                     .password(token.getSecretKey())
