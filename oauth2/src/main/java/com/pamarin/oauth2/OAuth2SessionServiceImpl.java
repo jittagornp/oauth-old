@@ -39,31 +39,35 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
     @Autowired
     private OAuth2SessionCacheStore cacheStore;
 
+    private OAuth2Session buildOAuth2Session(AccessTokenVerification.Output output) {
+        OAuth2Client client = clientRepo.findOne(output.getClientId());
+        return OAuth2Session.builder()
+                .id(output.getSessionId())
+                .issuedAt(output.getIssuedAt())
+                .expiresAt(output.getExpiresAt())
+                .user(
+                        OAuth2Session.User.builder()
+                                .id(output.getUserId())
+                                .name("นาย สมชาย ใจดี")
+                                .authorities(Arrays.asList("sso"))
+                                .build()
+                )
+                .client(OAuth2Session.Client.builder()
+                        .id(client == null ? null : client.getId())
+                        .name(client == null ? null : client.getName())
+                        .scopes(client == null ? null : clientScopeRepo.findScopeByClientId(client.getId()))
+                        .build()
+                )
+                .token(output.getId())
+                .build();
+    }
+
     @Override
     public OAuth2Session getSession(String accessToken) {
         AccessTokenVerification.Output output = accessTokenVerification.verify(accessToken);
         OAuth2Session session = cacheStore.get(output.getId());
         if (session == null) {
-            OAuth2Client client = clientRepo.findOne(output.getClientId());
-            session = OAuth2Session.builder()
-                    .id(output.getId())
-                    .issuedAt(output.getIssuedAt())
-                    .expiresAt(output.getExpiresAt())
-                    .user(
-                            OAuth2Session.User.builder()
-                                    .id(output.getUserId())
-                                    .name("นาย สมชาย ใจดี")
-                                    .authorities(Arrays.asList("sso"))
-                                    .build()
-                    )
-                    .client(OAuth2Session.Client.builder()
-                            .id(client == null ? null : client.getId())
-                            .name(client == null ? null : client.getName())
-                            .scopes(client == null ? null : clientScopeRepo.findScopeByClientId(client.getId()))
-                            .build()
-                    )
-                    .session(output.getSessionId())
-                    .build();
+            session = buildOAuth2Session(output);
             cacheStore.cache(output.getId(), session);
         }
         return session;
