@@ -17,6 +17,8 @@ import lombok.Setter;
 @Setter
 @Builder
 public class OAuth2Session implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
 
     private String id;
     

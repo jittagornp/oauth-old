@@ -20,6 +20,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Setter
 @Builder
 public class DefaultUserDetails implements UserDetails {
+    
+    private static final long serialVersionUID = 1L;
 
     private String username;
 
