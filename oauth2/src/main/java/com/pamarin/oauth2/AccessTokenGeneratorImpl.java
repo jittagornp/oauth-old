@@ -65,9 +65,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
 
     @Autowired
     private HashBasedToken hashBasedToken;
-
-    @Autowired
-    private OAuth2SessionCacheStore sessionCacheStore;
+//
+//    @Autowired
+//    private OAuth2SessionCacheStore sessionCacheStore;
 
     private AccessTokenResponse buildAccessTokenResponse(TokenBase base) {
         OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
@@ -127,6 +127,6 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     private void revokeToken(String tokenId) {
         refreshTokenRepo.deleteById(tokenId);
         accessTokenRepo.deleteById(tokenId);
-        sessionCacheStore.delete(tokenId);
+        //sessionCacheStore.delete(tokenId);
     }
 }

@@ -23,35 +23,35 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableRedisHttpSession
 @Profile("!test") //inactive for test profile
 public class RedisApplicationListener implements ApplicationListener<ApplicationEvent> {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(RedisApplicationListener.class);
 
     @Value("${spring.session.timeout}")
-    private Integer maxInactiveIntervalInSeconds;
+    private Integer sessionTimeout;
 
     @Autowired
     private RedisOperationsSessionRepository redisOperation;
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
-        
+
         if (event instanceof ContextRefreshedEvent) {
-            LOG.debug("ContextRefreshedEvent..., redisOperation.setDefaultMaxInactiveInterval({})", maxInactiveIntervalInSeconds);
-            redisOperation.setDefaultMaxInactiveInterval(maxInactiveIntervalInSeconds);
+            LOG.debug("ContextRefreshedEvent..., redisOperation.setDefaultMaxInactiveInterval({})", sessionTimeout);
+            redisOperation.setDefaultMaxInactiveInterval(sessionTimeout);
             return;
         }
-        
-        if(event instanceof HttpSessionCreatedEvent){
-            HttpSessionCreatedEvent ev = (HttpSessionCreatedEvent)event;
+
+        if (event instanceof HttpSessionCreatedEvent) {
+            HttpSessionCreatedEvent ev = (HttpSessionCreatedEvent) event;
             LOG.debug("session id {} was created...", ev.getSession().getId());
             return;
         }
-        
-        if(event instanceof HttpSessionDestroyedEvent){
-            HttpSessionDestroyedEvent ev = (HttpSessionDestroyedEvent)event;
+
+        if (event instanceof HttpSessionDestroyedEvent) {
+            HttpSessionDestroyedEvent ev = (HttpSessionDestroyedEvent) event;
             LOG.debug("session id {} expires...", ev.getId());
         }
-        
+
     }
 
 }

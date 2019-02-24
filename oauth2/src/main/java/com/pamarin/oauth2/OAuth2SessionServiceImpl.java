@@ -4,8 +4,8 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.commons.security.LoginSession;
-import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.domain.OAuth2Client;
+import com.pamarin.oauth2.exception.OAuth2ClientNotFoundException;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
 import com.pamarin.oauth2.repository.OAuth2ClientRepo;
@@ -38,16 +38,13 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
     private OAuth2ClientRepo clientRepo;
 
     @Autowired
-    private AccessTokenVerification accessTokenVerification;
-
-    @Autowired
-    private OAuth2SessionCacheStore cacheStore;
-
-    @Autowired
     private LoginSession loginSession;
 
     private OAuth2Session buildOAuth2Session(AccessTokenVerification.Output output) {
         OAuth2Client client = clientRepo.findOne(output.getClientId());
+        if (client == null) {
+            throw new OAuth2ClientNotFoundException("Not found client id " + output.getClientId());
+        }
         return OAuth2Session.builder()
                 .id(output.getSessionId())
                 .issuedAt(output.getIssuedAt())
@@ -60,12 +57,11 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
                                 .build()
                 )
                 .client(OAuth2Session.Client.builder()
-                        .id(client == null ? null : client.getId())
-                        .name(client == null ? null : client.getName())
-                        .scopes(client == null ? null : clientScopeRepo.findScopeByClientId(client.getId()))
+                        .id(client.getId())
+                        .name(client.getName())
+                        .scopes(clientScopeRepo.findScopeByClientId(client.getId()))
                         .build()
                 )
-                .token(output.getId())
                 .build();
     }
 

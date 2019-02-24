@@ -26,7 +26,7 @@ import org.springframework.util.ReflectionUtils;
 public class RedisConf {
 
     @Value("${spring.session.timeout}")
-    private Integer maxInactiveIntervalInSeconds;
+    private Integer sessionTimeout;
 
     @Value("${spring.session.redis.namespace}")
     private String namespace;
@@ -44,7 +44,7 @@ public class RedisConf {
         keyPrefixField.setAccessible(true);
         ReflectionUtils.setField(keyPrefixField, sessionRepository, namespace + ":");
 
-        sessionRepository.setDefaultMaxInactiveInterval(maxInactiveIntervalInSeconds);
+        sessionRepository.setDefaultMaxInactiveInterval(sessionTimeout);
         sessionRepository.setRedisFlushMode("on-save".equals(flushMode) ? RedisFlushMode.ON_SAVE : RedisFlushMode.IMMEDIATE);
         return sessionRepository;
     }

@@ -49,9 +49,9 @@ public class LoginCtrl {
 
     @Autowired
     private LoginSession loginSession;
-
-    @Autowired
-    private RememberMeServices rememberMeServices;
+//
+//    @Autowired
+//    private RememberMeServices rememberMeServices;
 
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);
@@ -83,7 +83,7 @@ public class LoginCtrl {
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
         try {
             loginService.login(credential.getUsername(), credential.getPassword());
-            rememberMeServices.loginSuccess(httpReq, httpResp, loginSession.getAuthentication());
+            //rememberMeServices.loginSuccess(httpReq, httpResp, loginSession.getAuthentication());
             httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + req.buildQuerystring());
         } catch (InvalidUsernamePasswordException ex) {
             LOG.warn("Invalid username password ", ex);

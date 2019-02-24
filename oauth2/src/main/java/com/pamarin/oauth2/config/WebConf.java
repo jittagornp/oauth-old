@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.config;
 
-import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.oauth2.security.SessionCookieSerializer;
@@ -11,8 +10,6 @@ import com.pamarin.commons.security.DefaultAuthenticityToken;
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
 import com.pamarin.oauth2.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.RedisOAuth2RefreshTokenRepo;
-import com.pamarin.oauth2.RedisOAuth2SessionCacheStore;
-import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.interceptor.SourceTokenInterceptor;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
@@ -44,9 +41,12 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;
+    
+    @Value("${spring.session.access-token.timeout}")
+    private Integer accessTokenTimeout;
 
-    @Value("${spring.session.rememberme.timeout}")
-    private Integer remembermeTimeout;
+    @Value("${spring.session.refresh-token.timeout}")
+    private Integer refreshTokenTimeout;
 
     @Value("${spring.session.secretKey}")
     private String secretKey;
@@ -130,16 +130,11 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public OAuth2AccessTokenRepo newOAuth2AccessTokenRepo() {
-        return new RedisOAuth2AccessTokenRepo(sessionTimeout / 60);
+        return new RedisOAuth2AccessTokenRepo(accessTokenTimeout / 60);
     }
 
     @Bean
     public OAuth2RefreshTokenRepo newOAuth2RefreshTokenRepo() {
-        return new RedisOAuth2RefreshTokenRepo(remembermeTimeout / 60);
-    }
-
-    @Bean
-    public OAuth2SessionCacheStore newOAuth2SessionCacheStore() {
-        return new RedisOAuth2SessionCacheStore();
+        return new RedisOAuth2RefreshTokenRepo(refreshTokenTimeout / 60);
     }
 }

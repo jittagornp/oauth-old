@@ -31,9 +31,9 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     private static final String REMEMBER_ME_KEY = "test";
 
     private static final String HASHBASED_KEY = "test";
-
-    @Value("${spring.session.rememberme.timeout}")
-    private Integer remembermeTimeout;
+//
+//    @Value("${spring.session.rememberme.timeout}")
+//    private Integer remembermeTimeout;
 
     @Autowired
     private LoginService loginService;
@@ -68,25 +68,27 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                 )
                 .permitAll()
                 .anyRequest()
-                .fullyAuthenticated()
+                .authenticated();
+                /*
+                .fullyAuthenticated();
                 .and()
                 .rememberMe()
                 .key(REMEMBER_ME_KEY)
-                .rememberMeServices(newRememberMeServices());
+                .rememberMeServices(newRememberMeServices());*/
     }
-
-    @Bean
-    public RememberMeServices newRememberMeServices() {
-        TokenBasedRememberMeServices service = new CustomTokenBasedRememberMeServices(
-                REMEMBER_ME_KEY,
-                loginService
-        );
-        service.setParameter("remember-me");
-        service.setCookieName("remember-me");
-        service.setUseSecureCookie(hostUrl.startsWith("https://"));
-        service.setTokenValiditySeconds(remembermeTimeout);
-        return service;
-    }
+//
+//    @Bean
+//    public RememberMeServices newRememberMeServices() {
+//        TokenBasedRememberMeServices service = new CustomTokenBasedRememberMeServices(
+//                REMEMBER_ME_KEY,
+//                loginService
+//        );
+//        service.setParameter("remember-me");
+//        service.setCookieName("remember-me");
+//        service.setUseSecureCookie(hostUrl.startsWith("https://"));
+//        service.setTokenValiditySeconds(remembermeTimeout);
+//        return service;
+//    }
 
     @Bean
     public HashBasedToken newHashBasedToken() {
