@@ -11,6 +11,12 @@ import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
  */
 public class RedisOAuth2RefreshTokenRepo extends RedisOAuth2TokenRepoAdapter<OAuth2RefreshToken> implements OAuth2RefreshTokenRepo {
 
+    private int expiresMinutes;
+
+    public RedisOAuth2RefreshTokenRepo(int expiresMinutes) {
+        this.expiresMinutes = expiresMinutes;
+    }
+
     @Override
     protected Class<OAuth2RefreshToken> getTokenClass() {
         return OAuth2RefreshToken.class;
@@ -23,7 +29,11 @@ public class RedisOAuth2RefreshTokenRepo extends RedisOAuth2TokenRepoAdapter<OAu
 
     @Override
     protected int getExpiresMinutes() {
-        return 60 * 24 * 14;//2 Weeks
+        return expiresMinutes;
+    }
+
+    public void setExpiresMinutes(int expiresMinutes) {
+        this.expiresMinutes = expiresMinutes;
     }
 
 }

@@ -32,6 +32,9 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     private static final String HASHBASED_KEY = "test";
 
+    @Value("${spring.session.rememberme.timeout}")
+    private Integer remembermeTimeout;
+
     @Autowired
     private LoginService loginService;
 
@@ -81,7 +84,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
         service.setParameter("remember-me");
         service.setCookieName("remember-me");
         service.setUseSecureCookie(hostUrl.startsWith("https://"));
-        //service.setTokenValiditySeconds(0);
+        service.setTokenValiditySeconds(remembermeTimeout);
         return service;
     }
 

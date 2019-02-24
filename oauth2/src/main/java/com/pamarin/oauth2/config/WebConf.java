@@ -45,6 +45,9 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;
 
+    @Value("${spring.session.rememberme.timeout}")
+    private Integer remembermeTimeout;
+
     @Value("${spring.session.secretKey}")
     private String secretKey;
 
@@ -127,12 +130,12 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public OAuth2AccessTokenRepo newOAuth2AccessTokenRepo() {
-        return new RedisOAuth2AccessTokenRepo();
+        return new RedisOAuth2AccessTokenRepo(sessionTimeout / 60);
     }
 
     @Bean
     public OAuth2RefreshTokenRepo newOAuth2RefreshTokenRepo() {
-        return new RedisOAuth2RefreshTokenRepo();
+        return new RedisOAuth2RefreshTokenRepo(remembermeTimeout / 60);
     }
 
     @Bean
