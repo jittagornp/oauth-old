@@ -3,14 +3,18 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.domain.OAuth2Client;
+import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
 import com.pamarin.oauth2.repository.OAuth2ClientRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import com.pamarin.oauth2.service.OAuth2SessionService;
 import java.util.Arrays;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,9 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
     @Autowired
     private OAuth2SessionCacheStore cacheStore;
 
+    @Autowired
+    private LoginSession loginSession;
+
     private OAuth2Session buildOAuth2Session(AccessTokenVerification.Output output) {
         OAuth2Client client = clientRepo.findOne(output.getClientId());
         return OAuth2Session.builder()
@@ -63,14 +70,26 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
     }
 
     @Override
-    public OAuth2Session getSession(String accessToken) {
-        AccessTokenVerification.Output output = accessTokenVerification.verify(accessToken);
-        OAuth2Session session = cacheStore.get(output.getId());
+    public OAuth2Session getSession(HttpServletRequest request) {
+        HttpSession session = request.getSession();
         if (session == null) {
-            session = buildOAuth2Session(output);
-            cacheStore.cache(output.getId(), session);
+            throw new UnauthorizedClientException("Session it's not create.");
         }
-        return session;
+
+        AccessTokenVerification.Output accessToken = (AccessTokenVerification.Output) request.getAttribute("accessToken");
+        if (accessToken == null) {
+            throw new UnauthorizedClientException("Access token not found.");
+        }
+
+        OAuth2Session oauth2Session = (OAuth2Session) session.getAttribute("clientSession:" + accessToken.getClientId());
+        if (oauth2Session == null) {
+            oauth2Session = buildOAuth2Session(accessToken);
+            session.setAttribute("clientSession:" + accessToken.getClientId(), oauth2Session);
+        }
+
+        LOG.debug("username => {}", loginSession.getUserDetails().getUsername());
+        LOG.debug("sessionId => {}", loginSession.getSessionId());
+        return oauth2Session;
     }
 
 }

@@ -4,6 +4,7 @@
 package com.pamarin.oauth2.service;
 
 import com.pamarin.oauth2.model.OAuth2Session;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -11,6 +12,6 @@ import com.pamarin.oauth2.model.OAuth2Session;
  */
 public interface OAuth2SessionService {
     
-    OAuth2Session getSession(String accessToken);
+    OAuth2Session getSession(HttpServletRequest request);
     
 }

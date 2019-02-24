@@ -6,8 +6,9 @@ package com.pamarin.oauth2.config;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.security.CsrfInterceptor;
-import com.pamarin.commons.security.SessionCookieSerializer;
+import com.pamarin.oauth2.security.SessionCookieSerializer;
 import com.pamarin.commons.security.DefaultAuthenticityToken;
+import com.pamarin.commons.util.HttpAuthorizeBearerParser;
 import com.pamarin.oauth2.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.RedisOAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.RedisOAuth2SessionCacheStore;
@@ -15,6 +16,7 @@ import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.interceptor.SourceTokenInterceptor;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.service.AccessTokenVerification;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,12 +44,18 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;
-    
+
     @Value("${spring.session.secretKey}")
     private String secretKey;
 
+    @Value("${server.hostUrl}")
+    private String hostUrl;
+
     @Autowired
-    private HostUrlProvider hostUrlProvider;
+    private HttpAuthorizeBearerParser httpAuthorizeBearerParser;
+
+    @Autowired
+    private AccessTokenVerification accessTokenVerification;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -55,8 +63,8 @@ public class WebConf extends WebMvcConfigurerAdapter {
         registry.addMapping("/session").allowedOrigins("*");
         registry.addMapping("/token").allowedOrigins("*");
         registry.addMapping("/logout").allowedOrigins("*");
-        registry.addMapping("/login").allowedOrigins(hostUrlProvider.provide());
-        registry.addMapping("/login/*").allowedOrigins(hostUrlProvider.provide());
+        registry.addMapping("/login").allowedOrigins(hostUrl);
+        registry.addMapping("/login/*").allowedOrigins(hostUrl);
     }
 
     @Bean
@@ -83,8 +91,8 @@ public class WebConf extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public CookieSerializer cookieSerializer(@Value("${server.hostUrl}") String hostUrl) {
-        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer(secretKey);
+    public CookieSerializer newCookieSerializer() {
+        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer(secretKey, httpAuthorizeBearerParser, accessTokenVerification);
         cookieSerializer.setCookieMaxAge(sessionTimeout);
         cookieSerializer.setCookieName("user-session");
         cookieSerializer.setSecure(hostUrl.startsWith("https://"));
