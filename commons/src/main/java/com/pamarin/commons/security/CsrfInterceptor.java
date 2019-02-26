@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,7 +84,8 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
             throw new InvalidCsrfTokenException("Can't decode csrf token");
         }
 
-        if (getCsrfSession(httpReq, token) == null) {
+        String attribute = getCsrfSessionKey(httpReq.getServletPath());
+        if (!Objects.equals(httpReq.getSession().getAttribute(attribute), token)) {
             throw new InvalidCsrfTokenException("Not found csrf token in user session");
         }
     }
@@ -97,10 +99,6 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         if (!MessageDigest.isEqual(csrfToken.getBytes(), csrfCookie.getBytes())) {
             throw new InvalidCsrfTokenException("Invalid Double Submit Cookie");
         }
-    }
-
-    private Object getCsrfSession(HttpServletRequest httpReq, String token) {
-        return httpReq.getSession().getAttribute(getCsrfSessionKey(token));
     }
 
     private String getCsrfToken(HttpServletRequest httpReq) {
@@ -139,14 +137,16 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
                 AuthenticityToken.RandomOutput random = authenticityToken.random();
                 modelAndView.addObject(CSRF_ATTRIBUTE_KEY, CSRF_HEADER_KEY);
                 modelAndView.addObject(CSRF_ATTRIBUTE_VALUE, random.getAuthenticityToken());
-                saveToken(random, request.getSession());
+                saveToken(random, request);
                 addTokenCookieAndHeader(random.getAuthenticityToken(), request, response);
             }
         }
     }
 
-    private void saveToken(AuthenticityToken.RandomOutput random, HttpSession session) {
-        session.setAttribute(getCsrfSessionKey(random.getToken()), true);
+    private void saveToken(AuthenticityToken.RandomOutput random, HttpServletRequest request) {
+        String attribute = getCsrfSessionKey(request.getServletPath());
+        String value = random.getToken();
+        request.getSession().setAttribute(attribute, value);
     }
 
     /**
@@ -166,8 +166,8 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
                 .build());
     }
 
-    private String getCsrfSessionKey(String token) {
-        return CSRF_HEADER_KEY + ":" + token;
+    private String getCsrfSessionKey(String path) {
+        return CSRF_HEADER_KEY + ":" + path;
     }
 
 }

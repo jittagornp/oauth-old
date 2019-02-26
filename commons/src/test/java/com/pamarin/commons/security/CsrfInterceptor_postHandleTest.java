@@ -89,8 +89,8 @@ public class CsrfInterceptor_postHandleTest {
 
     @Test
     public void shouldBeOk() throws Exception {
-        when(authenticityToken.random())
-                .thenReturn(new AuthenticityToken.RandomOutput("abc", "xyz"));
+        when(authenticityToken.random()).thenReturn(new AuthenticityToken.RandomOutput("abc", "xyz"));
+        when(httpReq.getServletPath()).thenReturn("/login");
 
         ModelAndView modelAndView = mock(ModelAndView.class);
 
@@ -98,7 +98,7 @@ public class CsrfInterceptor_postHandleTest {
 
         verify(modelAndView).addObject("csrfParam", "X-CSRF-Token");
         verify(modelAndView).addObject("csrfToken", "xyz");
-        verify(httpReq.getSession()).setAttribute("X-CSRF-Token:abc", true);
+        verify(httpReq.getSession()).setAttribute("X-CSRF-Token:/login", "abc");
         verify(httpResp).setHeader("X-CSRF-Token", "xyz");
     }
 }

@@ -173,7 +173,8 @@ public class CsrfInterceptor_preHandleTest {
             new Cookie(CSRF_COOKIE, "xyz")
         });
         when(authenticityToken.decode("xyz")).thenReturn("1234");
-        when(httpReq.getSession().getAttribute(CSRF_PARAM + ":1234")).thenReturn(true);
+        when(httpReq.getServletPath()).thenReturn("/login");
+        when(httpReq.getSession().getAttribute(CSRF_PARAM + ":/login")).thenReturn("1234");
 
         boolean output = interceptor.preHandle(httpReq, httpResp, null);
         boolean expected = true;
