@@ -41,7 +41,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;
-    
+
     @Value("${spring.session.access-token.timeout}")
     private Integer accessTokenTimeout;
 
@@ -113,7 +113,8 @@ public class WebConf extends WebMvcConfigurerAdapter {
         CsrfInterceptor interceptor = new CsrfInterceptor();
         interceptor.setIgnorePaths(
                 "/token",
-                "/session"
+                "/session",
+                "/logout"
         );
         return interceptor;
     }
