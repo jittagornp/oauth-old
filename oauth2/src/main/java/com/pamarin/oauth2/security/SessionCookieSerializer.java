@@ -132,7 +132,7 @@ public class SessionCookieSerializer implements CookieSerializer {
                         try {
                             values.add(aesEncryption.decrypt(cookie.getValue(), secretKey));
                         } catch (AESEncryptionException ex) {
-                            //
+                            //swallow exception
                         }
                     }
                 }
