@@ -102,8 +102,6 @@ public class SessionCookieSerializer implements CookieSerializer {
                 try {
                     String accessToken = httpAuthorizeBearerParser.parse(authorization);
                     AccessTokenVerification.Output output = accessTokenVerification.verify(accessToken);
-                    LOG.debug("request tokenId => {}", output.getId());
-                    LOG.debug("request sessionId => {}", output.getSessionId());
                     request.setAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE, output);
                     return Arrays.asList(output.getSessionId());
                 } catch (InvalidHttpAuthorizationException | InvalidTokenException ex) {

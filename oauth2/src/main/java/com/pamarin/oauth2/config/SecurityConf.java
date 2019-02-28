@@ -6,6 +6,7 @@ package com.pamarin.oauth2.config;
 import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.commons.security.hashing.HmacSHA384Hashing;
+import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -55,7 +56,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .logout()
-                .logoutUrl("logoutService");
+                .logoutUrl("logout-" + UUID.randomUUID().toString()); //not publish logout url to outside
     }
 
     @Bean
