@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.security;
 
+import com.pamarin.commons.exception.AESEncryptionException;
 import com.pamarin.commons.exception.InvalidHttpAuthorizationException;
 import com.pamarin.commons.security.Base64AESEncryption;
 import com.pamarin.commons.security.DefaultAESEncryption;
@@ -59,7 +60,7 @@ public class SessionCookieSerializer implements CookieSerializer {
         String value = cookieValue.getCookieValue();
         boolean hasValue = hasText(value);
         int maxAge = hasValue ? cookieMaxAge : -1;
-        String token = hasValue ? aesEncryption.encrypt(value, secretKey) : null;
+        String token = hasValue ? aesEncryption.encrypt(value, secretKey) : "";
         cookieValue.getResponse().addHeader("Set-Cookie",
                 new CookieSpecBuilder(cookieName)
                         .setHttpOnly(true)
@@ -123,17 +124,20 @@ public class SessionCookieSerializer implements CookieSerializer {
 
     public List<String> resolveByCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        List<String> matchingCookieValues = new ArrayList<>();
+        List<String> values = new ArrayList<>();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (this.cookieName.equals(cookie.getName())) {
-                    if (!hasText(cookie.getValue())) {
-                        continue;
+                    if (hasText(cookie.getValue())) {
+                        try {
+                            values.add(aesEncryption.decrypt(cookie.getValue(), secretKey));
+                        } catch (AESEncryptionException ex) {
+                            //
+                        }
                     }
-                    matchingCookieValues.add(aesEncryption.decrypt(cookie.getValue(), secretKey));
                 }
             }
         }
-        return matchingCookieValues;
+        return values;
     }
 }
