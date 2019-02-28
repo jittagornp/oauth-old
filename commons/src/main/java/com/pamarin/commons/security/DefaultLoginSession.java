@@ -81,12 +81,24 @@ class DefaultLoginSession implements LoginSession {
         return authentication;
     }
 
+    private HttpSession getSession() {
+        HttpServletRequest httpReq = httpServletRequestProvider.provide();
+        return httpReq == null ? null : httpReq.getSession(false);
+    }
+
     @Override
     public String getSessionId() {
-        HttpServletRequest httpReq = httpServletRequestProvider.provide();
-        HttpSession session = httpReq == null ? null : httpReq.getSession();
+        HttpSession session = getSession();
         return session == null ? null : session.getId();
     }
 
+    @Override
+    public void logout() {
+        SecurityContextHolder.clearContext();
+        HttpSession session = getSession();
+        if (session != null) {
+            session.invalidate();
+        }
+    }
+
 }
- 

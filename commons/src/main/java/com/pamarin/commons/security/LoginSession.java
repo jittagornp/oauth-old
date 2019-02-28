@@ -21,4 +21,6 @@ public interface LoginSession {
     Authentication getAuthentication();
      
     String getSessionId();
+    
+    void logout();
 }
