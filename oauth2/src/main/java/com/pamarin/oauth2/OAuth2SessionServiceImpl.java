@@ -4,10 +4,13 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.commons.security.LoginSession;
+import com.pamarin.oauth2.constant.OAuth2Constant;
+import com.pamarin.oauth2.domain.OAuth2Approval;
 import com.pamarin.oauth2.domain.OAuth2Client;
 import com.pamarin.oauth2.exception.OAuth2ClientNotFoundException;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
+import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
@@ -29,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OAuth2SessionServiceImpl implements OAuth2SessionService {
 
+    private static final String OAUTH2_SESSION = "oauth2-session";
+
     private static final Logger LOG = LoggerFactory.getLogger(OAuth2SessionServiceImpl.class);
 
     @Autowired
@@ -38,9 +43,17 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
     private OAuth2ClientRepo clientRepo;
 
     @Autowired
+    private OAuth2ApprovalRepo approvalRepo;
+
+    @Autowired
     private LoginSession loginSession;
 
     private OAuth2Session buildOAuth2Session(AccessTokenVerification.Output output) {
+        OAuth2Approval approval = approvalRepo.findOne(new OAuth2Approval.PK(output.getUserId(), output.getClientId()));
+        if (approval == null) {
+            throw new UnauthorizedClientException("Unauthorized client " + output.getClientId() + " for user " + output.getUserId() + ".");
+        }
+
         OAuth2Client client = clientRepo.findOne(output.getClientId());
         if (client == null) {
             throw new OAuth2ClientNotFoundException("Not found client id " + output.getClientId());
@@ -65,6 +78,10 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
                 .build();
     }
 
+    private String makeAttributeKey(String attribute) {
+        return OAUTH2_SESSION + ":" + attribute;
+    }
+
     @Override
     public OAuth2Session getSession(HttpServletRequest request) {
         HttpSession session = request.getSession();
@@ -72,15 +89,16 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
             throw new UnauthorizedClientException("Session it's not create.");
         }
 
-        AccessTokenVerification.Output accessToken = (AccessTokenVerification.Output) request.getAttribute("accessToken");
+        AccessTokenVerification.Output accessToken = (AccessTokenVerification.Output) request.getAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE);
         if (accessToken == null) {
             throw new UnauthorizedClientException("Access token not found.");
         }
 
-        OAuth2Session oauth2Session = (OAuth2Session) session.getAttribute("clientSession:" + accessToken.getClientId());
+        String attributeKey = makeAttributeKey(accessToken.getClientId());
+        OAuth2Session oauth2Session = (OAuth2Session) session.getAttribute(attributeKey);
         if (oauth2Session == null) {
             oauth2Session = buildOAuth2Session(accessToken);
-            session.setAttribute("clientSession:" + accessToken.getClientId(), oauth2Session);
+            session.setAttribute(attributeKey, oauth2Session);
         }
 
         LOG.debug("username => {}", loginSession.getUserDetails().getUsername());

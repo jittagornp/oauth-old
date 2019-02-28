@@ -9,6 +9,7 @@ import com.pamarin.commons.security.DefaultAESEncryption;
 import com.pamarin.commons.security.DefaultBase64AESEncryption;
 import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
+import com.pamarin.oauth2.constant.OAuth2Constant;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ import static org.springframework.util.StringUtils.hasText;
  * @author jitta
  */
 public class SessionCookieSerializer implements CookieSerializer {
+
+    private static final String RESOLVE_SESSION_ATTRIBUTE = "OAUTH2_RESOLVE_SESSION";
 
     private static final Logger LOG = LoggerFactory.getLogger(SessionCookieSerializer.class);
 
@@ -70,8 +73,9 @@ public class SessionCookieSerializer implements CookieSerializer {
 
     @Override
     public List<String> readCookieValues(HttpServletRequest request) {
-        if (request.getAttribute("resolveSessionIds") == null) {
-            request.setAttribute("resolveSessionIds", true);
+        //protect duplicate call on same request
+        if (request.getAttribute(RESOLVE_SESSION_ATTRIBUTE) == null) {
+            request.setAttribute(RESOLVE_SESSION_ATTRIBUTE, true);
             return resolve(request);
         } else {
             return Collections.emptyList();
@@ -91,7 +95,6 @@ public class SessionCookieSerializer implements CookieSerializer {
     }
 
     private List<String> resolve(HttpServletRequest request) {
-        LOG.debug("resolveSessionIds...");
         String authorization = request.getHeader("Authorization");
         if (hasText(authorization)) {
             if (isBearer(authorization)) {
@@ -100,7 +103,7 @@ public class SessionCookieSerializer implements CookieSerializer {
                     AccessTokenVerification.Output output = accessTokenVerification.verify(accessToken);
                     LOG.debug("request tokenId => {}", output.getId());
                     LOG.debug("request sessionId => {}", output.getSessionId());
-                    request.setAttribute("accessToken", output);
+                    request.setAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE, output);
                     return Arrays.asList(output.getSessionId());
                 } catch (InvalidHttpAuthorizationException | InvalidTokenException ex) {
                     LOG.debug("error on resolve sessionId => {}", ex);
