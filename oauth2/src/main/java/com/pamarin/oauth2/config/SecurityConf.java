@@ -52,7 +52,10 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                 )
                 .permitAll()
                 .anyRequest()
-                .authenticated();
+                .authenticated()
+                .and()
+                .logout()
+                .logoutUrl("logoutService");
     }
 
     @Bean
