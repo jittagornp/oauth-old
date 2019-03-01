@@ -18,8 +18,6 @@ import com.pamarin.oauth2.service.OAuth2SessionService;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class OAuth2SessionServiceImpl implements OAuth2SessionService {
 
     private static final String OAUTH2_SESSION = "oauth2-session";
-
-    private static final Logger LOG = LoggerFactory.getLogger(OAuth2SessionServiceImpl.class);
 
     @Autowired
     private OAuth2ClientScopeRepo clientScopeRepo;
@@ -87,17 +83,13 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
 
         loginSession.getUserDetails();
 
-        HttpSession session = request.getSession();
-        if (session == null) {
-            throw new UnauthorizedClientException("Session it's not create.");
-        }
-
         AccessTokenVerification.Output accessToken = (AccessTokenVerification.Output) request.getAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE);
         if (accessToken == null) {
             throw new UnauthorizedClientException("Access token not found.");
         }
 
         String attributeKey = makeAttributeKey(accessToken.getClientId());
+        HttpSession session = request.getSession();
         OAuth2Session oauth2Session = (OAuth2Session) session.getAttribute(attributeKey);
         if (oauth2Session == null) {
             oauth2Session = buildOAuth2Session(accessToken);
