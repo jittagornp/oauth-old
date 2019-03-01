@@ -84,6 +84,9 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
 
     @Override
     public OAuth2Session getSession(HttpServletRequest request) {
+
+        loginSession.getUserDetails();
+
         HttpSession session = request.getSession();
         if (session == null) {
             throw new UnauthorizedClientException("Session it's not create.");
@@ -101,8 +104,6 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
             session.setAttribute(attributeKey, oauth2Session);
         }
 
-        LOG.debug("username => {}", loginSession.getUserDetails().getUsername());
-        LOG.debug("sessionId => {}", loginSession.getSessionId());
         return oauth2Session;
     }
 

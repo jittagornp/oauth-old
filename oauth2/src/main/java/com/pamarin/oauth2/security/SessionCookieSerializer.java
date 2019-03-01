@@ -33,6 +33,8 @@ public class SessionCookieSerializer implements CookieSerializer {
 
     private static final String RESOLVE_SESSION_ATTRIBUTE = "OAUTH2_RESOLVE_SESSION";
 
+    private static final String ANONYMOUS = "anonymous";
+
     private static final Logger LOG = LoggerFactory.getLogger(SessionCookieSerializer.class);
 
     private String cookieName = "user-session";
@@ -60,7 +62,7 @@ public class SessionCookieSerializer implements CookieSerializer {
         String value = cookieValue.getCookieValue();
         boolean hasValue = hasText(value);
         int maxAge = hasValue ? cookieMaxAge : -1;
-        String token = hasValue ? aesEncryption.encrypt(value, secretKey) : "";
+        String token = hasValue ? aesEncryption.encrypt(value, secretKey) : ANONYMOUS;
         cookieValue.getResponse().addHeader("Set-Cookie",
                 new CookieSpecBuilder(cookieName)
                         .setHttpOnly(true)
@@ -126,7 +128,7 @@ public class SessionCookieSerializer implements CookieSerializer {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (this.cookieName.equals(cookie.getName())) {
-                    if (hasText(cookie.getValue())) {
+                    if (hasValue(cookie.getValue())) {
                         try {
                             values.add(aesEncryption.decrypt(cookie.getValue(), secretKey));
                         } catch (AESEncryptionException ex) {
@@ -137,5 +139,9 @@ public class SessionCookieSerializer implements CookieSerializer {
             }
         }
         return values;
+    }
+
+    private boolean hasValue(String value) {
+        return hasText(value) && !ANONYMOUS.equals(value);
     }
 }
