@@ -97,6 +97,7 @@ class DefaultLoginSession implements LoginSession {
         SecurityContextHolder.clearContext();
         HttpSession session = getSession();
         if (session != null) {
+            session.setMaxInactiveInterval(0);
             session.invalidate();
         }
     }
