@@ -94,12 +94,12 @@ class DefaultLoginSession implements LoginSession {
 
     @Override
     public void logout() {
-        SecurityContextHolder.clearContext();
         HttpSession session = getSession();
         if (session != null) {
             session.setMaxInactiveInterval(0);
             session.invalidate();
         }
+        SecurityContextHolder.clearContext();
     }
 
 }

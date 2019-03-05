@@ -6,13 +6,16 @@ package com.pamarin.oauth2.controller;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.service.ClientVerification;
 import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
@@ -26,6 +29,9 @@ public class LogoutCtrl {
 
     @Autowired
     private ClientVerification clientVerification;
+    
+    @Autowired
+    private RedisOperationsSessionRepository sessionRepository;
 
     @GetMapping("/logout")
     public void getLogout(
@@ -36,18 +42,25 @@ public class LogoutCtrl {
 
         clientVerification.verifyClientIdAndRedirectUri(clientId, redirectUri);
 
-        loginSession.logout();
+        doLogout();
 
         httpResp.sendRedirect(redirectUri);
 
     }
 
     //request from backend by access_token in header Authorization : bearer xxx
+    @ResponseBody
     @PostMapping("/logout")
     public void postLogout(@RequestHeader("Authorization") String authrorization) {
 
-        loginSession.logout();
+        doLogout();
 
+    }
+    
+    private void doLogout(){
+        String sessionId = loginSession.getSessionId();
+        loginSession.logout();
+        sessionRepository.delete(sessionId);
     }
 
 }
