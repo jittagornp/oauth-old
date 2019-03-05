@@ -17,6 +17,7 @@ import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
 import com.pamarin.oauth2.repository.UserSessionRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import com.pamarin.oauth2.service.OAuth2SessionService;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -130,6 +131,8 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
         } else {
             userSession.setId(oauth2Session.getId());
             userSession.setUserId(oauth2Session.getUser().getId());
+            userSession.setUpdatedDate(LocalDateTime.now());
+            userSession.setUpdatedUser(oauth2Session.getUser().getId());
         }
     }
 
