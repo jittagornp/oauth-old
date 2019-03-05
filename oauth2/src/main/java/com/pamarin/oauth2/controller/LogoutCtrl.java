@@ -8,7 +8,6 @@ import com.pamarin.oauth2.service.ClientVerification;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,9 +27,6 @@ public class LogoutCtrl {
 
     @Autowired
     private ClientVerification clientVerification;
-    
-    @Autowired
-    private RedisOperationsSessionRepository sessionRepository;
 
     @GetMapping("/logout")
     public void getLogout(
@@ -41,7 +37,7 @@ public class LogoutCtrl {
 
         clientVerification.verifyClientIdAndRedirectUri(clientId, redirectUri);
 
-        doLogout();
+        loginSession.logout();
 
         httpResp.sendRedirect(redirectUri);
 
@@ -52,14 +48,7 @@ public class LogoutCtrl {
     @PostMapping("/logout")
     public void postLogout(@RequestHeader("Authorization") String authrorization) {
 
-        doLogout();
+       loginSession.logout();
 
     }
-    
-    private void doLogout(){
-        String sessionId = loginSession.getSessionId();
-        //loginSession.logout();
-        sessionRepository.delete(sessionId);
-    }
-
 }
