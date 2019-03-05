@@ -6,7 +6,6 @@ package com.pamarin.oauth2.controller;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.service.ClientVerification;
 import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.data.redis.RedisOperationsSessionRepository;
@@ -59,7 +58,7 @@ public class LogoutCtrl {
     
     private void doLogout(){
         String sessionId = loginSession.getSessionId();
-        loginSession.logout();
+        //loginSession.logout();
         sessionRepository.delete(sessionId);
     }
 
