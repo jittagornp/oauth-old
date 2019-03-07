@@ -46,7 +46,6 @@ public class UserSourceTokenInterceptor extends HandlerInterceptorAdapter {
             httpResp.setHeader("Set-Cookie", new CookieSpecBuilder(cookieName, makeToken())
                     .setPath("/")
                     .setSecure(hostUrl.startsWith("https://"))
-                    .sameSiteStrict()
                     .setExpires(LocalDateTime.now().plusYears(100))
                     .build());
         }

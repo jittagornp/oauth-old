@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.resolver;
 
+import java.util.Base64;
 import java.util.stream.Stream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -29,9 +30,13 @@ public class DefaultUserSourceTokenIdResolver implements UserSourceTokenIdResolv
 
         return Stream.of(cookies)
                 .filter(cookie -> cookie != null && cookieName.equalsIgnoreCase(cookie.getName()))
-                .map(cookie -> cookie.getValue())
+                .map(cookie -> decode(cookie.getValue()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private String decode(String cookieValue) {
+        return new String(Base64.getDecoder().decode(cookieValue));
     }
 
 }
