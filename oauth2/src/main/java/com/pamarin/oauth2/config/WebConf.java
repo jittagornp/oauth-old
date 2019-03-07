@@ -10,9 +10,11 @@ import com.pamarin.commons.security.DefaultAuthenticityToken;
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
 import com.pamarin.oauth2.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.RedisOAuth2RefreshTokenRepo;
-import com.pamarin.oauth2.interceptor.SourceTokenInterceptor;
+import com.pamarin.oauth2.interceptor.UserSourceTokenInterceptor;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.resolver.DefaultUserSourceTokenIdResolver;
+import com.pamarin.oauth2.resolver.UserSourceTokenIdResolver;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +106,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(newCsrfInterceptor());
-        registry.addInterceptor(newSourceInterceptor());
+        registry.addInterceptor(newUserSourceInterceptor());
     }
 
     @Bean
@@ -119,8 +121,16 @@ public class WebConf extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public SourceTokenInterceptor newSourceInterceptor() {
-        return new SourceTokenInterceptor();
+    public UserSourceTokenInterceptor newUserSourceInterceptor() {
+        return new UserSourceTokenInterceptor(
+                "user-source",
+                newUserSourceTokenIdResolver()
+        );
+    }
+
+    @Bean
+    public UserSourceTokenIdResolver newUserSourceTokenIdResolver() {
+        return new DefaultUserSourceTokenIdResolver("user-source");
     }
 
     @Bean

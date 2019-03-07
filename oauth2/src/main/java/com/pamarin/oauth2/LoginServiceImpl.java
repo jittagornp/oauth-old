@@ -18,7 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 
 /**
- * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
+ * @author jittagornp &lt;http://jittagornp.me&gt; createSession : 2017/11/12
  */
 @Service
 @Transactional
@@ -53,7 +53,7 @@ public class LoginServiceImpl implements LoginService {
 
         loginSession.create(convert(user));
 
-        databaseSessionSynchronizer.synchronize();
+        databaseSessionSynchronizer.createSession();
     }
 
     @Override

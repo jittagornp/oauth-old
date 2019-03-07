@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.cache;
 
-import com.pamarin.oauth2.CacheStore;
 import com.pamarin.oauth2.model.OAuth2Session;
 
 /**

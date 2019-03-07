@@ -30,6 +30,7 @@ import java.util.Arrays;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2ScopeRepo;
 import com.pamarin.oauth2.repository.UserSessionRepo;
+import com.pamarin.oauth2.repository.UserSourceRepo;
 import com.pamarin.oauth2.service.AuthorizeViewModelService;
 import com.pamarin.oauth2.service.AuthorizeViewModelService.Model;
 import com.pamarin.oauth2.service.AuthorizeViewModelService.Scope;
@@ -52,6 +53,9 @@ public class IntegrationTestBase {
 
     @MockBean
     private UserSessionRepo userSessionRepo;
+    
+    @MockBean
+    private UserSourceRepo userSourceRepo;
     
     @MockBean
     private CsrfInterceptor csrfVerificationInterceptor;
