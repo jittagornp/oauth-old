@@ -30,7 +30,6 @@ import java.util.Arrays;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2ScopeRepo;
 import com.pamarin.oauth2.repository.UserSessionRepo;
-import com.pamarin.oauth2.repository.UserSourceRepo;
 import com.pamarin.oauth2.service.AuthorizeViewModelService;
 import com.pamarin.oauth2.service.AuthorizeViewModelService.Model;
 import com.pamarin.oauth2.service.AuthorizeViewModelService.Scope;
@@ -38,6 +37,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.pamarin.oauth2.repository.UserSourceRepo;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12

@@ -113,6 +113,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
     public CsrfInterceptor newCsrfInterceptor() {
         CsrfInterceptor interceptor = new CsrfInterceptor();
         interceptor.setIgnorePaths(
+                "/",
                 "/token",
                 "/session",
                 "/logout"

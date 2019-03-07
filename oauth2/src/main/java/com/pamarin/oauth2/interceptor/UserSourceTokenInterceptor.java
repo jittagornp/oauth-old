@@ -5,7 +5,6 @@ package com.pamarin.oauth2.interceptor;
 
 import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.oauth2.domain.UserSource;
-import com.pamarin.oauth2.repository.UserSourceRepo;
 import com.pamarin.oauth2.resolver.UserSourceTokenIdResolver;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import static org.springframework.util.StringUtils.hasText;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import com.pamarin.oauth2.repository.UserSourceRepo;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/07

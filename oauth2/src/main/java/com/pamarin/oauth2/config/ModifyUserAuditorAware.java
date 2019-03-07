@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.config;
 
+import com.pamarin.commons.exception.AuthenticationException;
 import com.pamarin.commons.security.LoginSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
@@ -12,12 +13,18 @@ import org.springframework.data.domain.AuditorAware;
  */
 public class ModifyUserAuditorAware implements AuditorAware<String> {
 
+    private static final String DEFAULT_USERNAME = "system";
+
     @Autowired
     private LoginSession loginSession;
 
     @Override
     public String getCurrentAuditor() {
-        return loginSession.getUserDetails().getUsername();
+        try {
+            return loginSession.getUserDetails().getUsername();
+        } catch (AuthenticationException ex) {
+            return DEFAULT_USERNAME;
+        }
     }
 
 }
