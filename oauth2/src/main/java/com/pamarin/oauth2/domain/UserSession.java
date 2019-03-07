@@ -28,6 +28,9 @@ public class UserSession extends AuditingEntity {
 
     @Column(name = "user_id", nullable = false)
     private String userId;
+    
+    @Column(nullable = false)
+    private Integer timeout;
 
     @Override
     public int hashCode() {

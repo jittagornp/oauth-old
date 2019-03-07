@@ -13,13 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
  * @author jitta
  */
 @Service
-public class DatabaseSessionSynchronizerServiceImpl implements DatabaseSessionSynchronizer {
+public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchronizer {
 
     private static final String LAST_ACCESSED_TIME = "lastAccessedTimeUserSession";
 
@@ -34,9 +35,16 @@ public class DatabaseSessionSynchronizerServiceImpl implements DatabaseSessionSy
     @Autowired
     private LoginSession loginSession;
 
+    @Value("${spring.session.timeout}")
+    private Integer sessionTimeout;
+
     @Override
     public void synchronize() {
         HttpSession session = httpSessionProvider.provide();
+        if (session == null) {
+            throw new IllegalStateException("Don't have session.");
+        }
+
         Long lastAcccessedTime = (Long) session.getAttribute(LAST_ACCESSED_TIME);
         if (lastAcccessedTime == null) {
             updateUserSession(session);
@@ -58,15 +66,15 @@ public class DatabaseSessionSynchronizerServiceImpl implements DatabaseSessionSy
         UserSession userSession = userSessionRepo.findOne(sessionId);
         if (userSession == null) {
             userSession = new UserSession();
-            userSession.setId(sessionId);
-            userSession.setUserId(userId);
-            userSessionRepo.save(userSession);
         } else {
-            userSession.setId(sessionId);
-            userSession.setUserId(userDetails.getUsername());
             userSession.setUpdatedDate(LocalDateTime.now());
             userSession.setUpdatedUser(userId);
         }
+
+        userSession.setId(sessionId);
+        userSession.setUserId(userId);
+        userSession.setTimeout(sessionTimeout);
+        userSessionRepo.save(userSession);
     }
 
 }
