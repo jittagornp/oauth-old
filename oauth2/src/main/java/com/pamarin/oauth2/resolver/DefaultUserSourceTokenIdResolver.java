@@ -31,7 +31,7 @@ public class DefaultUserSourceTokenIdResolver implements UserSourceTokenIdResolv
                 .filter(cookie -> cookie != null && cookieName.equalsIgnoreCase(cookie.getName()))
                 .map(cookie -> cookie.getValue())
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 
 }
