@@ -3,27 +3,24 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.constant.OAuth2Constant;
 import com.pamarin.oauth2.domain.OAuth2Approval;
 import com.pamarin.oauth2.domain.OAuth2Client;
-import com.pamarin.oauth2.domain.UserSession;
 import com.pamarin.oauth2.exception.OAuth2ClientNotFoundException;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
 import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
-import com.pamarin.oauth2.repository.UserSessionRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import com.pamarin.oauth2.service.OAuth2SessionService;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 
 /**
  *
@@ -35,10 +32,6 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
 
     private static final String OAUTH2_SESSION = "oauth2-session";
 
-    private static final String LAST_ACCESSED_USER_SESSION = "lastAccessedTimeUserSession";
-
-    private static final long USER_SESSION_SYNCRONIZE_TIMEOUT = 1000 * 30; //30 seconds
-
     @Autowired
     private OAuth2ClientScopeRepo clientScopeRepo;
 
@@ -49,10 +42,7 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
     private OAuth2ApprovalRepo approvalRepo;
 
     @Autowired
-    private LoginSession loginSession;
-
-    @Autowired
-    private UserSessionRepo userSessionRepo;
+    private DatabaseSessionSynchronizer databaseSessionSynchronizer;
 
     private OAuth2Session buildOAuth2Session(AccessTokenVerification.Output output) {
         OAuth2Approval approval = approvalRepo.findOne(new OAuth2Approval.PK(output.getUserId(), output.getClientId()));
@@ -91,7 +81,7 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
     @Override
     public OAuth2Session getSession(HttpServletRequest request) {
 
-        loginSession.getUserDetails();
+        databaseSessionSynchronizer.synchronize();
 
         AccessTokenVerification.Output accessToken = (AccessTokenVerification.Output) request.getAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE);
         if (accessToken == null) {
@@ -106,34 +96,6 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
             session.setAttribute(attributeKey, oauth2Session);
         }
 
-        Long lastAcccessedTime = (Long) session.getAttribute(LAST_ACCESSED_USER_SESSION);
-        if (lastAcccessedTime == null) {
-            updateUserSession(oauth2Session);
-            session.setAttribute(LAST_ACCESSED_USER_SESSION, System.currentTimeMillis());
-        } else {
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - lastAcccessedTime > USER_SESSION_SYNCRONIZE_TIMEOUT) {
-                updateUserSession(oauth2Session);
-                session.setAttribute(LAST_ACCESSED_USER_SESSION, currentTime);
-            }
-        }
-
         return oauth2Session;
     }
-
-    private void updateUserSession(OAuth2Session oauth2Session) {
-        UserSession userSession = userSessionRepo.findOne(oauth2Session.getId());
-        if (userSession == null) {
-            userSession = new UserSession();
-            userSession.setId(oauth2Session.getId());
-            userSession.setUserId(oauth2Session.getUser().getId());
-            userSessionRepo.save(userSession);
-        } else {
-            userSession.setId(oauth2Session.getId());
-            userSession.setUserId(oauth2Session.getUser().getId());
-            userSession.setUpdatedDate(LocalDateTime.now());
-            userSession.setUpdatedUser(oauth2Session.getUser().getId());
-        }
-    }
-
 }

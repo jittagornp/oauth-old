@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author jitta
  */
 @Controller
-public class LogoutCtrl {
+public class LogoutEnpointCtrl {
 
     @Autowired
     private LoginSession loginSession;

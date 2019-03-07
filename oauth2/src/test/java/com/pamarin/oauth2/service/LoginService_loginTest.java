@@ -38,6 +38,9 @@ public class LoginService_loginTest {
 
     @Mock
     private LoginSession loginSession;
+    
+    @Mock
+    private DatabaseSessionSynchronizer databaseSessionSynchronizerService;
 
     @Before
     public void before() {

@@ -4,8 +4,7 @@
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.AuthenticationException;
-import com.pamarin.commons.provider.HttpServletRequestProvider;
-import javax.servlet.http.HttpServletRequest;
+import com.pamarin.commons.provider.HttpSessionProvider;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ class DefaultLoginSession implements LoginSession {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultLoginSession.class);
 
     @Autowired
-    private HttpServletRequestProvider httpServletRequestProvider;
+    private HttpSessionProvider httpSessionProvider;
 
     @Override
     public void create(UserDetails userDetails) {
@@ -81,20 +80,15 @@ class DefaultLoginSession implements LoginSession {
         return authentication;
     }
 
-    private HttpSession getSession() {
-        HttpServletRequest httpReq = httpServletRequestProvider.provide();
-        return httpReq == null ? null : httpReq.getSession(false);
-    }
-
     @Override
     public String getSessionId() {
-        HttpSession session = getSession();
+        HttpSession session = httpSessionProvider.provide();
         return session == null ? null : session.getId();
     }
 
     @Override
     public void logout() {
-        HttpSession session = getSession();
+        HttpSession session = httpSessionProvider.provide();
         if (session != null) {
             session.setMaxInactiveInterval(0);
             session.invalidate();

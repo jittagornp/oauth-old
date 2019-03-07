@@ -67,7 +67,6 @@ public class WebConf extends WebMvcConfigurerAdapter {
         registry.addMapping("/token").allowedOrigins("*");
         registry.addMapping("/logout").allowedOrigins("*");
         registry.addMapping("/login").allowedOrigins(hostUrl);
-        registry.addMapping("/login/*").allowedOrigins(hostUrl);
     }
 
     @Bean

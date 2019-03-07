@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pamarin.oauth2.service.LoginService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -32,6 +33,9 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private LoginSession loginSession;
 
+    @Autowired
+    private DatabaseSessionSynchronizer databaseSessionSynchronizer;
+
     @Override
     public void login(String username, String password) {
         if (username == null || password == null) {
@@ -48,6 +52,8 @@ public class LoginServiceImpl implements LoginService {
         }
 
         loginSession.create(convert(user));
+
+        databaseSessionSynchronizer.synchronize();
     }
 
     @Override
@@ -63,8 +69,8 @@ public class LoginServiceImpl implements LoginService {
 
         return convert(user);
     }
-    
-    private UserDetails convert(User user){
+
+    private UserDetails convert(User user) {
         return DefaultUserDetails.builder()
                 .username(user.getId())
                 .password(user.getPassword())

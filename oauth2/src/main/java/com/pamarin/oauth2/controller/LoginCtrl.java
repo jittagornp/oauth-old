@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.pamarin.oauth2.service.LoginService;
-import org.springframework.security.web.authentication.RememberMeServices;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -49,9 +48,6 @@ public class LoginCtrl {
 
     @Autowired
     private LoginSession loginSession;
-//
-//    @Autowired
-//    private RememberMeServices rememberMeServices;
 
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);
@@ -83,7 +79,6 @@ public class LoginCtrl {
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
         try {
             loginService.login(credential.getUsername(), credential.getPassword());
-            //rememberMeServices.loginSuccess(httpReq, httpResp, loginSession.getAuthentication());
             httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + req.buildQuerystring());
         } catch (InvalidUsernamePasswordException ex) {
             LOG.warn("Invalid username password ", ex);
