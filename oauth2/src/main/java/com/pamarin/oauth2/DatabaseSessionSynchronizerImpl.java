@@ -21,12 +21,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import static org.springframework.util.StringUtils.hasText;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author jitta
  */
 @Service
+@Transactional 
 public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchronizer {
 
     private static final String LAST_ACCESSED_TIME = "lastAccessedTimeUserSession";
