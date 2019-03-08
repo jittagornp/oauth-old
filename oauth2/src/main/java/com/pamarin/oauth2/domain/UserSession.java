@@ -34,6 +34,9 @@ public class UserSession extends AuditingEntity {
 
     @Column(name = "source_id", nullable = false)
     private String sourceId;
+    
+    @Column(name = "ip_address", nullable = false)
+    private String ipAddress;
 
     @Override
     public int hashCode() {

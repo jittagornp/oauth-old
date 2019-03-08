@@ -6,8 +6,10 @@ package com.pamarin.oauth2;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.domain.UserSession;
+import com.pamarin.oauth2.domain.UserSource;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.repository.UserSessionRepo;
+import com.pamarin.oauth2.repository.UserSourceRepo;
 import com.pamarin.oauth2.resolver.UserSourceTokenIdResolver;
 import java.time.LocalDateTime;
 import javax.servlet.http.HttpSession;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import static org.springframework.util.StringUtils.hasText;
+import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 
 /**
  *
@@ -39,10 +43,16 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
     private UserSessionRepo userSessionRepo;
 
     @Autowired
+    private UserSourceRepo userSourceRepo;
+
+    @Autowired
     private LoginSession loginSession;
 
     @Autowired
     private UserSourceTokenIdResolver userSourceTokenIdResolver;
+
+    @Autowired
+    private HttpClientIPAddressResolver httpClientIPAddressResolver;
 
     @Override
     public void createSession() {
@@ -57,11 +67,27 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
         userSession.setId(sessionId);
         userSession.setUserId(userId);
         userSession.setTimeout(sessionTimeout);
-        userSession.setSourceId(userSourceTokenIdResolver.resolve(httpReq));
+        userSession.setSourceId(resolveUserSourceId(httpReq));
+        userSession.setIpAddress(httpClientIPAddressResolver.resolve(httpReq));
         userSessionRepo.save(userSession);
 
         session.setAttribute(LAST_ACCESSED_TIME, System.currentTimeMillis());
 
+    }
+
+    private String resolveUserSourceId(HttpServletRequest httpReq) {
+        String sourceId = userSourceTokenIdResolver.resolve(httpReq);
+        if (!hasText(sourceId)) {
+            throw new IllegalStateException("user-source token is null.");
+        }
+
+        UserSource userSource = userSourceRepo.findOne(sourceId);
+        if (userSource == null) {
+            userSource = new UserSource();
+            userSource.setId(sourceId);
+            userSourceRepo.save(userSource);
+        }
+        return userSource.getId();
     }
 
     @Override
@@ -79,10 +105,11 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
             String sessionId = session.getId();
             String userId = userDetails.getUsername();
 
-            userSessionRepo.updateUpdatedDateAndUpdatedUserById(
+            userSessionRepo.update(
+                    sessionId,
                     LocalDateTime.now(),
                     userId,
-                    sessionId
+                    httpClientIPAddressResolver.resolve(httpReq)
             );
 
             session.setAttribute(LAST_ACCESSED_TIME, currentTime);

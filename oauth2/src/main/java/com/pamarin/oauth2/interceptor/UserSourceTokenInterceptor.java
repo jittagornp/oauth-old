@@ -4,7 +4,6 @@
 package com.pamarin.oauth2.interceptor;
 
 import com.pamarin.commons.util.CookieSpecBuilder;
-import com.pamarin.oauth2.domain.UserSource;
 import com.pamarin.oauth2.resolver.UserSourceTokenIdResolver;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -12,12 +11,10 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import static org.springframework.util.StringUtils.hasText;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-import com.pamarin.oauth2.repository.UserSourceRepo;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/07
@@ -25,9 +22,6 @@ import com.pamarin.oauth2.repository.UserSourceRepo;
 public class UserSourceTokenInterceptor extends HandlerInterceptorAdapter {
 
     private final String cookieName;
-
-    @Autowired
-    private UserSourceRepo userSourceRepo;
 
     @NotBlank
     @Value("${server.hostUrl}")
@@ -53,10 +47,6 @@ public class UserSourceTokenInterceptor extends HandlerInterceptorAdapter {
 
     private String makeToken() {
         String id = UUID.randomUUID().toString();
-        UserSource userSource = new UserSource();
-        userSource.setId(id);
-        userSourceRepo.save(userSource);
-
         return Base64.getEncoder().encodeToString(id.getBytes());
     }
 

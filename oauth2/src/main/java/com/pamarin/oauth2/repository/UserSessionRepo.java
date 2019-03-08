@@ -18,10 +18,16 @@ public interface UserSessionRepo extends JpaRepository<UserSession, String> {
     @Modifying
     @Query(
             "UPDATE UserSession us "
-            + "SET us.updatedDate = ?1, "
-            + "    us.updatedUser = ?2 "
-            + "WHERE us.id = ?3 "
+            + "SET us.updatedDate = ?2, "
+            + "    us.updatedUser = ?3, "
+            + "    us.ipAddress = ? 4 "
+            + "WHERE us.id = ?1 "
     )
-    public void updateUpdatedDateAndUpdatedUserById(LocalDateTime date, String userId, String sessionId);
+    public void update(
+            String sessionId,
+            LocalDateTime date,
+            String userId,
+            String ipAddress
+    );
 
 }
