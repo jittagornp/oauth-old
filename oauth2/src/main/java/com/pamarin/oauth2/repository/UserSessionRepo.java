@@ -20,7 +20,7 @@ public interface UserSessionRepo extends JpaRepository<UserSession, String> {
             "UPDATE UserSession us "
             + "SET us.updatedDate = ?2, "
             + "    us.updatedUser = ?3, "
-            + "    us.ipAddress = ? 4 "
+            + "    us.ipAddress = ?4 "
             + "WHERE us.id = ?1 "
     )
     public void update(
