@@ -14,7 +14,7 @@ import static org.springframework.util.StringUtils.hasText;
 @Component
 public class DefaultHttpClientIPAddressResolver implements HttpClientIPAddressResolver {
 
-    private static final String[] IP_ADDRESS_HEADER = {
+    private static final String[] IP_ADDRESS_HEADERS = {
         "X-Forwarded-For",
         "Proxy-Client-IP",
         "WL-Proxy-Client-IP",
@@ -42,7 +42,7 @@ public class DefaultHttpClientIPAddressResolver implements HttpClientIPAddressRe
             throw new IllegalArgumentException("require request.");
         }
 
-        for (String header : IP_ADDRESS_HEADER) {
+        for (String header : IP_ADDRESS_HEADERS) {
             String ip = httpReq.getHeader(header);
             if (hasIp(ip)) {
                 return ip;
