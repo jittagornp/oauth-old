@@ -3,7 +3,6 @@
  */
 package com.pamarin.commons.resolver;
 
-import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import static org.springframework.util.StringUtils.hasText;
@@ -29,17 +28,12 @@ public class DefaultHttpClientIPAddressResolver implements HttpClientIPAddressRe
         "REMOTE_ADDR"
     };
 
-    private static boolean isValidFormat(String text) {
-        Pattern pattern = Pattern.compile("^[\\d]+\\.[\\d]+\\.[\\d]+\\.[\\d]+$");
-        return pattern.matcher(text).matches();
-    }
-
     private static boolean hasIp(String ip) {
         if (!hasText(ip)) {
             return false;
         }
 
-        return isValidFormat(ip);
+        return !"unknown".equalsIgnoreCase(ip);
     }
 
     @Override
