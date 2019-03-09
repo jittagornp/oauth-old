@@ -34,7 +34,7 @@ public class HashBasedToken_hashTest {
      */
     @Test
     public void shouldBeOk() {
-        LocalDateTime expires = LocalDateTime.of(2000, Month.JANUARY, 1, 0, 0, 0, 0);
+        LocalDateTime expires = LocalDateTime.of(5000, Month.JANUARY, 1, 0, 0, 0, 0);
         UserDetails credential = DefaultUserDetails.builder()
                 .username("b98e21b4-ce2a-11e7-abc4-cec278b6b50a")
                 .password("$2a$10$2SLqTL7.Ug9cyfRPFwxQeemMA4SeB9MymLjRl4RGR0h7aHwLDy7qC")
