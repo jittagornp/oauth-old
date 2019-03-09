@@ -18,9 +18,9 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author jitta
  * @param <T>
  */
-public abstract class RedisCacheStoreAdaptor<T> implements CacheStore<T> {
+public abstract class RedisCacheStoreAdapter<T> implements CacheStore<T> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisCacheStoreAdaptor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisCacheStoreAdapter.class);
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;

@@ -33,13 +33,13 @@ public class DefaultHttpClientIPAddressResolver implements HttpClientIPAddressRe
             return false;
         }
 
-        return !"unknown".equalsIgnoreCase(ip);
+        return !"UNKNOWN".equalsIgnoreCase(ip);
     }
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
         if (httpReq == null) {
-            throw new IllegalArgumentException("require request.");
+            throw new IllegalArgumentException("require httpReq.");
         }
 
         for (String header : IP_ADDRESS_HEADERS) {
