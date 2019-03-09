@@ -10,6 +10,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -28,12 +32,31 @@ public class LoginSession_getUserDetailsTest {
     public void before() {
         loginSession = new DefaultLoginSession();
     }
+    
+    @Test
+    public void shouldBeThrowAuthenticationException_whenPrincipalIsNull() {
+
+        exception.expect(AuthenticationException.class);
+        exception.expectMessage("Please login, principal is null.");
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(null, null);
+        SecurityContext context = new SecurityContextImpl();
+        context.setAuthentication(authenticationToken);
+        SecurityContextHolder.setContext(context);
+
+        loginSession.getUserDetails();
+    }
 
     @Test
     public void shouldBeThrowAuthenticationException_whenAuthenticationIsNull() {
 
         exception.expect(AuthenticationException.class);
-        exception.expectMessage("Please login.");
+        exception.expectMessage("Please login, principal is not user details.");
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken("anonymousUser", null);
+        SecurityContext context = new SecurityContextImpl();
+        context.setAuthentication(authenticationToken);
+        SecurityContextHolder.setContext(context);
 
         loginSession.getUserDetails();
     }

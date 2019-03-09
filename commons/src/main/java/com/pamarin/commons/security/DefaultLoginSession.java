@@ -56,25 +56,26 @@ class DefaultLoginSession implements LoginSession {
     @SuppressWarnings("null")
     public UserDetails getUserDetails() {
         Authentication authentication = getAuthentication();
-        if (!(authentication.getPrincipal() instanceof UserDetails)) {
-            LOG.debug("principal class name => {}", authentication.getPrincipal().getClass().getName());
-            LOG.debug("principal value => {}", authentication.getPrincipal());
-            AuthenticationException.throwByMessage("Please login, it's not user details.");
+        Object principal = authentication.getPrincipal();
+        if (principal == null) {
+            throw new AuthenticationException("Please login, principal is null.");
         }
 
-        return (UserDetails) authentication.getPrincipal();
+        if (!(principal instanceof UserDetails)) {
+            LOG.debug("principal class name => {}", principal.getClass().getName());
+            LOG.debug("principal value => {}", principal);
+            throw new AuthenticationException("Please login, principal is not user details.");
+        }
+
+        return (UserDetails) principal;
     }
 
     @Override
-    @SuppressWarnings("null")
     public Authentication getAuthentication() {
         SecurityContext context = SecurityContextHolder.getContext();
-        if (context == null) {
-            AuthenticationException.throwByMessage("Please login.");
-        }
         Authentication authentication = context.getAuthentication();
         if (authentication == null) {
-            AuthenticationException.throwByMessage("Please login.");
+            throw new AuthenticationException("Please login, authentication is null.");
         }
 
         return authentication;
