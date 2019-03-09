@@ -32,6 +32,19 @@ public class ClassUtils_isPrivateConstructorTest {
 
     }
 
+    public static class PrivateConstructorWithArguments {
+
+        private PrivateConstructorWithArguments(String[] args) {
+
+        }
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void shouldBeThrowRuntimeException() {
+        isPrivateConstructor(PrivateConstructorWithArguments.class);
+    }
+
     @Test
     public void shouldBeFalse_whenEmptyConstructor() {
         assertFalse(isPrivateConstructor(EmptyConstructor.class));
@@ -43,7 +56,12 @@ public class ClassUtils_isPrivateConstructorTest {
     }
 
     @Test
-    public void shouldBeFalse_whenPrivateConstructor() {
+    public void shouldBeTrue_whenPrivateConstructor() {
         assertTrue(isPrivateConstructor(PrivateConstructor.class));
+    }
+    
+    @Test
+    public void shouldBePrivateConstructor() {
+        assertTrue(isPrivateConstructor(ClassUtils.class));
     }
 }
