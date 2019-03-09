@@ -19,7 +19,7 @@ public class CookieSpecBuilderTest {
         String expected = "X-CSRF-Token=xyz; Path=/; HttpOnly";
         assertThat(output).isEqualTo(expected);
     }
-    
+
     @Test
     public void shouldBeOk_whenSetHttpOnlyFalse() {
         String output = new CookieSpecBuilder("X-CSRF-Token", "xyz")
@@ -28,7 +28,7 @@ public class CookieSpecBuilderTest {
         String expected = "X-CSRF-Token=xyz; Path=/";
         assertThat(output).isEqualTo(expected);
     }
-    
+
     @Test
     public void shouldBeOk_whenSetPathIsLogin() {
         String output = new CookieSpecBuilder("X-CSRF-Token", "xyz")
@@ -49,7 +49,7 @@ public class CookieSpecBuilderTest {
         String expected = "X-CSRF-Token=xyz; Path=/login; HttpOnly; Secure";
         assertThat(output).isEqualTo(expected);
     }
-    
+
     @Test
     public void shouldBeOk_whenSameSiteStrict() {
         String output = new CookieSpecBuilder("X-CSRF-Token", "xyz")
@@ -61,8 +61,8 @@ public class CookieSpecBuilderTest {
         String expected = "X-CSRF-Token=xyz; Path=/login; HttpOnly; SameSite=Strict; Secure";
         assertThat(output).isEqualTo(expected);
     }
-    
-     @Test
+
+    @Test
     public void shouldBeOk_whenExpires() {
         String output = new CookieSpecBuilder("X-CSRF-Token", "xyz")
                 .setHttpOnly(Boolean.TRUE)
@@ -72,6 +72,20 @@ public class CookieSpecBuilderTest {
                 .setExpires(LocalDateTime.of(2020, Month.JANUARY, 1, 12, 30))
                 .build();
         String expected = "X-CSRF-Token=xyz; Path=/login; HttpOnly; SameSite=Strict; Secure; Expires=Wed, 01 Jan 2020 12:30:00 GMT";
+        assertThat(output).isEqualTo(expected);
+    }
+    
+    @Test
+    public void shouldBeOk_whenMaxAge() {
+        String output = new CookieSpecBuilder("X-CSRF-Token", "xyz")
+                .setHttpOnly(Boolean.TRUE)
+                .setPath("/login")
+                .setSecure(Boolean.TRUE)
+                .sameSiteStrict()
+                .setMaxAge(1000)
+                .setExpires(LocalDateTime.of(2020, Month.JANUARY, 1, 12, 30))
+                .build();
+        String expected = "X-CSRF-Token=xyz; Path=/login; HttpOnly; SameSite=Strict; Secure; Max-Age=1000; Expires=Wed, 01 Jan 2020 12:30:00 GMT";
         assertThat(output).isEqualTo(expected);
     }
 

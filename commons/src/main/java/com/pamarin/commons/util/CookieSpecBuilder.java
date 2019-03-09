@@ -6,7 +6,6 @@ package com.pamarin.commons.util;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,27 +32,11 @@ public class CookieSpecBuilder {
 
     private LocalDateTime expires;
 
-    private boolean encodeBase64Value = false;
-
     private int maxAge;
-
-    public CookieSpecBuilder(String key) {
-        this(key, null);
-    }
 
     public CookieSpecBuilder(String key, String value) {
         this.key = key;
         this.value = value;
-    }
-
-    public CookieSpecBuilder setValue(String value) {
-        this.value = value;
-        return this;
-    }
-
-    public CookieSpecBuilder encodeBase64Value() {
-        this.encodeBase64Value = true;
-        return this;
     }
 
     public CookieSpecBuilder setPath(String path) {
@@ -131,7 +114,7 @@ public class CookieSpecBuilder {
     }
 
     public String getValue() {
-        return isEncodeBase64Value() ? Base64.getEncoder().encodeToString(value.getBytes()) : value;
+        return value;
     }
 
     public String getPath() {
@@ -152,10 +135,6 @@ public class CookieSpecBuilder {
 
     public LocalDateTime getExpires() {
         return expires;
-    }
-
-    public boolean isEncodeBase64Value() {
-        return encodeBase64Value;
     }
 
     public int getMaxAge() {

@@ -64,11 +64,10 @@ public class SessionCookieSerializer implements CookieSerializer {
         int maxAge = hasValue ? cookieMaxAge : -1;
         String token = hasValue ? aesEncryption.encrypt(value, secretKey) : ANONYMOUS;
         cookieValue.getResponse().addHeader("Set-Cookie",
-                new CookieSpecBuilder(cookieName)
+                new CookieSpecBuilder(cookieName, token)
                         .setHttpOnly(true)
                         .setSecure(secure)
                         .setPath("/")
-                        .setValue(token)
                         .setMaxAge(maxAge)
                         .build()
         );
