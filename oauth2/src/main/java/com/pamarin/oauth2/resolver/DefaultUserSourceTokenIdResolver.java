@@ -3,11 +3,11 @@
  */
 package com.pamarin.oauth2.resolver;
 
-import java.util.Base64;
-import java.util.stream.Stream;
-import javax.servlet.http.Cookie;
+import com.pamarin.commons.resolver.DefaultHttpCookieResolver;
+import com.pamarin.commons.resolver.HttpCookieResolver;
+import com.pamarin.commons.util.Base64Utils;
 import javax.servlet.http.HttpServletRequest;
-import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  *
@@ -15,28 +15,18 @@ import static org.apache.commons.lang.ArrayUtils.isEmpty;
  */
 public class DefaultUserSourceTokenIdResolver implements UserSourceTokenIdResolver {
 
-    private final String cookieName;
+    private final HttpCookieResolver httpCookieResolver;
 
     public DefaultUserSourceTokenIdResolver(String cookieName) {
-        this.cookieName = cookieName;
+        httpCookieResolver = new DefaultHttpCookieResolver(cookieName);
     }
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
-        Cookie[] cookies = httpReq.getCookies();
-        if (isEmpty(cookies)) {
+        String cookieValue = httpCookieResolver.resolve(httpReq);
+        if (!hasText(cookieValue)) {
             return null;
         }
-
-        return Stream.of(cookies)
-                .filter(cookie -> cookie != null && cookieName.equalsIgnoreCase(cookie.getName()))
-                .map(cookie -> decode(cookie.getValue()))
-                .findFirst()
-                .orElse(null);
+        return Base64Utils.decode(cookieValue);
     }
-
-    private String decode(String cookieValue) {
-        return new String(Base64.getDecoder().decode(cookieValue));
-    }
-
 }

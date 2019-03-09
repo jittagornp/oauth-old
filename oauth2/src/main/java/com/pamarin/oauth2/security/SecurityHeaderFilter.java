@@ -34,10 +34,12 @@ public class SecurityHeaderFilter implements Filter {
     @NotBlank
     @Value("${secure.strict-transport-security.allow-source}")
     private String allowSource;
+    
+    private boolean isSecure;
 
     @Override
     public void init(FilterConfig config) throws ServletException {
-
+        isSecure = serverHostUrl.startsWith("https://");
     }
 
     @Override
@@ -47,7 +49,7 @@ public class SecurityHeaderFilter implements Filter {
 
         httpResp.addHeader("X-Download-Options", "noopen");
         httpResp.setHeader("Content-Security-Policy", "default-src " + allowSource + " 'unsafe-eval' 'unsafe-inline'; object-src 'none'");
-        if (serverHostUrl.startsWith("https://")) {
+        if (isSecure) {
             httpResp.setHeader("Strict-Transport-Security", "max-age=" + STS_MAX_AGE_A_YEAR + "; includeSubDomains; preload;");
             httpResp.setHeader("Referrer-Policy", "no-referrer-when-downgrade");
         }
