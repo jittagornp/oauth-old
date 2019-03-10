@@ -32,11 +32,7 @@ public class FixedResultLengthHashing implements Hashing {
 
     @Override
     public boolean matches(byte[] data, String token) {
-        try {
-            return hashing.matches(data, subString(token));
-        } catch (StringIndexOutOfBoundsException ex) {
-            return false;
-        }
+        return hashing.matches(data, token);
     }
 
 }
