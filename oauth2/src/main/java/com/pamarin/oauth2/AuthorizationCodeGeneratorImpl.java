@@ -38,7 +38,6 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
                 .userId(loginSession.getUserDetails().getUsername())
                 .clientId(req.getClientId())
                 .sessionId(loginSession.getSessionId())
-                .scopes(req.getScopes())
                 .build()
         );
 

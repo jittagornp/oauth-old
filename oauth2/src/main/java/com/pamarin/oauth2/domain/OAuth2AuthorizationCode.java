@@ -34,17 +34,8 @@ public class OAuth2AuthorizationCode implements OAuth2Token {
 
     private String sessionId;
 
-    private List<String> scopes;
-
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
-    }
-
-    public List<String> getScopes() {
-        if (scopes == null) {
-            scopes = new ArrayList<>();
-        }
-        return scopes;
     }
 }
