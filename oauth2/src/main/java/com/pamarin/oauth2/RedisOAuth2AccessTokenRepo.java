@@ -11,7 +11,7 @@ import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
  */
 public class RedisOAuth2AccessTokenRepo extends RedisOAuth2TokenRepoAdapter<OAuth2AccessToken> implements OAuth2AccessTokenRepo {
 
-    private int expiresMinutes;
+    private final int expiresMinutes;
 
     public RedisOAuth2AccessTokenRepo(int expiresMinutes) {
         this.expiresMinutes = expiresMinutes;

@@ -13,6 +13,7 @@ import com.pamarin.commons.security.DefaultBase64AESEncryption;
 import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
 import com.pamarin.oauth2.constant.OAuth2Constant;
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import java.util.Arrays;
@@ -134,9 +135,9 @@ public class SessionCookieSerializer implements CookieSerializer {
     private List<String> resolveByHeader(HttpServletRequest httpReq, String authorization) {
         try {
             String accessToken = httpAuthorizeBearerParser.parse(authorization);
-            AccessTokenVerification.Output output = accessTokenVerification.verify(accessToken);
-            httpReq.setAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE, output);
-            return Arrays.asList(output.getSessionId());
+            OAuth2AccessToken instance = accessTokenVerification.verify(accessToken);
+            httpReq.setAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE, instance);
+            return Arrays.asList(instance.getSessionId());
         } catch (InvalidHttpAuthorizationException | InvalidTokenException ex) {
             return emptyList();
         }

@@ -63,4 +63,5 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     public HashBasedToken newHashBasedToken() {
         return new DefaultHashBasedToken(new HmacSHA384Hashing(HASHBASED_KEY));
     }
+    
 }

@@ -12,6 +12,7 @@ import com.pamarin.commons.security.UserDetailsStub;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import java.util.UUID;
@@ -24,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
 import com.pamarin.oauth2.repository.OAuth2ApprovalScopeRepo;
+import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
 import java.util.Arrays;
@@ -46,52 +48,55 @@ import com.pamarin.oauth2.repository.UserSourceRepo;
 public class IntegrationTestBase {
 
     @MockBean
-    private OAuth2RefreshTokenRepo refreshTokenRepo;
+    protected UserRepo userRepo;
 
     @MockBean
-    private UserRepo userRepo;
+    protected UserSessionRepo userSessionRepo;
 
     @MockBean
-    private UserSessionRepo userSessionRepo;
-    
-    @MockBean
-    private UserSourceRepo userSourceRepo;
-    
-    @MockBean
-    private CsrfInterceptor csrfVerificationInterceptor;
+    protected UserSourceRepo userSourceRepo;
 
     @MockBean
-    private LoginSession loginSession;
+    protected CsrfInterceptor csrfVerificationInterceptor;
 
     @MockBean
-    private OAuth2ApprovalRepo approvalRepo;
+    protected LoginSession loginSession;
 
     @MockBean
-    private OAuth2ApprovalScopeRepo approvalScopeRepo;
+    protected OAuth2ApprovalRepo approvalRepo;
 
     @MockBean
-    private OAuth2ClientRepo clientRepo;
+    protected OAuth2ApprovalScopeRepo approvalScopeRepo;
 
     @MockBean
-    private OAuth2AllowDomainRepo allowDomainRepo;
+    protected OAuth2ClientRepo clientRepo;
 
     @MockBean
-    private OAuth2ClientScopeRepo clientScopeRepo;
+    protected OAuth2AllowDomainRepo allowDomainRepo;
 
     @MockBean
-    private OAuth2ScopeRepo scopeRepo;
+    protected OAuth2ClientScopeRepo clientScopeRepo;
 
     @MockBean
-    private AuthorizeViewModelService authorizeViewModelService;
+    protected OAuth2ScopeRepo scopeRepo;
 
     @MockBean
-    private OAuth2AccessTokenRepo accessTokenRepo;
-    
+    protected AuthorizeViewModelService authorizeViewModelService;
+
     @MockBean
-    private OAuth2SessionCacheStore sessionCacheStore;
-    
+    protected OAuth2AuthorizationCodeRepo authorizationCodeRepo;
+
     @MockBean
-    private HttpServletRequestProvider httpServletRequestProvider;
+    protected OAuth2AccessTokenRepo accessTokenRepo;
+
+    @MockBean
+    protected OAuth2RefreshTokenRepo refreshTokenRepo;
+
+    @MockBean
+    protected OAuth2SessionCacheStore sessionCacheStore;
+
+    @MockBean
+    protected HttpServletRequestProvider httpServletRequestProvider;
 
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()
@@ -168,6 +173,20 @@ public class IntegrationTestBase {
         when(accessTokenRepo.save(any(OAuth2AccessToken.class)))
                 .thenReturn(OAuth2AccessToken.builder()
                         .id("abcdefghijklmnopqrstuvwxyz")
+                        .userId(UUID.randomUUID().toString())
+                        .clientId(UUID.randomUUID().toString())
+                        .issuedAt(Timestamp.valueOf(now).getTime())
+                        .expiresAt(Timestamp.valueOf(expires).getTime())
+                        .build());
+    }
+
+    @Before
+    public void mockOAuth2AuthorizationCodeRepo() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expires = now.plusMinutes(30);
+        when(authorizationCodeRepo.save(any(OAuth2AuthorizationCode.class)))
+                .thenReturn(OAuth2AuthorizationCode.builder()
+                        .id("00000000-0000-0000-0000-000000000000")
                         .userId(UUID.randomUUID().toString())
                         .clientId(UUID.randomUUID().toString())
                         .issuedAt(Timestamp.valueOf(now).getTime())

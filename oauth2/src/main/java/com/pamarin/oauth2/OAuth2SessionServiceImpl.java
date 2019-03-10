@@ -4,9 +4,9 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.constant.OAuth2Constant;
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
-import com.pamarin.oauth2.service.AccessTokenVerification;
 import com.pamarin.oauth2.service.OAuth2SessionService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -41,7 +41,7 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
 
         databaseSessionSynchronizer.synchronize();
 
-        AccessTokenVerification.Output accessToken = getAccessToken(httpReq);
+        OAuth2AccessToken accessToken = getAccessToken(httpReq);
         if (accessToken == null) {
             throw new UnauthorizedClientException("Access token not found.");
         }
@@ -57,7 +57,7 @@ public class OAuth2SessionServiceImpl implements OAuth2SessionService {
         return oauth2Session;
     }
 
-    private AccessTokenVerification.Output getAccessToken(HttpServletRequest httpReq) {
-        return (AccessTokenVerification.Output) httpReq.getAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE);
+    private OAuth2AccessToken getAccessToken(HttpServletRequest httpReq) {
+        return (OAuth2AccessToken) httpReq.getAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE);
     }
 }

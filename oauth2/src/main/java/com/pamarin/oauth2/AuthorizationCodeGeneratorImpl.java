@@ -3,19 +3,18 @@
  */
 package com.pamarin.oauth2;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.pamarin.commons.security.DefaultUserDetails;
+import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.AuthorizationResponse;
 import com.pamarin.oauth2.service.AuthorizationCodeGenerator;
 import com.pamarin.commons.security.LoginSession;
-import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
-import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import com.pamarin.commons.security.RSAKeyPairs;
+import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
+import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepo;
+import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
+import java.util.Date;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -23,35 +22,36 @@ import com.pamarin.commons.security.RSAKeyPairs;
 @Component
 public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerator {
 
-    private static final int EXPIRES_MINUTE = 1;
-
     @Autowired
     private LoginSession loginSession;
 
     @Autowired
-    @Qualifier("autorizationCodeKeyPairs")
-    private RSAKeyPairs keyPairs;
+    private OAuth2AuthorizationCodeRepo auth2AuthorizationCodeRepo;
 
-    private Algorithm getAlgorithm() {
-        return Algorithm.RSA256(keyPairs.getPublicKey(), keyPairs.getPrivateKey());
-    }
+    @Autowired
+    private HashBasedToken hashBasedToken;
 
     @Override
     public AuthorizationResponse generate(AuthorizationRequest req) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expires = now.plusMinutes(EXPIRES_MINUTE);
-        String[] arr = new String[req.getScopes().size()];
-        UserDetails userDetails = loginSession.getUserDetails();
-        String code = JWT.create()
-                .withSubject(req.getClientId())
-                .withIssuer(userDetails.getUsername())
-                .withIssuedAt(convert2Date(now))
-                .withExpiresAt(convert2Date(expires))
-                .withArrayClaim("scopes", req.getScopes().toArray(arr))
-                .withClaim("session", loginSession.getSessionId())
-                .sign(getAlgorithm());
+
+        OAuth2AuthorizationCode code = auth2AuthorizationCodeRepo.save(OAuth2AuthorizationCode.builder()
+                .userId(loginSession.getUserDetails().getUsername())
+                .clientId(req.getClientId())
+                .sessionId(loginSession.getSessionId())
+                .scopes(req.getScopes())
+                .build()
+        );
+
+        String token = hashBasedToken.hash(
+                DefaultUserDetails.builder()
+                        .username(code.getId())
+                        .password(code.getSecretKey())
+                        .build(),
+                convert2LocalDateTime(new Date(code.getExpiresAt()))
+        );
+
         return AuthorizationResponse.builder()
-                .code(code)
+                .code(token)
                 .state(req.getState())
                 .build();
     }

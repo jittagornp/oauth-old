@@ -30,6 +30,12 @@ public interface OAuth2Token extends Cloneable {
 
     String getUserId();
 
+    void setUserId(String userId);
+
+    String getClientId();
+
+    void setClientId(String clientId);
+
     String getSessionId();
 
     void setSessionId(String sessionId);

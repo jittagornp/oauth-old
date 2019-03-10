@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.service;
 
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.model.OAuth2Session;
 
 /**
@@ -11,6 +12,6 @@ import com.pamarin.oauth2.model.OAuth2Session;
  */
 public interface OAuth2SessionBuilderService {
 
-    OAuth2Session build(AccessTokenVerification.Output output);
+    OAuth2Session build(OAuth2AccessToken accessToken);
 
 }

@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2Approval;
 import com.pamarin.oauth2.domain.OAuth2Client;
 import com.pamarin.oauth2.exception.OAuth2ClientNotFoundException;
@@ -51,11 +52,11 @@ public class OAuth2SessionBuilderService_buildTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    private AccessTokenVerification.Output stubAccessToken() {
+    private OAuth2AccessToken stubAccessToken() {
         String clientId = "client_id-123";
         String userId = "user_id-123";
         String sessionId = "session_id-123";
-        return AccessTokenVerification.Output.builder()
+        return OAuth2AccessToken.builder()
                 .clientId(clientId)
                 .userId(userId)
                 .sessionId(sessionId)
@@ -65,7 +66,7 @@ public class OAuth2SessionBuilderService_buildTest {
     @Test
     public void shouldBeThrowUnauthorizedClientException_whenOAuth2ApprovalIsNull() {
 
-        AccessTokenVerification.Output accessToken = stubAccessToken();
+        OAuth2AccessToken accessToken = stubAccessToken();
 
         when(approvalRepo.findOne(new OAuth2Approval.PK(
                 accessToken.getUserId(),
@@ -82,7 +83,7 @@ public class OAuth2SessionBuilderService_buildTest {
     @Test
     public void shouldBeThrowOAuth2ClientNotFoundException_whenOAuth2ClientIsNull() {
 
-        AccessTokenVerification.Output accessToken = stubAccessToken();
+        OAuth2AccessToken accessToken = stubAccessToken();
 
         when(approvalRepo.findOne(new OAuth2Approval.PK(
                 accessToken.getUserId(),
@@ -101,7 +102,7 @@ public class OAuth2SessionBuilderService_buildTest {
     @Test
     public void shouldBeOk() {
 
-        AccessTokenVerification.Output accessToken = stubAccessToken();
+        OAuth2AccessToken accessToken = stubAccessToken();
 
         when(approvalRepo.findOne(new OAuth2Approval.PK(
                 accessToken.getUserId(),

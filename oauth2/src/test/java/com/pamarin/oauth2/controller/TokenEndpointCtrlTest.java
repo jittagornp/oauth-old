@@ -7,6 +7,7 @@ import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.commons.security.PasswordEncryption;
+import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.service.AuthorizationCodeGenerator;
 import org.junit.Before;
 import org.junit.Test;

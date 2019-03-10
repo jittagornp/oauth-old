@@ -9,6 +9,7 @@ import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,19 +27,15 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
     @Autowired
     private HashBasedToken hashBasedToken;
 
-    private UserDetailsService userDetailsService(Output output) {
+    private UserDetailsService userDetailsService(OAuth2AccessToken output) {
         return id -> {
             OAuth2AccessToken token = accessTokenRepo.findById(id);
             if (token == null) {
                 throw new UsernameNotFoundException("Not found access token");
             }
 
-            output.setId(token.getId());
-            output.setIssuedAt(token.getIssuedAt());
-            output.setExpiresAt(token.getExpiresAt());
-            output.setUserId(token.getUserId());
-            output.setClientId(token.getClientId());
-            output.setSessionId(token.getSessionId());
+            String[] ignoreProperties = new String[]{"secretKey"};
+            BeanUtils.copyProperties(token, output, ignoreProperties);
             return DefaultUserDetails.builder()
                     .username(token.getId())
                     .password(token.getSecretKey())
@@ -47,8 +44,8 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
     }
 
     @Override
-    public Output verify(String accessToken) {
-        Output output = Output.builder().build();
+    public OAuth2AccessToken verify(String accessToken) {
+        OAuth2AccessToken output = OAuth2AccessToken.builder().build();
         if (!hashBasedToken.matches(accessToken, userDetailsService(output))) {
             throw new InvalidTokenException("Invalid access token.");
         }

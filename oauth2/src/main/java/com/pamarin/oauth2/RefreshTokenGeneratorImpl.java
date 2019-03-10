@@ -7,9 +7,9 @@ import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
 import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
 import com.pamarin.oauth2.domain.OAuth2RefreshToken;
+import com.pamarin.oauth2.domain.OAuth2Token;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.UserNotFoundException;
-import com.pamarin.oauth2.model.TokenBase;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
@@ -34,23 +34,23 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
     @Autowired
     private UserRepo userRepo;
 
-    private OAuth2RefreshToken generateRefreshToken(TokenBase base) {
+    private OAuth2RefreshToken generateRefreshToken(OAuth2Token token) {
         return refreshTokenRepo.save(OAuth2RefreshToken.builder()
-                .id(base.getId())
-                .userId(base.getUserId())
-                .clientId(base.getClientId())
-                .sessionId(base.getSessionId())
+                .id(token.getId())
+                .userId(token.getUserId())
+                .clientId(token.getClientId())
+                .sessionId(token.getSessionId())
                 .build());
     }
 
     @Override
     @SuppressWarnings("null")
-    public String generate(TokenBase base) {
-        User user = userRepo.findOne(base.getUserId());
+    public String generate(OAuth2Token token) {
+        User user = userRepo.findOne(token.getUserId());
         if (user == null) {
-            UserNotFoundException.throwbyUserId(base.getUserId());
+            UserNotFoundException.throwbyUserId(token.getUserId());
         }
-        OAuth2RefreshToken refreshToken = generateRefreshToken(base);
+        OAuth2RefreshToken refreshToken = generateRefreshToken(token);
         return hashBasedToken.hash(
                 DefaultUserDetails.builder()
                         .username(refreshToken.getId())

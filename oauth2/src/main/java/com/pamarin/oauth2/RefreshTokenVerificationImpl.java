@@ -8,10 +8,10 @@ import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.domain.OAuth2RefreshToken;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
-import com.pamarin.oauth2.model.TokenBase;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,7 +34,7 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
     @Autowired
     private UserRepo userRepo;
 
-    private UserDetailsService userDetailsService(TokenBase base) {
+    private UserDetailsService userDetailsService(OAuth2RefreshToken output) {
         return id -> {
             OAuth2RefreshToken refreshToken = refreshTokenRepo.findById(id);
             if (refreshToken == null) {
@@ -47,10 +47,8 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
                         refreshToken.getUserId()
                 ));
             }
-            base.setId(id);
-            base.setClientId(refreshToken.getClientId());
-            base.setUserId(refreshToken.getUserId());
-            base.setSessionId(refreshToken.getSessionId());
+            String[] ignoreProperties = new String[]{"secretKey"};
+            BeanUtils.copyProperties(refreshToken, output, ignoreProperties);
             return DefaultUserDetails.builder()
                     .username(refreshToken.getId())
                     .password(user.getPassword() + refreshToken.getSecretKey())
@@ -59,12 +57,12 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
     }
 
     @Override
-    public TokenBase verify(String token) {
-        TokenBase base = TokenBase.builder().build();
-        if (!hashBasedToken.matches(token, userDetailsService(base))) {
+    public OAuth2RefreshToken verify(String token) {
+        OAuth2RefreshToken output = OAuth2RefreshToken.builder().build();
+        if (!hashBasedToken.matches(token, userDetailsService(output))) {
             throw new UnauthorizedClientException("Invalid refresh token");
         }
-        return base;
+        return output;
     }
 
 }

@@ -4,9 +4,9 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.constant.OAuth2Constant;
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
-import com.pamarin.oauth2.service.AccessTokenVerification;
 import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 import com.pamarin.oauth2.service.OAuth2SessionBuilderService;
 import com.pamarin.oauth2.service.OAuth2SessionService;
@@ -65,11 +65,11 @@ public class OAuth2SessionService_getSessionTest {
         );
     }
 
-    private AccessTokenVerification.Output stubAccessToken() {
+    private OAuth2AccessToken stubAccessToken() {
         String clientId = "client_id-123";
         String userId = "user_id-123";
         String sessionId = "session_id-123";
-        return AccessTokenVerification.Output.builder()
+        return OAuth2AccessToken.builder()
                 .clientId(clientId)
                 .userId(userId)
                 .sessionId(sessionId)
@@ -95,7 +95,7 @@ public class OAuth2SessionService_getSessionTest {
     @Test
     public void shouldBeNotBuildOAuth2Session_whenAlreadyHaveSessionAttribute() {
 
-        AccessTokenVerification.Output accessToken = stubAccessToken();
+        OAuth2AccessToken accessToken = stubAccessToken();
         OAuth2Session oauth2Session = subOAuth2Session();
         String attributeKey = "oauth2-session:" + accessToken.getClientId();
 
@@ -113,7 +113,7 @@ public class OAuth2SessionService_getSessionTest {
     @Test
     public void shouldBeBuildOAuth2Session_whenDontHaveSessionAttribute() {
 
-        AccessTokenVerification.Output accessToken = stubAccessToken();
+        OAuth2AccessToken accessToken = stubAccessToken();
         OAuth2Session oauth2Session = subOAuth2Session();
         String attributeKey = "oauth2-session:" + accessToken.getClientId();
 

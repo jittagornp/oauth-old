@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2;
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
@@ -11,23 +10,24 @@ import com.pamarin.oauth2.model.AccessTokenResponse;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.CodeAccessTokenRequest;
 import com.pamarin.oauth2.model.RefreshAccessTokenRequest;
-import com.pamarin.oauth2.model.TokenBase;
 import com.pamarin.oauth2.service.AccessTokenGenerator;
 import com.pamarin.oauth2.service.ClientVerification;
 import com.pamarin.commons.security.LoginSession;
-import com.pamarin.oauth2.service.TokenVerification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
-import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
+import com.pamarin.oauth2.domain.OAuth2RefreshToken;
+import com.pamarin.oauth2.domain.OAuth2Token;
+import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.service.AuthorizationCodeVerification;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
 import java.util.Date;
@@ -45,8 +45,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     private LoginSession loginSession;
 
     @Autowired
-    @Qualifier("authorizationCodeVerification")
-    private TokenVerification authorizationCodeVerification;
+    private AuthorizationCodeVerification authorizationCodeVerification;
 
     @Autowired
     private ClientVerification clientVerification;
@@ -65,15 +64,12 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
 
     @Autowired
     private HashBasedToken hashBasedToken;
-//
-//    @Autowired
-//    private OAuth2SessionCacheStore sessionCacheStore;
 
-    private AccessTokenResponse buildAccessTokenResponse(TokenBase base) {
+    private AccessTokenResponse buildAccessTokenResponse(OAuth2Token instance) {
         OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
-                .userId(base.getUserId())
-                .clientId(base.getClientId())
-                .sessionId(base.getSessionId())
+                .userId(instance.getUserId())
+                .clientId(instance.getClientId())
+                .sessionId(instance.getSessionId())
                 .build()
         );
         String token = hashBasedToken.hash(
@@ -83,11 +79,11 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
                         .build(),
                 convert2LocalDateTime(new Date(accessToken.getExpiresAt()))
         );
-        base.setId(accessToken.getId());
+        instance.setId(accessToken.getId());
         return AccessTokenResponse.builder()
                 .accessToken(token)
                 .expiresIn(accessToken.getExpireMinutes() * 60L)
-                .refreshToken(refreshTokenGenerator.generate(base))
+                .refreshToken(refreshTokenGenerator.generate(instance))
                 .tokenType("bearer")
                 .build();
     }
@@ -95,7 +91,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     @Override
     public AccessTokenResponse generate(AuthorizationRequest req) {
         UserDetails userDetails = loginSession.getUserDetails();
-        return buildAccessTokenResponse(TokenBase.builder()
+        return buildAccessTokenResponse(OAuth2AccessToken.builder()
                 .clientId(req.getClientId())
                 .userId(userDetails.getUsername())
                 .sessionId(loginSession.getSessionId())
@@ -106,9 +102,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     public AccessTokenResponse generate(CodeAccessTokenRequest req) {
         clientVerification.verifyClientIdAndClientSecret(req.getClientId(), req.getClientSecret());
         try {
-            TokenBase authCode = authorizationCodeVerification.verify(req.getCode());
+            OAuth2AuthorizationCode authCode = authorizationCodeVerification.verify(req.getCode());
             return buildAccessTokenResponse(authCode);
-        } catch (TokenExpiredException ex) {
+        } catch (InvalidTokenException ex) {
             LOG.warn(null, ex);
             throw new UnauthorizedClientException(ex);
         }
@@ -117,16 +113,15 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     @Override
     public AccessTokenResponse generate(RefreshAccessTokenRequest req) {
         clientVerification.verifyClientIdAndClientSecret(req.getClientId(), req.getClientSecret());
-        TokenBase base = refreshTokenVerification.verify(req.getRefreshToken());
-        revokeToken(base.getId());
-        base.setId(null);
-        base.setClientId(req.getClientId());
-        return buildAccessTokenResponse(base);
+        OAuth2RefreshToken refreshToken = refreshTokenVerification.verify(req.getRefreshToken());
+        revokeToken(refreshToken.getId());
+        refreshToken.setId(null);
+        refreshToken.setClientId(req.getClientId());
+        return buildAccessTokenResponse(refreshToken);
     }
 
     private void revokeToken(String tokenId) {
         refreshTokenRepo.deleteById(tokenId);
         accessTokenRepo.deleteById(tokenId);
-        //sessionCacheStore.delete(tokenId);
     }
 }

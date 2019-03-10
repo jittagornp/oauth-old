@@ -10,7 +10,6 @@ import com.pamarin.commons.security.hashing.SHA384Hashing;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
-import com.pamarin.oauth2.service.AccessTokenVerification.Output;
 import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
@@ -74,14 +73,14 @@ public class AccessTokenVerificationTest {
         exception.expectMessage("Invalid access token.");
 
         String input = "123456";
-        Output output = verification.verify(makeToken(input, LocalDateTime.now()));
+        OAuth2AccessToken output = verification.verify(makeToken(input, LocalDateTime.now()));
 
     }
 
     @Test
     public void shouldBeOk() {
         String input = "999999";
-        Output output = verification.verify(makeToken(input, LocalDateTime.now().plusDays(1)));
+        OAuth2AccessToken output = verification.verify(makeToken(input, LocalDateTime.now().plusDays(1)));
         String expected = input;
         assertThat(output.getId()).isEqualTo(expected);
     }

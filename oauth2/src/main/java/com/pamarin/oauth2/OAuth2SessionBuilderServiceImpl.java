@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2Approval;
 import com.pamarin.oauth2.domain.OAuth2Client;
 import com.pamarin.oauth2.exception.OAuth2ClientNotFoundException;
@@ -11,7 +12,6 @@ import com.pamarin.oauth2.model.OAuth2Session;
 import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
-import com.pamarin.oauth2.service.AccessTokenVerification;
 import com.pamarin.oauth2.service.OAuth2SessionBuilderService;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,24 +36,24 @@ public class OAuth2SessionBuilderServiceImpl implements OAuth2SessionBuilderServ
     private OAuth2ApprovalRepo approvalRepo;
 
     @Override
-    public OAuth2Session build(AccessTokenVerification.Output output) {
-        OAuth2Approval approval = approvalRepo.findOne(new OAuth2Approval.PK(output.getUserId(), output.getClientId()));
+    public OAuth2Session build(OAuth2AccessToken accessToken) {
+        OAuth2Approval approval = approvalRepo.findOne(new OAuth2Approval.PK(accessToken.getUserId(), accessToken.getClientId()));
         if (approval == null) {
-            throw new UnauthorizedClientException("Unauthorized client " + output.getClientId() + " for user " + output.getUserId() + ".");
+            throw new UnauthorizedClientException("Unauthorized client " + accessToken.getClientId() + " for user " + accessToken.getUserId() + ".");
         }
 
-        OAuth2Client client = clientRepo.findOne(output.getClientId());
+        OAuth2Client client = clientRepo.findOne(accessToken.getClientId());
         if (client == null) {
-            throw new OAuth2ClientNotFoundException("Not found client id " + output.getClientId());
+            throw new OAuth2ClientNotFoundException("Not found client id " + accessToken.getClientId());
         }
 
         return OAuth2Session.builder()
-                .id(output.getSessionId())
-                .issuedAt(output.getIssuedAt())
-                .expiresAt(output.getExpiresAt())
+                .id(accessToken.getSessionId())
+                .issuedAt(accessToken.getIssuedAt())
+                .expiresAt(accessToken.getExpiresAt())
                 .user(
                         OAuth2Session.User.builder()
-                                .id(output.getUserId())
+                                .id(accessToken.getUserId())
                                 .name("นาย สมชาย ใจดี")
                                 .authorities(Arrays.asList("sso"))
                                 .build()
