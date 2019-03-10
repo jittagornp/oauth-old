@@ -96,9 +96,14 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public CookieSerializer newCookieSerializer() {
-        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer(secretKey, httpAuthorizeBearerParser, accessTokenVerification);
+        SessionCookieSerializer cookieSerializer = new SessionCookieSerializer(
+                "user-session",
+                secretKey,
+                httpAuthorizeBearerParser,
+                accessTokenVerification
+        );
+
         cookieSerializer.setCookieMaxAge(sessionTimeout);
-        cookieSerializer.setCookieName("user-session");
         cookieSerializer.setSecure(hostUrl.startsWith("https://"));
         return cookieSerializer;
     }
