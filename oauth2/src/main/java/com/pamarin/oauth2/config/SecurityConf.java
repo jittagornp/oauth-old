@@ -62,7 +62,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     @Bean
     public HashBasedToken newHashBasedToken() {
-        return new DefaultHashBasedToken(new ShortHashing(new HmacSHA384Hashing(HASHBASED_KEY), 32));
+        return new DefaultHashBasedToken(new ShortHashing(new HmacSHA384Hashing(HASHBASED_KEY), 37));
     }
 
 }
