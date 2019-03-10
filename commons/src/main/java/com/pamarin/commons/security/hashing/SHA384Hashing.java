@@ -13,7 +13,7 @@ import org.springframework.security.crypto.codec.Hex;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/29
  */
-public class SHA384Hashing implements Hashing {
+public class SHA384Hashing extends AbstractHashing {
 
     private static final Logger LOG = LoggerFactory.getLogger(SHA384Hashing.class);
 
@@ -30,13 +30,5 @@ public class SHA384Hashing implements Hashing {
             LOG.warn(null, ex);
             return null;
         }
-    }
-
-    @Override
-    public boolean matches(byte[] data, String token) {
-        if (token == null || isEmpty(data)) {
-            return false;
-        }
-        return MessageDigest.isEqual(hash(data).getBytes(), token.getBytes());
     }
 }
