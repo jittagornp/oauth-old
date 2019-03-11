@@ -5,6 +5,7 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.service.ClientVerification;
+import com.pamarin.oauth2.service.LogoutService;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class LogoutEnpointCtrl {
 
     @Autowired
-    private LoginSession loginSession;
+    private LogoutService logoutService;
 
     @Autowired
     private ClientVerification clientVerification;
@@ -37,7 +38,7 @@ public class LogoutEnpointCtrl {
 
         clientVerification.verifyClientIdAndRedirectUri(clientId, redirectUri);
 
-        loginSession.logout();
+        logoutService.logout();
 
         httpResp.sendRedirect(redirectUri);
 
@@ -48,7 +49,7 @@ public class LogoutEnpointCtrl {
     @PostMapping("/logout")
     public void postLogout(@RequestHeader("Authorization") String authrorization) {
 
-       loginSession.logout();
+        logoutService.logout();
 
     }
 }
