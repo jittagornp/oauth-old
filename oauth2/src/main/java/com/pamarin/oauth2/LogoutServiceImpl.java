@@ -9,7 +9,7 @@ import com.pamarin.oauth2.repository.UserSessionRepo;
 import com.pamarin.oauth2.service.LogoutService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.session.data.redis.RedisOperationsSessionRepository;
+import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
@@ -28,7 +28,7 @@ public class LogoutServiceImpl implements LogoutService {
     private UserSessionRepo userSessionRepo;
 
     @Autowired
-    private RedisOperationsSessionRepository sessionRepository;
+    private SessionRepository sessionRepository;
 
     @Override
     public void logout() {

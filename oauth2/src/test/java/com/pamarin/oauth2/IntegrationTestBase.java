@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.pamarin.oauth2.repository.UserSourceRepo;
-import org.springframework.session.data.redis.RedisOperationsSessionRepository;
+import org.springframework.session.SessionRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -100,7 +100,7 @@ public class IntegrationTestBase {
     protected HttpServletRequestProvider httpServletRequestProvider;
     
     @MockBean
-    protected RedisOperationsSessionRepository sessionRepository;
+    protected SessionRepository sessionRepository;
 
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()
