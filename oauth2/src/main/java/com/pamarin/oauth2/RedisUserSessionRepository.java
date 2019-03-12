@@ -406,6 +406,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
 
     @Scheduled(cron = "${spring.session.cleanup.cron.expression:0 * * * * *}")
     public void cleanupExpiredSessions() {
+        LOG.debug("cleanupExpiredSessions()...");
         this.expirationPolicy.cleanExpiredSessions();
     }
 
@@ -416,6 +417,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
 
     public Map<String, RedisSession> findByIndexNameAndIndexValue(String indexName,
             String indexValue) {
+        LOG.debug("findByIndexNameAndIndexValue({}, {})...", indexName, indexValue);
         if (!PRINCIPAL_NAME_INDEX_NAME.equals(indexName)) {
             return Collections.emptyMap();
         }
@@ -443,6 +445,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
      * @return the Redis session
      */
     private RedisSession getSession(String id, boolean allowExpired) {
+        LOG.debug("getSession({}, {})...", id, allowExpired);
         Map<Object, Object> entries = getSessionBoundHashOperations(id).entries();
         if (entries.isEmpty()) {
             LOG.debug("entries.isEmpty()");
@@ -565,12 +568,14 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
     }
 
     public void handleCreated(Map<Object, Object> loaded, String channel) {
+        LOG.debug("handleCreated()...");
         String id = channel.substring(channel.lastIndexOf(":") + 1);
         ExpiringSession session = loadSession(id, loaded);
         publishEvent(new SessionCreatedEvent(this, session));
     }
 
     private void handleDeleted(String sessionId, RedisSession session) {
+        LOG.debug("handleDeleted()...");
         if (session == null) {
             publishEvent(new SessionDeletedEvent(this, sessionId));
         } else {
@@ -579,6 +584,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
     }
 
     private void handleExpired(String sessionId, RedisSession session) {
+        LOG.debug("handleExpired()...");
         if (session == null) {
             publishEvent(new SessionExpiredEvent(this, sessionId));
         } else {
@@ -663,8 +669,8 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
         return SESSION_ATTR_PREFIX + attributeName;
     }
 
-    private static RedisTemplate<Object, Object> createDefaultTemplate(
-            RedisConnectionFactory connectionFactory) {
+    private static RedisTemplate<Object, Object> createDefaultTemplate(RedisConnectionFactory connectionFactory) {
+        LOG.debug("createDefaultTemplate()...");
         Assert.notNull(connectionFactory, "connectionFactory cannot be null");
         RedisTemplate<Object, Object> template = new RedisTemplate<Object, Object>();
         template.setKeySerializer(new StringRedisSerializer());
@@ -719,9 +725,11 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
 
         public void setNew(boolean isNew) {
             this.isNew = isNew;
+            LOG.debug("setNew({})...", isNew);
         }
 
         public void setLastAccessedTime(long lastAccessedTime) {
+            LOG.debug("setLastAccessedTime({})...", lastAccessedTime);
             this.cached.setLastAccessedTime(lastAccessedTime);
             this.putAndFlush(LAST_ACCESSED_ATTR, getLastAccessedTime());
         }
@@ -834,6 +842,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
         private SpelExpressionParser parser = new SpelExpressionParser();
 
         public String resolvePrincipal(Session session) {
+            LOG.debug("resolvePrincipal({})...", session);
             String principalName = session.getAttribute(PRINCIPAL_NAME_INDEX_NAME);
             if (principalName != null) {
                 return principalName;
