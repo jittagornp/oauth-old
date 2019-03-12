@@ -336,8 +336,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
      * @param sessionRedisOperations The {@link RedisOperations} to use for
      * managing the sessions. Cannot be null.
      */
-    public RedisUserSessionRepository(
-            RedisOperations<Object, Object> sessionRedisOperations) {
+    public RedisUserSessionRepository(RedisOperations<Object, Object> sessionRedisOperations) {
         Assert.notNull(sessionRedisOperations, "sessionRedisOperations cannot be null");
         this.sessionRedisOperations = sessionRedisOperations;
         this.expirationPolicy = new RedisSessionExpirationPolicy(sessionRedisOperations,
@@ -352,10 +351,8 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
      * @param applicationEventPublisher the {@link ApplicationEventPublisher}
      * that is used to publish {@link SessionDestroyedEvent}. Cannot be null.
      */
-    public void setApplicationEventPublisher(
-            ApplicationEventPublisher applicationEventPublisher) {
-        Assert.notNull(applicationEventPublisher,
-                "applicationEventPublisher cannot be null");
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        Assert.notNull(applicationEventPublisher, "applicationEventPublisher cannot be null");
         this.eventPublisher = applicationEventPublisher;
     }
 
@@ -438,46 +435,46 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
     /**
      * Gets the session.
      *
-     * @param id the session id
+     * @param sessionId the session id
      * @param allowExpired if true, will also include expired sessions that have
      * not been deleted. If false, will ensure expired sessions are not
      * returned.
      * @return the Redis session
      */
-    private RedisSession getSession(String id, boolean allowExpired) {
-        LOG.debug("getSession({}, {})...", id, allowExpired);
-        Map<Object, Object> entries = getSessionBoundHashOperations(id).entries();
-        if (entries.isEmpty()) {
+    private RedisSession getSession(String sessionId, boolean allowExpired) {
+        LOG.debug("getSession({}, {})...", sessionId, allowExpired);
+        Map<Object, Object> hashEntries = getSessionBoundHashOperations(sessionId).entries();
+        if (hashEntries.isEmpty()) {
             LOG.debug("entries.isEmpty()");
             return null;
         }
-        MapSession loaded = loadSession(id, entries);
-        if (!allowExpired && loaded.isExpired()) {
+        MapSession mapSession = convertHashToMapSession(sessionId, hashEntries);
+        if (!allowExpired && mapSession.isExpired()) {
             LOG.debug("!allowExpired && loaded.isExpired()");
+            delete(sessionId);
             return null;
         }
-        RedisSession result = new RedisSession(loaded);
-        result.originalLastAccessTime = loaded.getLastAccessedTime();
-        return result;
+        RedisSession session = new RedisSession(mapSession);
+        session.originalLastAccessTime = mapSession.getLastAccessedTime();
+        return session;
     }
 
-    private MapSession loadSession(String id, Map<Object, Object> entries) {
+    private MapSession convertHashToMapSession(String sessionId, Map<Object, Object> entries) {
         LOG.debug("loadSession...");
-        MapSession loaded = new MapSession(id);
+        MapSession mapSession = new MapSession(sessionId);
         for (Map.Entry<Object, Object> entry : entries.entrySet()) {
             String key = (String) entry.getKey();
             if (CREATION_TIME_ATTR.equals(key)) {
-                loaded.setCreationTime((Long) entry.getValue());
+                mapSession.setCreationTime((Long) entry.getValue());
             } else if (MAX_INACTIVE_ATTR.equals(key)) {
-                loaded.setMaxInactiveIntervalInSeconds((Integer) entry.getValue());
+                mapSession.setMaxInactiveIntervalInSeconds((Integer) entry.getValue());
             } else if (LAST_ACCESSED_ATTR.equals(key)) {
-                loaded.setLastAccessedTime((Long) entry.getValue());
+                mapSession.setLastAccessedTime((Long) entry.getValue());
             } else if (key.startsWith(SESSION_ATTR_PREFIX)) {
-                loaded.setAttribute(key.substring(SESSION_ATTR_PREFIX.length()),
-                        entry.getValue());
+                mapSession.setAttribute(key.substring(SESSION_ATTR_PREFIX.length()), entry.getValue());
             }
         }
-        return loaded;
+        return mapSession;
     }
 
     public void delete(String sessionId) {
@@ -570,7 +567,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
     public void handleCreated(Map<Object, Object> loaded, String channel) {
         LOG.debug("handleCreated()...");
         String id = channel.substring(channel.lastIndexOf(":") + 1);
-        ExpiringSession session = loadSession(id, loaded);
+        ExpiringSession session = convertHashToMapSession(id, loaded);
         publishEvent(new SessionCreatedEvent(this, session));
     }
 
@@ -803,34 +800,26 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
             }
             String sessionId = getId();
             getSessionBoundHashOperations(sessionId).putAll(this.delta);
-            String principalSessionKey = getSessionAttrNameKey(
-                    FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME);
-            String securityPrincipalSessionKey = getSessionAttrNameKey(
-                    SPRING_SECURITY_CONTEXT);
-            if (this.delta.containsKey(principalSessionKey)
-                    || this.delta.containsKey(securityPrincipalSessionKey)) {
-                if (this.originalPrincipalName != null) {
-                    String originalPrincipalRedisKey = getPrincipalKey(
-                            this.originalPrincipalName);
-                    RedisUserSessionRepository.this.sessionRedisOperations
-                            .boundSetOps(originalPrincipalRedisKey).remove(sessionId);
-                }
-                String principal = PRINCIPAL_NAME_RESOLVER.resolvePrincipal(this);
-                this.originalPrincipalName = principal;
-                if (principal != null) {
-                    String principalRedisKey = getPrincipalKey(principal);
-                    RedisUserSessionRepository.this.sessionRedisOperations
-                            .boundSetOps(principalRedisKey).add(sessionId);
-                }
-            }
+//            
+//            String principalSessionKey = getSessionAttrNameKey(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME);
+//            String securityPrincipalSessionKey = getSessionAttrNameKey(SPRING_SECURITY_CONTEXT);
+//            if (this.delta.containsKey(principalSessionKey) || this.delta.containsKey(securityPrincipalSessionKey)) {
+//                if (this.originalPrincipalName != null) {
+//                    String originalPrincipalRedisKey = getPrincipalKey(this.originalPrincipalName);
+//                    RedisUserSessionRepository.this.sessionRedisOperations.boundSetOps(originalPrincipalRedisKey).remove(sessionId);
+//                }
+//                String principal = PRINCIPAL_NAME_RESOLVER.resolvePrincipal(this);
+//                this.originalPrincipalName = principal;
+//                if (principal != null) {
+//                    String principalRedisKey = getPrincipalKey(principal);
+//                    RedisUserSessionRepository.this.sessionRedisOperations.boundSetOps(principalRedisKey).add(sessionId);
+//                }
+//            }
 
-            this.delta = new HashMap<String, Object>(this.delta.size());
-
-            Long originalExpiration = this.originalLastAccessTime == null ? null
-                    : this.originalLastAccessTime + TimeUnit.SECONDS
-                            .toMillis(getMaxInactiveIntervalInSeconds());
-            RedisUserSessionRepository.this.expirationPolicy
-                    .onExpirationUpdated(originalExpiration, this);
+            this.delta = new HashMap<>(this.delta.size());
+//
+//            Long originalExpiration = this.originalLastAccessTime == null ? null : this.originalLastAccessTime + TimeUnit.SECONDS.toMillis(getMaxInactiveIntervalInSeconds());
+//            RedisUserSessionRepository.this.expirationPolicy.onExpirationUpdated(originalExpiration, this);
         }
     }
 
@@ -849,8 +838,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
             }
             Object authentication = session.getAttribute(SPRING_SECURITY_CONTEXT);
             if (authentication != null) {
-                Expression expression = this.parser
-                        .parseExpression("authentication?.name");
+                Expression expression = this.parser.parseExpression("authentication?.name");
                 return expression.getValue(authentication, String.class);
             }
             return null;

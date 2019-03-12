@@ -57,8 +57,7 @@ final class RedisSessionExpirationPolicy {
 
     private final RedisUserSessionRepository redisSession;
 
-    RedisSessionExpirationPolicy(RedisOperations<Object, Object> sessionRedisOperations,
-            RedisUserSessionRepository redisSession) {
+    RedisSessionExpirationPolicy(RedisOperations<Object, Object> sessionRedisOperations, RedisUserSessionRepository redisSession) {
         super();
         this.redis = sessionRedisOperations;
         this.redisSession = redisSession;
@@ -71,8 +70,7 @@ final class RedisSessionExpirationPolicy {
         this.redis.boundSetOps(expireKey).remove(session.getId());
     }
 
-    public void onExpirationUpdated(Long originalExpirationTimeInMilli,
-            ExpiringSession session) {
+    public void onExpirationUpdated(Long originalExpirationTimeInMilli, ExpiringSession session) {
         LOG.debug("onExpirationUpdated()...");
         String keyToExpire = "expires:" + session.getId();
         long toExpire = roundUpToNextMinute(expiresInMillis(session));
