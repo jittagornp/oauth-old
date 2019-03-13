@@ -38,24 +38,23 @@ public class RedisConf extends SpringHttpSessionConfiguration {
     @Value("${spring.session.redis.flush-mode}")
     private String flushMode;
 
-    @Bean
-    public RedisTemplate<Object, Object> sessionRedisTemplate(
-            RedisConnectionFactory connectionFactory) {
-        RedisTemplate<Object, Object> template = new RedisTemplate<>();
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setHashKeySerializer(new StringRedisSerializer());
-//        if (this.defaultRedisSerializer != null) {
-//            template.setDefaultSerializer(this.defaultRedisSerializer);
-//        }
-        template.setConnectionFactory(connectionFactory);
-        return template;
-    }
+//    @Bean
+//    public RedisTemplate<Object, Object> sessionRedisTemplate(RedisConnectionFactory connectionFactory) {
+//        RedisTemplate<Object, Object> template = new RedisTemplate<>();
+//        template.setKeySerializer(new StringRedisSerializer());
+//        template.setHashKeySerializer(new StringRedisSerializer());
+////        if (this.defaultRedisSerializer != null) {
+////            template.setDefaultSerializer(this.defaultRedisSerializer);
+////        }
+//        template.setConnectionFactory(connectionFactory);
+//        return template;
+//    }
 
     @Bean
     public SessionRepository sessionRepository(RedisConnectionFactory factory) {
         RedisUserSessionRepository sessionRepository = new RedisUserSessionRepository(factory);
 
-        sessionRepository.cleanupExpiredSessions();
+        //sessionRepository.cleanupExpiredSessions();
 
         Field keyPrefixField = ReflectionUtils.findField(RedisUserSessionRepository.class, "keyPrefix");
         keyPrefixField.setAccessible(true);
