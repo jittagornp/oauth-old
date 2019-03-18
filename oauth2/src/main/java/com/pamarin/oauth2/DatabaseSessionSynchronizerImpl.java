@@ -28,7 +28,11 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
 
     private static final Logger LOG = LoggerFactory.getLogger(DatabaseSessionSynchronizerImpl.class);
 
+    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
+
     private static final String LAST_ACCESSED_TIME_ATTR = "lastAccessedTimeUserSession";
+
+    private static final String LAST_ACCESSED_TIME_WITH_LOGIN_ATTR = "lastAccessedTimeUserSessionWithLogin";
 
     private final Long synchronizeTimeout;
 
@@ -59,18 +63,17 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
 
     private String resolveUserSourceId(HttpServletRequest httpReq) {
         String sourceId = userSourceTokenIdResolver.resolve(httpReq);
-        return sourceId;
-//        if (!hasText(sourceId)) {
-//            return null;
-//        }
-//
-//        UserSource userSource = userSourceRepo.findOne(sourceId);
-//        if (userSource == null) {
-//            userSource = new UserSource();
-//            userSource.setId(sourceId);
-//            userSourceRepo.save(userSource);
-//        }
-//        return userSource.getId();
+        if (!hasText(sourceId)) {
+            return null;
+        }
+
+        UserSource userSource = userSourceRepo.findOne(sourceId);
+        if (userSource == null) {
+            userSource = new UserSource();
+            userSource.setId(sourceId);
+            userSourceRepo.save(userSource);
+        }
+        return userSource.getId();
     }
 
     @Override
@@ -80,6 +83,17 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
         if (lastAcccessedTime == null || currentTime - lastAcccessedTime > synchronizeTimeout) {
             synchronizeUserSession(session);
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
+        } else {
+            Object firstTime = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
+            if (firstTime == null) {
+                boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
+                if (alreadyLogin) {
+                    synchronizeUserSession(session);
+                    session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
+                    session.setAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR, true);
+                }
+            }
+
         }
     }
 
