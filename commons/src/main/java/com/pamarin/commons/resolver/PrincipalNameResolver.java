@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2.service;
+package com.pamarin.commons.resolver;
 
 import org.springframework.session.Session;
 
@@ -9,8 +9,8 @@ import org.springframework.session.Session;
  *
  * @author jitta
  */
-public interface DatabaseSessionSynchronizer {
-
-    void synchronize(Session session);
+public interface PrincipalNameResolver {
+    
+    String resolve(Session session);
     
 }

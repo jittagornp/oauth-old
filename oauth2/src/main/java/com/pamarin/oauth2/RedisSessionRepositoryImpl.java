@@ -1,12 +1,14 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.RedisSessionRepositoryImpl.RedisSession;
+import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -15,12 +17,9 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.session.ExpiringSession;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.MapSession;
-import org.springframework.session.Session;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.util.Assert;
 
@@ -29,11 +28,10 @@ import org.springframework.util.Assert;
  */
 public class RedisSessionRepositoryImpl implements FindByIndexNameSessionRepository<RedisSession>, MessageListener {
 
-    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
-
     private static final Logger LOG = LoggerFactory.getLogger(RedisSessionRepositoryImpl.class);
 
-    private final PrincipalNameResolver principalNameResolver = new PrincipalNameResolver();
+    @Autowired
+    private DatabaseSessionSynchronizer databaseSessionSynchronizer;
 
     private static final String SESSION_KEY_PREFIX = "user-session:";
 
@@ -74,7 +72,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
     @Override
     public void save(RedisSession session) {
         LOG.debug("save({})...", session.getId());
-        session.saveDelta();
+        session.saveAttributeMap();
         if (session.isNew()) {
             session.setNew(false);
         }
@@ -178,14 +176,14 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
     public class RedisSession implements ExpiringSession {
 
         private final MapSession cached;
-        private Map<String, Object> delta = new HashMap<>();
+        private Map<String, Object> attributeMap = new HashMap<>();
         private boolean isNew;
 
         public RedisSession() {
             this(new MapSession());
-            this.delta.put(CREATION_TIME_ATTR, getCreationTime());
-            this.delta.put(MAX_INACTIVE_ATTR, getMaxInactiveIntervalInSeconds());
-            this.delta.put(LAST_ACCESSED_ATTR, getLastAccessedTime());
+            this.attributeMap.put(CREATION_TIME_ATTR, getCreationTime());
+            this.attributeMap.put(MAX_INACTIVE_ATTR, getMaxInactiveIntervalInSeconds());
+            this.attributeMap.put(LAST_ACCESSED_ATTR, getLastAccessedTime());
             this.isNew = true;
             this.flushImmediateIfNecessary();
         }
@@ -266,48 +264,27 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
 
         private void flushImmediateIfNecessary() {
             if (RedisSessionRepositoryImpl.this.redisFlushMode == RedisFlushMode.IMMEDIATE) {
-                saveDelta();
+                saveAttributeMap();
             }
         }
 
-        private void putAndFlush(String a, Object v) {
-            this.delta.put(a, v);
+        private void putAndFlush(String attribute, Object value) {
+            this.attributeMap.put(attribute, value);
             this.flushImmediateIfNecessary();
         }
 
-        private void saveDelta() {
-            LOG.debug("saveDelta()...");
-            if (this.delta.isEmpty()) {
+        private void saveAttributeMap() {
+            LOG.debug("saveAttributeMap()...");
+            if (this.attributeMap.isEmpty()) {
                 return;
             }
 
-            String userId = principalNameResolver.resolvePrincipal(this);
-            LOG.debug("Login userId => {}", userId);
+            databaseSessionSynchronizer.synchronize(this);
 
             String sessionId = getId();
-            getSessionBoundHashOperations(sessionId).putAll(this.delta);
+            getSessionBoundHashOperations(sessionId).putAll(this.attributeMap);
 
-            this.delta = new HashMap<>(this.delta.size());
+            this.attributeMap = new HashMap<>(this.attributeMap.size());
         }
-    }
-
-    /**
-     * Resolves the Spring Security principal name.
-     *
-     * @author Vedran Pavic
-     */
-    private static class PrincipalNameResolver {
-
-        private final SpelExpressionParser parser = new SpelExpressionParser();
-
-        public String resolvePrincipal(Session session) {
-            Object authentication = session.getAttribute(SPRING_SECURITY_CONTEXT);
-            if (authentication != null) {
-                Expression expression = this.parser.parseExpression("authentication?.name");
-                return expression.getValue(authentication, String.class);
-            }
-            return null;
-        }
-
     }
 }
