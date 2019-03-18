@@ -278,7 +278,9 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
                 return;
             }
 
-            databaseSessionSynchronizer.synchronize(this);
+            if (databaseSessionSynchronizer != null) {
+                databaseSessionSynchronizer.synchronize(this);
+            }
 
             String sessionId = getId();
             getSessionBoundHashOperations(sessionId).putAll(this.attributeMap);

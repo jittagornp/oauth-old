@@ -4,8 +4,10 @@
 package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
+import com.pamarin.oauth2.DatabaseSessionSynchronizerImpl;
 import com.pamarin.oauth2.security.SessionCookieSerializer;
 import com.pamarin.oauth2.service.AccessTokenVerification;
+import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -46,6 +48,11 @@ public class SessionConf {
         cookieSerializer.setCookieMaxAge(sessionTimeout);
         cookieSerializer.setSecure(hostUrl.startsWith("https://"));
         return cookieSerializer;
+    }
+    
+    @Bean
+    public DatabaseSessionSynchronizer newDatabaseSessionSynchronizer(){
+        return new DatabaseSessionSynchronizerImpl(sessionTimeout, 1000 * 30L);
     }
 
 }
