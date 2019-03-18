@@ -86,10 +86,10 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
 
     private void synchronizeUserSession(Session session) {
         LOG.debug("synchronizeUserSession({})", session.getId());
-        HttpServletRequest httpReq = httpServletRequestProvider.provide();
+        //HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String userId = principalNameResolver.resolve(session);
-        String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
-        String sourceId = resolveUserSourceId(httpReq);
+        String ipAddress = null;//httpClientIPAddressResolver.resolve(httpReq);
+        String sourceId = null;//resolveUserSourceId(httpReq);
 
         UserSession userSession = userSessionRepo.findOne(session.getId());
         if (userSession == null) {
