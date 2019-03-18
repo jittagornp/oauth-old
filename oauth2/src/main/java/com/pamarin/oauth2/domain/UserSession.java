@@ -26,16 +26,16 @@ public class UserSession extends AuditingEntity {
     @Id
     private String id;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private String userId;
 
     @Column(nullable = false)
     private Integer timeout;
 
-    @Column(name = "source_id", nullable = false)
+    @Column(name = "source_id")
     private String sourceId;
     
-    @Column(name = "ip_address", nullable = false)
+    @Column(name = "ip_address")
     private String ipAddress;
 
     @Override
