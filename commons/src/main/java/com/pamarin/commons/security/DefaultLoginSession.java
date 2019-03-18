@@ -37,7 +37,6 @@ class DefaultLoginSession implements LoginSession {
                 userDetails.getAuthorities()
         );
         context.setAuthentication(token);
-        SecurityContextHolder.clearContext();
         SecurityContextHolder.setContext(context);
     }
 

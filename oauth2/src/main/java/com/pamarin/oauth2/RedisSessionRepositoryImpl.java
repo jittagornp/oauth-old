@@ -1,6 +1,6 @@
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.RedisUserSessionRepository.RedisSession;
+import com.pamarin.oauth2.RedisSessionRepositoryImpl.RedisSession;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,11 +24,11 @@ import org.springframework.util.Assert;
 /**
  * @author Jitta
  */
-public class RedisUserSessionRepository implements FindByIndexNameSessionRepository<RedisSession>, MessageListener {
+public class RedisSessionRepositoryImpl implements FindByIndexNameSessionRepository<RedisSession>, MessageListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisUserSessionRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisSessionRepositoryImpl.class);
 
-    static final String DEFAULT_SPRING_SESSION_REDIS_PREFIX = "user-session:";
+    private static final String SESSION_KEY_PREFIX = "user-session:";
 
     static final String CREATION_TIME_ATTR = "creationTime";
 
@@ -38,7 +38,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
 
     static final String SESSION_ATTR_PREFIX = "sessionAttr:";
 
-    private String keyPrefix = DEFAULT_SPRING_SESSION_REDIS_PREFIX;
+    private String keyPrefix = SESSION_KEY_PREFIX;
 
     private final RedisOperations<Object, Object> sessionRedisOperations;
 
@@ -46,15 +46,14 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
 
     private RedisFlushMode redisFlushMode = RedisFlushMode.ON_SAVE;
 
-    public RedisUserSessionRepository(RedisConnectionFactory redisConnectionFactory) {
+    public RedisSessionRepositoryImpl(RedisConnectionFactory redisConnectionFactory) {
         this(createDefaultTemplate(redisConnectionFactory));
     }
 
-    public RedisUserSessionRepository(RedisOperations<Object, Object> sessionRedisOperations) {
+    public RedisSessionRepositoryImpl(RedisOperations<Object, Object> sessionRedisOperations) {
         Assert.notNull(sessionRedisOperations, "sessionRedisOperations cannot be null");
         this.sessionRedisOperations = sessionRedisOperations;
     }
-
 
     public void setDefaultMaxInactiveInterval(int defaultMaxInactiveInterval) {
         this.defaultMaxInactiveInterval = defaultMaxInactiveInterval;
@@ -68,7 +67,6 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
     @Override
     public void save(RedisSession session) {
         LOG.debug("save({})...", session.getId());
-
         session.saveDelta();
         if (session.isNew()) {
             session.setNew(false);
@@ -103,7 +101,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
     }
 
     private MapSession convertHashToMapSession(String sessionId, Map<Object, Object> entries) {
-        LOG.debug("loadSession...");
+        LOG.debug("convertHashToMapSession({})...", sessionId);
         MapSession mapSession = new MapSession(sessionId);
         for (Map.Entry<Object, Object> entry : entries.entrySet()) {
             String key = (String) entry.getKey();
@@ -137,22 +135,20 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
         return redisSession;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onMessage(Message message, byte[] pattern) {
 
     }
 
     public void setRedisKeyNamespace(String namespace) {
-        this.keyPrefix = DEFAULT_SPRING_SESSION_REDIS_PREFIX + namespace + ":";
+        this.keyPrefix = SESSION_KEY_PREFIX + ":";
     }
 
     String getSessionKey(String sessionId) {
-        return this.keyPrefix + "sessions:" + sessionId;
+        return this.keyPrefix + sessionId;
     }
 
-    private BoundHashOperations<Object, Object, Object> getSessionBoundHashOperations(
-            String sessionId) {
+    private BoundHashOperations<Object, Object, Object> getSessionBoundHashOperations(String sessionId) {
         String key = getSessionKey(sessionId);
         return this.sessionRedisOperations.boundHashOps(key);
     }
@@ -262,7 +258,7 @@ public class RedisUserSessionRepository implements FindByIndexNameSessionReposit
         }
 
         private void flushImmediateIfNecessary() {
-            if (RedisUserSessionRepository.this.redisFlushMode == RedisFlushMode.IMMEDIATE) {
+            if (RedisSessionRepositoryImpl.this.redisFlushMode == RedisFlushMode.IMMEDIATE) {
                 saveDelta();
             }
         }
