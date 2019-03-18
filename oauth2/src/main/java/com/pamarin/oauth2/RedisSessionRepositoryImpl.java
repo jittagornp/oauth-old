@@ -30,7 +30,6 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSessionRepositoryImpl.class);
 
-    @Autowired
     private DatabaseSessionSynchronizer databaseSessionSynchronizer;
 
     private static final String SESSION_KEY_PREFIX = "user-session:";
@@ -287,4 +286,9 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
             this.attributeMap = new HashMap<>(this.attributeMap.size());
         }
     }
+
+    public void setDatabaseSessionSynchronizer(DatabaseSessionSynchronizer databaseSessionSynchronizer) {
+        this.databaseSessionSynchronizer = databaseSessionSynchronizer;
+    }
+
 }

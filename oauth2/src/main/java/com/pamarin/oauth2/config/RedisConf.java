@@ -4,6 +4,8 @@
 package com.pamarin.oauth2.config;
 
 import com.pamarin.oauth2.RedisSessionRepositoryImpl;
+import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +30,9 @@ public class RedisConf extends SpringHttpSessionConfiguration {
 
     @Value("${spring.session.redis.flush-mode}")
     private String flushMode;
+    
+    @Autowired
+    private DatabaseSessionSynchronizer databaseSessionSynchronizer;
 
     @Bean
     public SessionRepository sessionRepository(RedisConnectionFactory factory) {
@@ -35,6 +40,7 @@ public class RedisConf extends SpringHttpSessionConfiguration {
         sessionRepository.setRedisKeyNamespace(namespace);
         sessionRepository.setDefaultMaxInactiveInterval(sessionTimeout);
         sessionRepository.setRedisFlushMode("on-save".equals(flushMode) ? RedisFlushMode.ON_SAVE : RedisFlushMode.IMMEDIATE);
+        sessionRepository.setDatabaseSessionSynchronizer(databaseSessionSynchronizer);
         return sessionRepository;
     }
 }
