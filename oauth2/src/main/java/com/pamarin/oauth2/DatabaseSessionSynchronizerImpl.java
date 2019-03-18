@@ -59,17 +59,18 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
 
     private String resolveUserSourceId(HttpServletRequest httpReq) {
         String sourceId = userSourceTokenIdResolver.resolve(httpReq);
-        if (!hasText(sourceId)) {
-            return null;
-        }
-
-        UserSource userSource = userSourceRepo.findOne(sourceId);
-        if (userSource == null) {
-            userSource = new UserSource();
-            userSource.setId(sourceId);
-            userSourceRepo.save(userSource);
-        }
-        return userSource.getId();
+        return sourceId;
+//        if (!hasText(sourceId)) {
+//            return null;
+//        }
+//
+//        UserSource userSource = userSourceRepo.findOne(sourceId);
+//        if (userSource == null) {
+//            userSource = new UserSource();
+//            userSource.setId(sourceId);
+//            userSourceRepo.save(userSource);
+//        }
+//        return userSource.getId();
     }
 
     @Override
@@ -87,7 +88,7 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String userId = principalNameResolver.resolve(session);
         String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
-        String sourceId = null;//resolveUserSourceId(httpReq);
+        String sourceId = resolveUserSourceId(httpReq);
         LocalDateTime now = LocalDateTime.now();
 
         UserSession userSession = userSessionRepo.findOne(session.getId());
