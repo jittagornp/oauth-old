@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -101,5 +102,10 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Bean
     public AuthenticityToken newAuthenticityToken() {
         return new DefaultAuthenticityToken(44);
+    }
+
+    @Bean
+    public RequestContextListener newRequestContextListener() {
+        return new RequestContextListener();
     }
 }
