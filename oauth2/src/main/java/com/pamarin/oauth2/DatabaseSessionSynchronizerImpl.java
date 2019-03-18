@@ -98,7 +98,6 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
             userSession.setCreateUser(userId);
             userSession.setCreatedDate(now);
             userSession.setTimeout(sessionTimeout);
-            userSession = userSessionRepo.save(userSession);
         }
 
         userSession.setUserId(userId);
@@ -107,5 +106,6 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
         userSession.setTimeout(sessionTimeout);
         userSession.setUpdatedDate(now);
         userSession.setUpdatedUser(hasText(userId) ? userId : "system");
+        userSessionRepo.save(userSession);
     }
 }
