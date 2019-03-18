@@ -15,9 +15,12 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.session.ExpiringSession;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.MapSession;
+import org.springframework.session.Session;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.util.Assert;
 
@@ -26,17 +29,21 @@ import org.springframework.util.Assert;
  */
 public class RedisSessionRepositoryImpl implements FindByIndexNameSessionRepository<RedisSession>, MessageListener {
 
+    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
+
     private static final Logger LOG = LoggerFactory.getLogger(RedisSessionRepositoryImpl.class);
+
+    private final PrincipalNameResolver principalNameResolver = new PrincipalNameResolver();
 
     private static final String SESSION_KEY_PREFIX = "user-session:";
 
-    static final String CREATION_TIME_ATTR = "creationTime";
+    private static final String CREATION_TIME_ATTR = "creationTime";
 
-    static final String MAX_INACTIVE_ATTR = "maxInactiveInterval";
+    private static final String MAX_INACTIVE_ATTR = "maxInactiveInterval";
 
-    static final String LAST_ACCESSED_ATTR = "lastAccessedTime";
+    private static final String LAST_ACCESSED_ATTR = "lastAccessedTime";
 
-    static final String SESSION_ATTR_PREFIX = "sessionAttr:";
+    private static final String SESSION_ATTR_PREFIX = "sessionAttr:";
 
     private String keyPrefix = SESSION_KEY_PREFIX;
 
@@ -141,10 +148,10 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
     }
 
     public void setRedisKeyNamespace(String namespace) {
-        this.keyPrefix = SESSION_KEY_PREFIX + ":";
+        this.keyPrefix = namespace + ":";
     }
 
-    String getSessionKey(String sessionId) {
+    private String getSessionKey(String sessionId) {
         return this.keyPrefix + sessionId;
     }
 
@@ -174,7 +181,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
         private Map<String, Object> delta = new HashMap<>();
         private boolean isNew;
 
-        RedisSession() {
+        public RedisSession() {
             this(new MapSession());
             this.delta.put(CREATION_TIME_ATTR, getCreationTime());
             this.delta.put(MAX_INACTIVE_ATTR, getMaxInactiveIntervalInSeconds());
@@ -183,7 +190,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
             this.flushImmediateIfNecessary();
         }
 
-        RedisSession(MapSession cached) {
+        public RedisSession(MapSession cached) {
             Assert.notNull(cached, "MapSession cannot be null");
             this.cached = cached;
         }
@@ -273,9 +280,34 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
             if (this.delta.isEmpty()) {
                 return;
             }
+
+            String userId = principalNameResolver.resolvePrincipal(this);
+            LOG.debug("Login userId => {}", userId);
+
             String sessionId = getId();
             getSessionBoundHashOperations(sessionId).putAll(this.delta);
+
             this.delta = new HashMap<>(this.delta.size());
         }
+    }
+
+    /**
+     * Resolves the Spring Security principal name.
+     *
+     * @author Vedran Pavic
+     */
+    private static class PrincipalNameResolver {
+
+        private final SpelExpressionParser parser = new SpelExpressionParser();
+
+        public String resolvePrincipal(Session session) {
+            Object authentication = session.getAttribute(SPRING_SECURITY_CONTEXT);
+            if (authentication != null) {
+                Expression expression = this.parser.parseExpression("authentication?.name");
+                return expression.getValue(authentication, String.class);
+            }
+            return null;
+        }
+
     }
 }
