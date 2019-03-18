@@ -3,14 +3,12 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.constant.OAuth2Constant;
+import com.pamarin.commons.provider.HttpSessionProvider;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
-import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 import com.pamarin.oauth2.service.OAuth2SessionBuilderService;
 import com.pamarin.oauth2.service.OAuth2SessionService;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
@@ -18,7 +16,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -27,35 +24,33 @@ import org.springframework.test.util.ReflectionTestUtils;
  *
  * @author jitta
  */
-public class OAuth2SessionService_getSessionTest {
+public class OAuth2SessionService_getSessionByOAuth2AccessTokenTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     private OAuth2SessionService oauth2SessionService;
-
-    private HttpServletRequest httpReq;
+    
+    private HttpSessionProvider sessionProvider;
 
     private HttpSession httpSession;
-
-    private DatabaseSessionSynchronizer databaseSessionSynchronizer;
 
     private OAuth2SessionBuilderService sessionBuilderService;
 
     @Before
     public void before() {
-        httpReq = mock(HttpServletRequest.class);
         httpSession = mock(HttpSession.class);
-        when(httpReq.getSession()).thenReturn(httpSession);
+        sessionProvider = mock(HttpSessionProvider.class);
+        
+        when(sessionProvider.provide()).thenReturn(httpSession);
 
-        databaseSessionSynchronizer = mock(DatabaseSessionSynchronizer.class);
         sessionBuilderService = mock(OAuth2SessionBuilderService.class);
         oauth2SessionService = new OAuth2SessionServiceImpl();
-
+        
         ReflectionTestUtils.setField(
                 oauth2SessionService,
-                "databaseSessionSynchronizer",
-                databaseSessionSynchronizer
+                "sessionProvider",
+                sessionProvider
         );
 
         ReflectionTestUtils.setField(
@@ -87,9 +82,7 @@ public class OAuth2SessionService_getSessionTest {
         exception.expect(UnauthorizedClientException.class);
         exception.expectMessage("Access token not found.");
 
-        oauth2SessionService.getSession(httpReq);
-
-        verify(databaseSessionSynchronizer, times(1)).synchronize();
+        oauth2SessionService.getSessionByOAuth2AccessToken(null);
     }
 
     @Test
@@ -102,10 +95,7 @@ public class OAuth2SessionService_getSessionTest {
         //already have session attribute
         when(httpSession.getAttribute(attributeKey)).thenReturn(oauth2Session);
 
-        //access token verification output
-        when(httpReq.getAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE)).thenReturn(accessToken);
-
-        OAuth2Session output = oauth2SessionService.getSession(httpReq);
+        OAuth2Session output = oauth2SessionService.getSessionByOAuth2AccessToken(accessToken);
         OAuth2Session expected = oauth2Session;
         assertThat(output).isEqualTo(expected);
     }
@@ -120,13 +110,10 @@ public class OAuth2SessionService_getSessionTest {
         //dont' have session attribute
         when(httpSession.getAttribute(attributeKey)).thenReturn(null);
 
-        //access token verification output
-        when(httpReq.getAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE)).thenReturn(accessToken);
-
         //build new oauth2 session
         when(sessionBuilderService.build(accessToken)).thenReturn(oauth2Session);
 
-        OAuth2Session output = oauth2SessionService.getSession(httpReq);
+        OAuth2Session output = oauth2SessionService.getSessionByOAuth2AccessToken(accessToken);
         OAuth2Session expected = oauth2Session;
         assertThat(output).isEqualTo(expected);
 

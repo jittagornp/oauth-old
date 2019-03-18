@@ -3,6 +3,8 @@
  */
 package com.pamarin.oauth2.controller;
 
+import com.pamarin.oauth2.constant.OAuth2Constant;
+import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.model.OAuth2Session;
 import com.pamarin.oauth2.service.OAuth2SessionService;
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +22,11 @@ public class SessionEndpointCtrl {
     private OAuth2SessionService sessionService;
 
     @PostMapping("/session")
-    public OAuth2Session getSession(HttpServletRequest request) {
-        return sessionService.getSession(request);
+    public OAuth2Session getSession(HttpServletRequest httpReq) {
+        return sessionService.getSessionByOAuth2AccessToken(getAccessToken(httpReq));
     }
 
+    private OAuth2AccessToken getAccessToken(HttpServletRequest httpReq) {
+        return (OAuth2AccessToken) httpReq.getAttribute(OAuth2Constant.ACCESS_TOKEN_ATTRIBUTE);
+    }
 }
