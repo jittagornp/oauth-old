@@ -96,6 +96,7 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
             userSession.setId(session.getId());
             userSession.setCreateUser(userId);
             userSession.setCreatedDate(now);
+            userSession.setTimeout(sessionTimeout);
             userSession = userSessionRepo.save(userSession);
         }
 

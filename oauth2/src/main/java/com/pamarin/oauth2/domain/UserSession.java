@@ -29,7 +29,7 @@ public class UserSession extends AuditingEntity {
     @Column(name = "user_id")
     private String userId;
 
-    @Column
+    @Column(nullable = false)
     private Integer timeout;
 
     @Column(name = "source_id")
