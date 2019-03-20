@@ -4,7 +4,6 @@
 package com.pamarin.oauth2.interceptor;
 
 import com.pamarin.commons.util.CookieSpecBuilder;
-import com.pamarin.oauth2.resolver.UserSourceTokenIdResolver;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.UUID;
@@ -15,11 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import static org.springframework.util.StringUtils.hasText;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/07
  */
-public class UserSourceTokenInterceptor extends HandlerInterceptorAdapter {
+public class UserAgentTokenInterceptor extends HandlerInterceptorAdapter {
 
     private final String cookieName;
 
@@ -27,11 +27,11 @@ public class UserSourceTokenInterceptor extends HandlerInterceptorAdapter {
     @Value("${server.hostUrl}")
     private String hostUrl;
 
-    private final UserSourceTokenIdResolver userSourceTokenIdResolver;
+    private final UserAgentTokenIdResolver userAgentTokenIdResolver;
 
-    public UserSourceTokenInterceptor(String cookieName, UserSourceTokenIdResolver userSourceTokenIdResolver) {
+    public UserAgentTokenInterceptor(String cookieName, UserAgentTokenIdResolver userAgentTokenIdResolver) {
         this.cookieName = cookieName;
-        this.userSourceTokenIdResolver = userSourceTokenIdResolver;
+        this.userAgentTokenIdResolver = userAgentTokenIdResolver;
     }
 
     @Override
@@ -51,6 +51,6 @@ public class UserSourceTokenInterceptor extends HandlerInterceptorAdapter {
     }
 
     private boolean hasSourceCookie(HttpServletRequest httpReq) {
-        return hasText(userSourceTokenIdResolver.resolve(httpReq));
+        return hasText(userAgentTokenIdResolver.resolve(httpReq));
     }
 }

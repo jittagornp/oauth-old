@@ -17,18 +17,18 @@ import static org.mockito.Mockito.when;
  *
  * @author jitta
  */
-public class UserSourceTokenIdResolverTest {
+public class UserAgentTokenIdResolverTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
-    private UserSourceTokenIdResolver resolver;
+    private UserAgentTokenIdResolver resolver;
 
     private HttpServletRequest httpReq;
 
     @Before
     public void before() {
-        resolver = new DefaultUserSourceTokenIdResolver("user-source");
+        resolver = new DefaultUserAgentTokenIdResolver("user-agent");
         httpReq = mock(HttpServletRequest.class);
     }
 
@@ -51,7 +51,7 @@ public class UserSourceTokenIdResolverTest {
     @Test
     public void shouldBeOk() {
         String cookieValue = "NWEwMWUxMTEtOGQyYi00ZjcyLWEwMWUtMjBiMDYyZGVhYTFi";
-        when(httpReq.getCookies()).thenReturn(new Cookie[]{new Cookie("user-source", cookieValue)});
+        when(httpReq.getCookies()).thenReturn(new Cookie[]{new Cookie("user-agent", cookieValue)});
         String output = resolver.resolve(httpReq);
         String expected = "5a01e111-8d2b-4f72-a01e-20b062deaa1b";
         assertThat(output).isEqualTo(expected);

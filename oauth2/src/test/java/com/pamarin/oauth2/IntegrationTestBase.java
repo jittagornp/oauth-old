@@ -39,8 +39,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.pamarin.oauth2.repository.UserSourceRepo;
 import org.springframework.session.SessionRepository;
+import com.pamarin.oauth2.repository.UserAgentRepo;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -55,7 +55,7 @@ public class IntegrationTestBase {
     protected UserSessionRepo userSessionRepo;
 
     @MockBean
-    protected UserSourceRepo userSourceRepo;
+    protected UserAgentRepo userAgentRepo;
 
     @MockBean
     protected CsrfInterceptor csrfVerificationInterceptor;

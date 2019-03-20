@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author jitta
  */
-public interface UserSourceTokenIdResolver {
+public interface UserAgentTokenIdResolver {
 
     String resolve(HttpServletRequest httpReq);
 

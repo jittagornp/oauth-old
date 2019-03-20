@@ -32,8 +32,8 @@ public class UserSession extends AuditingEntity {
     @Column(nullable = false)
     private Integer timeout;
 
-    @Column(name = "source_id")
-    private String sourceId;
+    @Column(name = "agent_id")
+    private String agentId;
     
     @Column(name = "ip_address")
     private String ipAddress;

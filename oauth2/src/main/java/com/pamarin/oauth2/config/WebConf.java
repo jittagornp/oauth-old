@@ -6,9 +6,8 @@ package com.pamarin.oauth2.config;
 import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.DefaultAuthenticityToken;
-import com.pamarin.oauth2.interceptor.UserSourceTokenInterceptor;
-import com.pamarin.oauth2.resolver.DefaultUserSourceTokenIdResolver;
-import com.pamarin.oauth2.resolver.UserSourceTokenIdResolver;
+import com.pamarin.oauth2.interceptor.UserAgentTokenInterceptor;
+import com.pamarin.oauth2.resolver.DefaultUserAgentTokenIdResolver;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.resource.AppCacheManifestTransformer;
 import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
+import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -87,16 +87,16 @@ public class WebConf extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public UserSourceTokenInterceptor newUserSourceInterceptor() {
-        return new UserSourceTokenInterceptor(
-                "user-source",
-                newUserSourceTokenIdResolver()
+    public UserAgentTokenInterceptor newUserSourceInterceptor() {
+        return new UserAgentTokenInterceptor(
+                "user-agent",
+                newUserAgentTokenIdResolver()
         );
     }
 
     @Bean
-    public UserSourceTokenIdResolver newUserSourceTokenIdResolver() {
-        return new DefaultUserSourceTokenIdResolver("user-source");
+    public UserAgentTokenIdResolver newUserAgentTokenIdResolver() {
+        return new DefaultUserAgentTokenIdResolver("user-agent");
     }
 
     @Bean

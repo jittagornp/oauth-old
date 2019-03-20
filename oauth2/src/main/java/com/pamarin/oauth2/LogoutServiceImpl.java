@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -19,6 +20,7 @@ import static org.springframework.util.StringUtils.hasText;
  * @author jitta
  */
 @Service
+@Transactional
 public class LogoutServiceImpl implements LogoutService {
 
     @Autowired
@@ -38,12 +40,14 @@ public class LogoutServiceImpl implements LogoutService {
 
     private void clearAllSessions() {
         String sessionId = loginSession.getSessionId();
-        String sourceId = userSessionRepo.findUserSourceIdBySessionId(sessionId);
-        if (!hasText(sourceId)) {
-            return;
+        String agentId = userSessionRepo.findUserAgentIdBySessionId(sessionId);
+        if (hasText(agentId)) {
+            revokeSessionByUserAgentId(agentId);
         }
+    }
 
-        List<UserSession> userSessions = userSessionRepo.findBySourceId(sourceId);
+    private void revokeSessionByUserAgentId(String agentId) {
+        List<UserSession> userSessions = userSessionRepo.findByAgentId(agentId);
         if (isEmpty(userSessions)) {
             return;
         }
@@ -55,5 +59,4 @@ public class LogoutServiceImpl implements LogoutService {
 
         userSessionRepo.delete(userSessions);
     }
-
 }

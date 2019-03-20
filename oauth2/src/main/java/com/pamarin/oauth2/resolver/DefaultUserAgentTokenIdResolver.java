@@ -13,11 +13,11 @@ import static org.springframework.util.StringUtils.hasText;
  *
  * @author jitta
  */
-public class DefaultUserSourceTokenIdResolver implements UserSourceTokenIdResolver {
+public class DefaultUserAgentTokenIdResolver implements UserAgentTokenIdResolver {
 
     private final HttpCookieResolver httpCookieResolver;
 
-    public DefaultUserSourceTokenIdResolver(String cookieName) {
+    public DefaultUserAgentTokenIdResolver(String cookieName) {
         httpCookieResolver = new DefaultHttpCookieResolver(cookieName);
     }
 

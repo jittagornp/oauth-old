@@ -5,10 +5,8 @@ package com.pamarin.oauth2;
 
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.oauth2.domain.UserSession;
-import com.pamarin.oauth2.domain.UserSource;
+import com.pamarin.oauth2.domain.UserAgent;
 import com.pamarin.oauth2.repository.UserSessionRepo;
-import com.pamarin.oauth2.repository.UserSourceRepo;
-import com.pamarin.oauth2.resolver.UserSourceTokenIdResolver;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
@@ -19,6 +17,8 @@ import com.pamarin.commons.resolver.PrincipalNameResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.session.Session;
+import com.pamarin.oauth2.repository.UserAgentRepo;
+import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 
 /**
  *
@@ -45,10 +45,10 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
     private UserSessionRepo userSessionRepo;
 
     @Autowired
-    private UserSourceRepo userSourceRepo;
+    private UserAgentRepo userAgentRepo;
 
     @Autowired
-    private UserSourceTokenIdResolver userSourceTokenIdResolver;
+    private UserAgentTokenIdResolver userAgentTokenIdResolver;
 
     @Autowired
     private HttpClientIPAddressResolver httpClientIPAddressResolver;
@@ -61,19 +61,19 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
         this.synchronizeTimeout = synchronizeTimeout;
     }
 
-    private String resolveUserSourceId(HttpServletRequest httpReq) {
-        String sourceId = userSourceTokenIdResolver.resolve(httpReq);
-        if (!hasText(sourceId)) {
+    private String resolveUserAgentId(HttpServletRequest httpReq) {
+        String agentId = userAgentTokenIdResolver.resolve(httpReq);
+        if (!hasText(agentId)) {
             return null;
         }
 
-        UserSource userSource = userSourceRepo.findOne(sourceId);
-        if (userSource == null) {
-            userSource = new UserSource();
-            userSource.setId(sourceId);
-            userSourceRepo.save(userSource);
+        UserAgent userAgent = userAgentRepo.findOne(agentId);
+        if (userAgent == null) {
+            userAgent = new UserAgent();
+            userAgent.setId(agentId);
+            userAgentRepo.save(userAgent);
         }
-        return userSource.getId();
+        return userAgent.getId();
     }
 
     @Override
@@ -84,8 +84,8 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
             synchronizeUserSession(session);
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
         } else {
-            Object firstTime = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
-            if (firstTime == null) {
+            Object firstTimeWithLogin = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
+            if (firstTimeWithLogin == null) {
                 boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
                 if (alreadyLogin) {
                     synchronizeUserSession(session);
@@ -98,11 +98,11 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
     }
 
     private void synchronizeUserSession(Session session) {
-        LOG.debug("synchronizeUserSession({})", session.getId());
+        LOG.debug("synchronizeUserSession({})...", session.getId());
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String userId = principalNameResolver.resolve(session);
         String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
-        String sourceId = resolveUserSourceId(httpReq);
+        String agentId = resolveUserAgentId(httpReq);
         LocalDateTime now = LocalDateTime.now();
 
         UserSession userSession = userSessionRepo.findOne(session.getId());
@@ -111,11 +111,10 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
             userSession.setId(session.getId());
             userSession.setCreateUser(userId);
             userSession.setCreatedDate(now);
-            userSession.setTimeout(sessionTimeout);
         }
 
         userSession.setUserId(userId);
-        userSession.setSourceId(sourceId);
+        userSession.setAgentId(agentId);
         userSession.setIpAddress(ipAddress);
         userSession.setTimeout(sessionTimeout);
         userSession.setUpdatedDate(now);

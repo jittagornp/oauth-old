@@ -17,10 +17,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = UserSource.TABLE_NAME)
-public class UserSource extends AuditingEntity {
+@Table(name = UserAgent.TABLE_NAME)
+public class UserAgent extends AuditingEntity {
 
-    public static final String TABLE_NAME = "user_source";
+    public static final String TABLE_NAME = "user_agent";
 
     @Id
     private String id;
@@ -43,7 +43,7 @@ public class UserSource extends AuditingEntity {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final UserSource other = (UserSource) obj;
+        final UserAgent other = (UserAgent) obj;
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }

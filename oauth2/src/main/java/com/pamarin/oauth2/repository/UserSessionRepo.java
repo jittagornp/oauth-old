@@ -14,8 +14,8 @@ import org.springframework.data.jpa.repository.Query;
  */
 public interface UserSessionRepo extends JpaRepository<UserSession, String> {
 
-    @Query("SELECT DISTINCT us.sourceId FROM UserSession us WHERE us.id = ?1")
-    String findUserSourceIdBySessionId(String sessionId);
+    @Query("SELECT DISTINCT us.agentId FROM UserSession us WHERE us.id = ?1")
+    String findUserAgentIdBySessionId(String sessionId);
 
-    List<UserSession> findBySourceId(String sourceId);
+    List<UserSession> findByAgentId(String agentId);
 }
