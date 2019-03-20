@@ -40,7 +40,7 @@ public class LoginService_loginTest {
     private LoginSession loginSession;
     
     @Mock
-    private DatabaseSessionSynchronizer databaseSessionSynchronizerService;
+    private DatabaseSessionRepo databaseSessionSynchronizerService;
 
     @Before
     public void before() {

@@ -1,7 +1,6 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.RedisSessionRepositoryImpl.RedisSession;
-import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +20,7 @@ import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.MapSession;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.util.Assert;
+import com.pamarin.oauth2.service.DatabaseSessionRepo;
 
 /**
  * @author Jitta
@@ -29,7 +29,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSessionRepositoryImpl.class);
 
-    private DatabaseSessionSynchronizer databaseSessionSynchronizer;
+    private DatabaseSessionRepo databaseSessionRepository;
 
     private static final String SESSION_KEY_PREFIX = "user-session:";
 
@@ -277,9 +277,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
                 return;
             }
 
-            if (databaseSessionSynchronizer != null) {
-                databaseSessionSynchronizer.synchronize(this);
-            }
+            databaseSessionRepository.synchronize(this);
 
             String sessionId = getId();
             getSessionBoundHashOperations(sessionId).putAll(this.attributeMap);
@@ -288,8 +286,8 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
         }
     }
 
-    public void setDatabaseSessionSynchronizer(DatabaseSessionSynchronizer databaseSessionSynchronizer) {
-        this.databaseSessionSynchronizer = databaseSessionSynchronizer;
+    public void setDatabaseSessionRepository(DatabaseSessionRepo databaseSessionRepository) {
+        this.databaseSessionRepository = databaseSessionRepository;
     }
 
 }

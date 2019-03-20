@@ -9,7 +9,6 @@ import com.pamarin.oauth2.domain.UserAgentEntity;
 import com.pamarin.oauth2.repository.UserSessionRepo;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.pamarin.oauth2.service.DatabaseSessionSynchronizer;
 import javax.servlet.http.HttpServletRequest;
 import static org.springframework.util.StringUtils.hasText;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
@@ -22,14 +21,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.session.Session;
 import com.pamarin.oauth2.repository.UserAgentRepo;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
+import com.pamarin.oauth2.service.DatabaseSessionRepo;
 
 /**
  *
  * @author jitta
  */
-public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchronizer {
+public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatabaseSessionSynchronizerImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseSessionRepoImpl.class);
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
@@ -65,7 +65,7 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
     @Autowired
     private UserAgentConverter userAgentConverter;
 
-    public DatabaseSessionSynchronizerImpl(Integer sessionTimeout, Long synchronizeTimeout) {
+    public DatabaseSessionRepoImpl(Integer sessionTimeout, Long synchronizeTimeout) {
         this.sessionTimeout = sessionTimeout;
         this.synchronizeTimeout = synchronizeTimeout;
     }
@@ -99,17 +99,17 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
         long currentTime = System.currentTimeMillis();
         Long lastAcccessedTime = (Long) session.getAttribute(LAST_ACCESSED_TIME_ATTR);
         if (lastAcccessedTime == null) {
-            synchronizeUserSession(session, true);
+            synchronize(session, true);
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
         } else if (currentTime - lastAcccessedTime > synchronizeTimeout) {
-            synchronizeUserSession(session, false);
+            synchronize(session, false);
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
         } else {
             Object firstTimeWithLogin = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
             if (firstTimeWithLogin == null) {
                 boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
                 if (alreadyLogin) {
-                    synchronizeUserSession(session, false);
+                    synchronize(session, true);
                     session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
                     session.setAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR, currentTime);
                 }
@@ -117,19 +117,20 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
         }
     }
 
-    private void synchronizeUserSession(Session session, boolean extractUserAgent) {
+    private void synchronize(Session session, boolean extractUserAgent) {
         LOG.debug("synchronizeUserSession({})...", session.getId());
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String userId = principalNameResolver.resolve(session);
         String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
         String agentId = resolveUserAgentId(httpReq, extractUserAgent);
         LocalDateTime now = LocalDateTime.now();
+        String updatedUser = hasText(userId) ? userId : "system";
 
         UserSession userSession = userSessionRepo.findOne(session.getId());
         if (userSession == null) {
             userSession = new UserSession();
             userSession.setId(session.getId());
-            userSession.setCreateUser(userId);
+            userSession.setCreateUser(updatedUser);
             userSession.setCreatedDate(now);
         }
 
@@ -138,7 +139,7 @@ public class DatabaseSessionSynchronizerImpl implements DatabaseSessionSynchroni
         userSession.setIpAddress(ipAddress);
         userSession.setTimeout(sessionTimeout);
         userSession.setUpdatedDate(now);
-        userSession.setUpdatedUser(hasText(userId) ? userId : "system");
+        userSession.setUpdatedUser(updatedUser);
         userSessionRepo.save(userSession);
     }
 }

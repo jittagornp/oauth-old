@@ -9,7 +9,7 @@ import org.springframework.session.Session;
  *
  * @author jitta
  */
-public interface DatabaseSessionSynchronizer {
+public interface DatabaseSessionRepo {
 
     void synchronize(Session session);
     
