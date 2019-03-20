@@ -3,13 +3,13 @@
  */
 package com.pamarin.oauth2.repository;
 
-import com.pamarin.oauth2.domain.UserAgent;
+import com.pamarin.oauth2.domain.UserAgentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  *
  * @author jitta
  */
-public interface UserAgentRepo extends JpaRepository<UserAgent, String>{
+public interface UserAgentRepo extends JpaRepository<UserAgentEntity, String>{
     
 }
