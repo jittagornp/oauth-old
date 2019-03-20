@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.web.http.CookieSerializer;
-import com.pamarin.oauth2.service.DatabaseSessionRepo;
+import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 
 /**
  *

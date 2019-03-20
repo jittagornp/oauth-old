@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.session.Session;
 import com.pamarin.oauth2.repository.UserAgentRepo;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
-import com.pamarin.oauth2.service.DatabaseSessionRepo;
+import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 
 /**
  *
@@ -118,7 +118,7 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
     }
 
     private void synchronize(Session session, boolean extractUserAgent) {
-        LOG.debug("synchronizeUserSession({})...", session.getId());
+        LOG.debug("synchronizeDatabaseSession({})...", session.getId());
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String userId = principalNameResolver.resolve(session);
         String ipAddress = httpClientIPAddressResolver.resolve(httpReq);

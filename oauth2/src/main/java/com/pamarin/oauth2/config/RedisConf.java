@@ -13,7 +13,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.session.SessionRepository;
 import org.springframework.session.config.annotation.web.http.SpringHttpSessionConfiguration;
 import org.springframework.session.data.redis.RedisFlushMode;
-import com.pamarin.oauth2.service.DatabaseSessionRepo;
+import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -30,9 +30,9 @@ public class RedisConf extends SpringHttpSessionConfiguration {
 
     @Value("${spring.session.redis.flush-mode}")
     private String flushMode;
-    
+
     @Autowired
-    private DatabaseSessionRepo databaseSessionSynchronizer;
+    private DatabaseSessionRepo databaseSessionRepo;
 
     @Bean
     public SessionRepository sessionRepository(RedisConnectionFactory factory) {
@@ -40,7 +40,7 @@ public class RedisConf extends SpringHttpSessionConfiguration {
         sessionRepository.setRedisKeyNamespace(namespace);
         sessionRepository.setDefaultMaxInactiveInterval(sessionTimeout);
         sessionRepository.setRedisFlushMode("on-save".equals(flushMode) ? RedisFlushMode.ON_SAVE : RedisFlushMode.IMMEDIATE);
-        sessionRepository.setDatabaseSessionRepository(databaseSessionSynchronizer);
+        sessionRepository.setDatabaseSessionRepository(databaseSessionRepo);
         return sessionRepository;
     }
 }

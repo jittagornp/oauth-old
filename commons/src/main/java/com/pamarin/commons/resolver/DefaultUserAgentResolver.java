@@ -10,6 +10,8 @@ import eu.bitwalker.useragentutils.Manufacturer;
 import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.Version;
 import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -19,10 +21,13 @@ import static org.springframework.util.StringUtils.hasText;
  */
 @Component
 public class DefaultUserAgentResolver implements UserAgentResolver {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultUserAgentResolver.class);
 
     @Override
     public UserAgent resolve(HttpServletRequest httpReq) {
         String header = httpReq.getHeader("User-Agent");
+        LOG.debug("User-Agent header => {}", header);
         if (!hasText(header)) {
             return null;
         }
@@ -64,6 +69,7 @@ public class DefaultUserAgentResolver implements UserAgentResolver {
         setBrowserManufacturer2Device(browserManufacturer, userAgent);
         setAgentVersion2Device(agentVersion, userAgent);
 
+        LOG.debug("userAgent => {}", userAgent);
         return userAgent;
     }
 

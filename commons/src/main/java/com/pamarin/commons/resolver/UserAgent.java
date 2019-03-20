@@ -40,4 +40,9 @@ public class UserAgent {
     private String agentMajorVersion; //52
     private String agentMinorVersion; //0
 
+    @Override
+    public String toString() {
+        return "UserAgent{" + "deviceTypeKey=" + deviceTypeKey + ", deviceTypeName=" + deviceTypeName + ", browserTypeKey=" + browserTypeKey + ", browserTypeName=" + browserTypeName + ", browserKey=" + browserKey + ", browserName=" + browserName + ", browserGroupKey=" + browserGroupKey + ", browserGroupName=" + browserGroupName + ", browserRenderingEngine=" + browserRenderingEngine + ", browserManufacturerKey=" + browserManufacturerKey + ", browserManufacturerName=" + browserManufacturerName + ", osManufacturerKey=" + osManufacturerKey + ", osManufacturerName=" + osManufacturerName + ", osGroupKey=" + osGroupKey + ", osGroupName=" + osGroupName + ", osKey=" + osKey + ", osName=" + osName + ", agentVersion=" + agentVersion + ", agentMajorVersion=" + agentMajorVersion + ", agentMinorVersion=" + agentMinorVersion + '}';
+    }
+
 }

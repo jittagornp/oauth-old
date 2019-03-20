@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.service;
 
+import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 import com.pamarin.oauth2.LoginServiceImpl;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;

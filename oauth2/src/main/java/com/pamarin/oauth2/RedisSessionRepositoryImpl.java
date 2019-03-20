@@ -20,7 +20,7 @@ import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.MapSession;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.util.Assert;
-import com.pamarin.oauth2.service.DatabaseSessionRepo;
+import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 
 /**
  * @author Jitta
