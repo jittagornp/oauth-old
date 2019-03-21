@@ -8,10 +8,7 @@ import com.pamarin.commons.security.HashBasedToken;
 import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
 import com.pamarin.oauth2.domain.OAuth2RefreshToken;
 import com.pamarin.oauth2.domain.OAuth2Token;
-import com.pamarin.oauth2.domain.User;
-import com.pamarin.oauth2.exception.UserNotFoundException;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
-import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +28,6 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
     @Autowired
     private HashBasedToken hashBasedToken;
 
-    @Autowired
-    private UserRepo userRepo;
-
     private OAuth2RefreshToken generateRefreshToken(OAuth2Token token) {
         return refreshTokenRepo.save(OAuth2RefreshToken.builder()
                 .id(token.getId())
@@ -44,17 +38,12 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
     }
 
     @Override
-    @SuppressWarnings("null")
     public String generate(OAuth2Token token) {
-        User user = userRepo.findOne(token.getUserId());
-        if (user == null) {
-            UserNotFoundException.throwbyUserId(token.getUserId());
-        }
         OAuth2RefreshToken refreshToken = generateRefreshToken(token);
         return hashBasedToken.hash(
                 DefaultUserDetails.builder()
                         .username(refreshToken.getId())
-                        .password(user.getPassword() + refreshToken.getSecretKey())
+                        .password(refreshToken.getSecretKey())
                         .build(),
                 convert2LocalDateTime(new Date(refreshToken.getExpiresAt()))
         );

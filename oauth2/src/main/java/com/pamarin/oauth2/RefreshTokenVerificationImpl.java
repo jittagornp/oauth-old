@@ -6,10 +6,8 @@ package com.pamarin.oauth2;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.domain.OAuth2RefreshToken;
-import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
-import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,27 +29,17 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
     @Autowired
     private HashBasedToken hashBasedToken;
 
-    @Autowired
-    private UserRepo userRepo;
-
     private UserDetailsService userDetailsService(OAuth2RefreshToken output) {
         return id -> {
             OAuth2RefreshToken refreshToken = refreshTokenRepo.findById(id);
             if (refreshToken == null) {
                 throw new UsernameNotFoundException("Not found refresh token");
             }
-            User user = userRepo.findOne(refreshToken.getUserId());
-            if (user == null) {
-                throw new UsernameNotFoundException(String.format("Not found %s of id \"%s\"",
-                        User.class.getSimpleName(),
-                        refreshToken.getUserId()
-                ));
-            }
             String[] ignoreProperties = new String[]{"secretKey"};
             BeanUtils.copyProperties(refreshToken, output, ignoreProperties);
             return DefaultUserDetails.builder()
                     .username(refreshToken.getId())
-                    .password(user.getPassword() + refreshToken.getSecretKey())
+                    .password(refreshToken.getSecretKey())
                     .build();
         };
     }
