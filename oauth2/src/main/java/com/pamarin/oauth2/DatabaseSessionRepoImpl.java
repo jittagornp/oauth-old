@@ -144,7 +144,8 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
         if (extractUserAgent) {
             UserAgent userAgent = userAgentResolver.resolve(httpReq);
             if (userAgent != null) {
-                BeanUtils.copyProperties(userAgent, entity);
+                String[] ignoreFields = new String[]{"id", "createdDate", "updatedDate"};
+                BeanUtils.copyProperties(userAgent, entity, ignoreFields);
             }
         }
         userAgentRepo.save(entity);
@@ -155,7 +156,8 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
         UserAgentEntity entity = userAgentRepo.findOne(agentId);
         UserAgent userAgent = userAgentResolver.resolve(httpReq);
         if (userAgent != null) {
-            BeanUtils.copyProperties(userAgent, entity);
+            String[] ignoreFields = new String[]{"id", "createdDate", "updatedDate"};
+            BeanUtils.copyProperties(userAgent, entity, ignoreFields);
         }
         entity.setUpdatedDate(now);
         userAgentRepo.save(entity);
