@@ -15,13 +15,14 @@ import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.commons.resolver.PrincipalNameResolver;
 import com.pamarin.commons.resolver.UserAgent;
 import com.pamarin.commons.resolver.UserAgentResolver;
-import com.pamarin.oauth2.converter.UserAgentConverter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.session.Session;
 import com.pamarin.oauth2.repository.UserAgentRepo;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import com.pamarin.oauth2.repository.DatabaseSessionRepo;
+import org.springframework.beans.BeanUtils;
 
 /**
  *
@@ -37,7 +38,7 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
 
     private static final String LAST_ACCESSED_TIME_WITH_LOGIN_ATTR = "lastAccessedTimeWithLogin";
 
-    private final Long synchronizeTimeout;
+    private final Integer synchronizeTimeout;
 
     private final Integer sessionTimeout;
 
@@ -62,36 +63,9 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
     @Autowired
     private UserAgentResolver userAgentResolver;
 
-    @Autowired
-    private UserAgentConverter userAgentConverter;
-
-    public DatabaseSessionRepoImpl(Integer sessionTimeout, Long synchronizeTimeout) {
+    public DatabaseSessionRepoImpl(Integer sessionTimeout, Integer synchronizeTimeout) {
         this.sessionTimeout = sessionTimeout;
         this.synchronizeTimeout = synchronizeTimeout;
-    }
-
-    private String resolveUserAgentId(HttpServletRequest httpReq, boolean extractUserAgent) {
-        String agentId = userAgentTokenIdResolver.resolve(httpReq);
-        if (!hasText(agentId)) {
-            return null;
-        }
-
-        if (extractUserAgent) {
-            UserAgent userAgent = userAgentResolver.resolve(httpReq);
-            if (userAgent != null) {
-                UserAgentEntity entity = userAgentConverter.convert(userAgent);
-                entity.setId(agentId);
-                userAgentRepo.save(entity);
-            }
-        } else {
-            if (!userAgentRepo.exists(agentId)) {
-                UserAgentEntity entity = new UserAgentEntity();
-                entity.setId(agentId);
-                userAgentRepo.save(entity);
-            }
-        }
-
-        return agentId;
     }
 
     @Override
@@ -99,17 +73,17 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
         long currentTime = System.currentTimeMillis();
         Long lastAcccessedTime = (Long) session.getAttribute(LAST_ACCESSED_TIME_ATTR);
         if (lastAcccessedTime == null) {
-            synchronize(session, true);
+            updateSession(session, false);
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
         } else if (currentTime - lastAcccessedTime > synchronizeTimeout) {
-            synchronize(session, false);
+            updateSession(session, false);
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
         } else {
             Object firstTimeWithLogin = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
             if (firstTimeWithLogin == null) {
                 boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
                 if (alreadyLogin) {
-                    synchronize(session, true);
+                    updateSession(session, true);
                     session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
                     session.setAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR, currentTime);
                 }
@@ -117,29 +91,81 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
         }
     }
 
-    private void synchronize(Session session, boolean extractUserAgent) {
-        LOG.debug("synchronizeDatabaseSession({})...", session.getId());
+    private void updateSession(Session session, boolean extractUserAgent) {
+
+        LOG.debug("updateSession({}, {})...", session.getId(), extractUserAgent);
+
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String userId = principalNameResolver.resolve(session);
+        String updatedUser = makeUpdatedUser(userId);
         String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
-        String agentId = resolveUserAgentId(httpReq, extractUserAgent);
-        LocalDateTime now = LocalDateTime.now();
-        String updatedUser = hasText(userId) ? userId : "system";
+        String agentId = resolveUserAgent(httpReq, extractUserAgent, updatedUser);
+        long now = System.currentTimeMillis();
 
         UserSession userSession = userSessionRepo.findOne(session.getId());
         if (userSession == null) {
             userSession = new UserSession();
             userSession.setId(session.getId());
-            userSession.setCreateUser(updatedUser);
-            userSession.setCreatedDate(now);
+            userSession.setCreationTime(now);
         }
 
         userSession.setUserId(userId);
-        userSession.setAgentId(agentId);
+        if (hasText(agentId)) { //Not update if don't have agentId
+            userSession.setAgentId(agentId);
+        }
         userSession.setIpAddress(ipAddress);
-        userSession.setTimeout(sessionTimeout);
-        userSession.setUpdatedDate(now);
-        userSession.setUpdatedUser(updatedUser);
+        userSession.setMaxInactiveInterval(sessionTimeout);
+        userSession.setLastAccessedTime(now);
         userSessionRepo.save(userSession);
+    }
+
+    private String resolveUserAgent(HttpServletRequest httpReq, boolean extractUserAgent, String updatedUser) {
+        String agentId = userAgentTokenIdResolver.resolve(httpReq);
+        if (!hasText(agentId)) {
+            return null;
+        }
+
+        if (!userAgentRepo.exists(agentId)) {
+            insertNewUserAgent(agentId, updatedUser, httpReq, extractUserAgent);
+            return agentId;
+        }
+
+        if (extractUserAgent) {
+            updateOldUserAgent(agentId, updatedUser, httpReq);
+        }
+        return agentId;
+    }
+
+    private void insertNewUserAgent(String agentId, String updatedUser, HttpServletRequest httpReq, boolean extractUserAgent) {
+        LocalDateTime now = LocalDateTime.now();
+        UserAgentEntity entity = new UserAgentEntity();
+        entity.setId(agentId);
+        entity.setCreateUser(updatedUser);
+        entity.setCreatedDate(now);
+        entity.setUpdatedUser(updatedUser);
+        entity.setUpdatedDate(now);
+        if (extractUserAgent) {
+            UserAgent userAgent = userAgentResolver.resolve(httpReq);
+            if (userAgent != null) {
+                BeanUtils.copyProperties(userAgent, entity);
+            }
+        }
+        userAgentRepo.save(entity);
+    }
+
+    private void updateOldUserAgent(String agentId, String updatedUser, HttpServletRequest httpReq) {
+        LocalDateTime now = LocalDateTime.now();
+        UserAgentEntity entity = userAgentRepo.findOne(agentId);
+        UserAgent userAgent = userAgentResolver.resolve(httpReq);
+        if (userAgent != null) {
+            BeanUtils.copyProperties(userAgent, entity);
+        }
+        entity.setUpdatedUser(updatedUser);
+        entity.setUpdatedDate(now);
+        userAgentRepo.save(entity);
+    }
+
+    private String makeUpdatedUser(String userId) {
+        return hasText(userId) ? userId : "system";
     }
 }

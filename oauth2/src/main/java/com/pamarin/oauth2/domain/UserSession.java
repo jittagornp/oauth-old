@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.domain;
 
+import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,22 +20,28 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = UserSession.TABLE_NAME)
-public class UserSession extends AuditingEntity {
+public class UserSession implements Serializable {
 
     public static final String TABLE_NAME = "user_session";
 
     @Id
     private String id;
 
+    @Column(name = "CREATION_TIME")
+    private Long creationTime;
+
+    @Column(name = "MAX_INACTIVE_INTERVAL")
+    private Integer maxInactiveInterval;
+
+    @Column(name = "LAST_ACCESSED_TIME")
+    private Long lastAccessedTime;
+
     @Column(name = "user_id")
     private String userId;
 
-    @Column(nullable = false)
-    private Integer timeout;
-
     @Column(name = "agent_id")
     private String agentId;
-    
+
     @Column(name = "ip_address")
     private String ipAddress;
 
@@ -62,5 +69,4 @@ public class UserSession extends AuditingEntity {
         }
         return true;
     }
-
 }

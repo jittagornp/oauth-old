@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.web.http.CookieSerializer;
 import com.pamarin.oauth2.repository.DatabaseSessionRepo;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -21,6 +22,7 @@ import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 @Configuration
 public class SessionConf {
 
+    @NotNull
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;
 
@@ -49,10 +51,10 @@ public class SessionConf {
         cookieSerializer.setSecure(hostUrl.startsWith("https://"));
         return cookieSerializer;
     }
-    
+
     @Bean
-    public DatabaseSessionRepo newDatabaseSessionRepo(){
-        return new DatabaseSessionRepoImpl(sessionTimeout, 1000 * 30L);
+    public DatabaseSessionRepo newDatabaseSessionRepo() {
+        return new DatabaseSessionRepoImpl(sessionTimeout, 1000 * 30);
     }
 
 }
