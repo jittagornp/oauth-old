@@ -42,6 +42,9 @@ public class LoginService_loginTest {
     
     @Mock
     private DatabaseSessionRepo databaseSessionSynchronizerService;
+    
+    @Mock
+    private RevokeSessionService revokeSessionService;
 
     @Before
     public void before() {

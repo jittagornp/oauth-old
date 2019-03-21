@@ -11,8 +11,14 @@ import java.util.List;
  */
 public interface RevokeSessionService {
 
-    void revoke(String sessionId);
-    
-    void revoke(List<String> sessionIds);
+    void revokeBySessionId(String sessionId);
+
+    void revokeBySessionIds(List<String> sessionIds);
+
+    void revokeAllOnSameUserAgentBySessionId(String sessionId);
+
+    void revokeAllOnSameUserAgentByIgnoreSessionId(String sessionId);
+
+    void revokeByUserId(String userId);
 
 }

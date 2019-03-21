@@ -28,7 +28,7 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     private SessionRepository sessionRepository;
 
     @Override
-    public void revoke(String sessionId) {
+    public void revokeBySessionId(String sessionId) {
         if (hasText(sessionId)) {
             sessionRepository.delete(sessionId);
             userSessionRepo.delete(sessionId);
@@ -36,9 +36,30 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     }
 
     @Override
-    public void revoke(List<String> sessionIds) {
+    public void revokeBySessionIds(List<String> sessionIds) {
         if (!isEmpty(sessionIds)) {
-            sessionIds.forEach(sessionId -> revoke(sessionId));
+            sessionIds.forEach(sessionId -> revokeBySessionId(sessionId));
+        }
+    }
+
+    @Override
+    public void revokeAllOnSameUserAgentBySessionId(String sessionId) {
+        if (hasText(sessionId)) {
+            revokeBySessionIds(userSessionRepo.findAllIdsOnSameUserAgentById(sessionId));
+        }
+    }
+
+    @Override
+    public void revokeByUserId(String userId) {
+        if (hasText(userId)) {
+            revokeBySessionIds(userSessionRepo.findAllIdsByUserId(userId));
+        }
+    }
+
+    @Override
+    public void revokeAllOnSameUserAgentByIgnoreSessionId(String sessionId) {
+        if (hasText(sessionId)) {
+            revokeBySessionIds(userSessionRepo.findAllIdsOnSameUserAgentByIgnoreId(sessionId));
         }
     }
 

@@ -18,9 +18,27 @@ public interface UserSessionRepo extends JpaRepository<UserSession, String> {
             value = "SELECT s2.id "
             + "FROM " + UserSession.TABLE_NAME + " s1 "
             + "INNER JOIN " + UserSession.TABLE_NAME + " s2 "
-            + "on (s1.agent_id = s2.agent_id) "
-            + "where s1.id = ?1 ",
+            + "ON (s1.agent_id = s2.agent_id) "
+            + "WHERE s1.id = ?1 ",
             nativeQuery = true
     )
-    List<String> findAllIdsRelativeWithId(String id);
+    List<String> findAllIdsOnSameUserAgentById(String id);
+
+    @Query(
+            value = "SELECT s2.id "
+            + "FROM " + UserSession.TABLE_NAME + " s1 "
+            + "INNER JOIN " + UserSession.TABLE_NAME + " s2 "
+            + "ON (s1.agent_id = s2.agent_id) "
+            + "WHERE s1.id = ?1 AND s2.id <> ?1",
+            nativeQuery = true
+    )
+    List<String> findAllIdsOnSameUserAgentByIgnoreId(String id);
+
+    @Query(
+            value = "SELECT id "
+            + "FROM " + UserSession.TABLE_NAME + " "
+            + "WHERE user_id = ?1 ",
+            nativeQuery = true
+    )
+    List<String> findAllIdsByUserId(String userId);
 }

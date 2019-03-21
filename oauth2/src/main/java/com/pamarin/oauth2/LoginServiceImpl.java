@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.pamarin.oauth2.service.LoginService;
+import com.pamarin.oauth2.service.RevokeSessionService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -32,6 +33,9 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private LoginSession loginSession;
 
+    @Autowired
+    private RevokeSessionService revokeSessionService;
+
     @Override
     public void login(String username, String password) {
         if (username == null || password == null) {
@@ -48,6 +52,7 @@ public class LoginServiceImpl implements LoginService {
         }
 
         loginSession.create(convert(user));
+        revokeSessionService.revokeAllOnSameUserAgentByIgnoreSessionId(loginSession.getSessionId());
     }
 
     @Override
