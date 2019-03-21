@@ -39,12 +39,15 @@ public class LoginService_loginTest {
 
     @Mock
     private LoginSession loginSession;
-    
+
     @Mock
     private DatabaseSessionRepo databaseSessionSynchronizerService;
-    
+
     @Mock
     private RevokeSessionService revokeSessionService;
+
+    @Mock
+    private LoginHistoryService loginHistoryService;
 
     @Before
     public void before() {

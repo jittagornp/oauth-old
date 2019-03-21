@@ -97,9 +97,8 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
 
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String userId = principalNameResolver.resolve(session);
-        String updatedUser = makeUpdatedUser(userId);
         String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
-        String agentId = resolveUserAgent(httpReq, extractUserAgent, updatedUser);
+        String agentId = resolveUserAgent(httpReq, extractUserAgent);
         long now = System.currentTimeMillis();
 
         UserSession userSession = userSessionRepo.findOne(session.getId());
@@ -119,30 +118,28 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
         userSessionRepo.save(userSession);
     }
 
-    private String resolveUserAgent(HttpServletRequest httpReq, boolean extractUserAgent, String updatedUser) {
+    private String resolveUserAgent(HttpServletRequest httpReq, boolean extractUserAgent) {
         String agentId = userAgentTokenIdResolver.resolve(httpReq);
         if (!hasText(agentId)) {
             return null;
         }
 
         if (!userAgentRepo.exists(agentId)) {
-            insertNewUserAgent(agentId, updatedUser, httpReq, extractUserAgent);
+            insertNewUserAgent(agentId, httpReq, extractUserAgent);
             return agentId;
         }
 
         if (extractUserAgent) {
-            updateOldUserAgent(agentId, updatedUser, httpReq);
+            updateOldUserAgent(agentId, httpReq);
         }
         return agentId;
     }
 
-    private void insertNewUserAgent(String agentId, String updatedUser, HttpServletRequest httpReq, boolean extractUserAgent) {
+    private void insertNewUserAgent(String agentId, HttpServletRequest httpReq, boolean extractUserAgent) {
         LocalDateTime now = LocalDateTime.now();
         UserAgentEntity entity = new UserAgentEntity();
         entity.setId(agentId);
-        entity.setCreateUser(updatedUser);
         entity.setCreatedDate(now);
-        entity.setUpdatedUser(updatedUser);
         entity.setUpdatedDate(now);
         if (extractUserAgent) {
             UserAgent userAgent = userAgentResolver.resolve(httpReq);
@@ -153,19 +150,14 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
         userAgentRepo.save(entity);
     }
 
-    private void updateOldUserAgent(String agentId, String updatedUser, HttpServletRequest httpReq) {
+    private void updateOldUserAgent(String agentId, HttpServletRequest httpReq) {
         LocalDateTime now = LocalDateTime.now();
         UserAgentEntity entity = userAgentRepo.findOne(agentId);
         UserAgent userAgent = userAgentResolver.resolve(httpReq);
         if (userAgent != null) {
             BeanUtils.copyProperties(userAgent, entity);
         }
-        entity.setUpdatedUser(updatedUser);
         entity.setUpdatedDate(now);
         userAgentRepo.save(entity);
-    }
-
-    private String makeUpdatedUser(String userId) {
-        return hasText(userId) ? userId : "system";
     }
 }
