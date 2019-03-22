@@ -28,19 +28,19 @@ public class LoginHistory implements Serializable {
     @Id
     private String id;
 
-    @Column(name = "login_date", nullable = false)
+    @Column(name = "login_date")
     private LocalDateTime loginDate;
 
     @Column(name = "logout_date")
     private LocalDateTime logoutDate;
 
-    @Column(name = "session_id", nullable = false)
+    @Column(name = "session_id")
     private String sessionId;
 
-    @Column(name = "agent_id", nullable = false)
+    @Column(name = "agent_id")
     private String agentId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private String userId;
 
     @Column(name = "ip_address")
