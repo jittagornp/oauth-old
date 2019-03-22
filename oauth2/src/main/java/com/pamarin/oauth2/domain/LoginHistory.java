@@ -23,7 +23,7 @@ import lombok.Setter;
 @Table(name = LoginHistory.TABLE_NAME)
 public class LoginHistory implements Serializable {
 
-    public static final String TABLE_NAME = "user_agent";
+    public static final String TABLE_NAME = "login_history";
 
     @Id
     private String id;
