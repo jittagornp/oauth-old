@@ -88,10 +88,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public UserAgentTokenInterceptor newUserSourceInterceptor() {
-        return new UserAgentTokenInterceptor(
-                "user-agent",
-                newUserAgentTokenIdResolver()
-        );
+        return new UserAgentTokenInterceptor("user-agent");
     }
 
     @Bean

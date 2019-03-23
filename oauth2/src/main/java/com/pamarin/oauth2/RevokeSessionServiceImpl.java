@@ -32,7 +32,7 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     public void revokeBySessionId(String sessionId) {
         if (hasText(sessionId)) {
             sessionRepository.delete(sessionId);
-            userSessionRepo.delete(sessionId);
+            userSessionRepo.deleteBySessionId(sessionId);
         }
     }
 
@@ -46,21 +46,21 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     @Override
     public void revokeAllOnSameUserAgentBySessionId(String sessionId) {
         if (hasText(sessionId)) {
-            revokeBySessionIds(userSessionRepo.findAllIdsOnSameUserAgentById(sessionId));
+            revokeBySessionIds(userSessionRepo.findAllSessionIdsOnSameUserAgentBySessionId(sessionId));
         }
     }
 
     @Override
     public void revokeByUserId(String userId) {
         if (hasText(userId)) {
-            revokeBySessionIds(userSessionRepo.findAllIdsByUserId(userId));
+            revokeBySessionIds(userSessionRepo.findAllSessionIdsByUserId(userId));
         }
     }
 
     @Override
     public void revokeOthersOnSameUserAgentBySessionId(String sessionId) {
         if (hasText(sessionId)) {
-            revokeBySessionIds(userSessionRepo.findOtherIdsOnSameUserAgentById(sessionId));
+            revokeBySessionIds(userSessionRepo.findOtherSessionIdsOnSameUserAgentBySessionId(sessionId));
         }
     }
 

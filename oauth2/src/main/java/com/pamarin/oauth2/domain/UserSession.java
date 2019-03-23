@@ -27,13 +27,16 @@ public class UserSession implements Serializable {
     @Id
     private String id;
 
-    @Column(name = "CREATION_TIME")
+    @Column(name = "session_id", nullable = false, unique = true)
+    private String sessionId;
+
+    @Column(name = "creation_time")
     private Long creationTime;
 
-    @Column(name = "MAX_INACTIVE_INTERVAL")
+    @Column(name = "max_inactive_interval")
     private Integer maxInactiveInterval;
 
-    @Column(name = "LAST_ACCESSED_TIME")
+    @Column(name = "last_accessed_time")
     private Long lastAccessedTime;
 
     @Column(name = "user_id")
