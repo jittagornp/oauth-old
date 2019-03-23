@@ -56,7 +56,7 @@ public class LoginServiceImpl implements LoginService {
         }
 
         loginSession.create(convert(user));
-        revokeSessionService.revokeAllOnSameUserAgentByIgnoreSessionId(loginSession.getSessionId());
+        revokeSessionService.revokeOthersOnSameUserAgentBySessionId(loginSession.getSessionId());
         loginHistoryService.createHistory();
     }
 

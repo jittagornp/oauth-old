@@ -17,7 +17,7 @@ public interface RevokeSessionService {
 
     void revokeAllOnSameUserAgentBySessionId(String sessionId);
 
-    void revokeAllOnSameUserAgentByIgnoreSessionId(String sessionId);
+    void revokeOthersOnSameUserAgentBySessionId(String sessionId);
 
     void revokeByUserId(String userId);
 

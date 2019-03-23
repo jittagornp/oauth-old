@@ -32,7 +32,7 @@ public interface UserSessionRepo extends JpaRepository<UserSession, String> {
             + "WHERE s1.id = ?1 AND s2.id <> ?1",
             nativeQuery = true
     )
-    List<String> findAllIdsOnSameUserAgentByIgnoreId(String id);
+    List<String> findOtherIdsOnSameUserAgentById(String id);
 
     @Query(
             value = "SELECT id "

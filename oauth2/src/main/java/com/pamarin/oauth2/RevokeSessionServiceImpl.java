@@ -5,6 +5,7 @@ package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.repository.UserSessionRepo;
 import com.pamarin.oauth2.service.RevokeSessionService;
+import com.pamarin.oauth2.service.RevokeSessionService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.SessionRepository;
@@ -57,9 +58,9 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     }
 
     @Override
-    public void revokeAllOnSameUserAgentByIgnoreSessionId(String sessionId) {
+    public void revokeOthersOnSameUserAgentBySessionId(String sessionId) {
         if (hasText(sessionId)) {
-            revokeBySessionIds(userSessionRepo.findAllIdsOnSameUserAgentByIgnoreId(sessionId));
+            revokeBySessionIds(userSessionRepo.findOtherIdsOnSameUserAgentById(sessionId));
         }
     }
 

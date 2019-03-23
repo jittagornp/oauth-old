@@ -142,11 +142,7 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
         entity.setCreatedDate(now);
         entity.setUpdatedDate(now);
         if (extractUserAgent) {
-            UserAgent userAgent = userAgentResolver.resolve(httpReq);
-            if (userAgent != null) {
-                String[] ignoreFields = new String[]{"id", "createdDate", "updatedDate"};
-                BeanUtils.copyProperties(userAgent, entity, ignoreFields);
-            }
+            extractUserAgentHeader(httpReq, entity);
         }
         userAgentRepo.save(entity);
     }
@@ -154,12 +150,15 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
     private void updateOldUserAgent(String agentId, HttpServletRequest httpReq) {
         LocalDateTime now = LocalDateTime.now();
         UserAgentEntity entity = userAgentRepo.findOne(agentId);
-        UserAgent userAgent = userAgentResolver.resolve(httpReq);
-        if (userAgent != null) {
-            String[] ignoreFields = new String[]{"id", "createdDate", "updatedDate"};
-            BeanUtils.copyProperties(userAgent, entity, ignoreFields);
-        }
+        extractUserAgentHeader(httpReq, entity);
         entity.setUpdatedDate(now);
         userAgentRepo.save(entity);
+    }
+
+    private void extractUserAgentHeader(HttpServletRequest httpReq, UserAgentEntity entity) {
+        UserAgent userAgent = userAgentResolver.resolve(httpReq);
+        if (userAgent != null) {
+            BeanUtils.copyProperties(userAgent, entity);
+        }
     }
 }
