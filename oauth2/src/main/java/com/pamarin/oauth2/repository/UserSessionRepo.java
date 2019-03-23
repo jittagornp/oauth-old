@@ -19,7 +19,7 @@ public interface UserSessionRepo extends JpaRepository<UserSession, String> {
 
     @Modifying
     @Query(
-            value = "DELETE FROM " + UserSession.TABLE_NAME + " s WHERE s.session_id = ?1",
+            value = "DELETE FROM " + UserSession.TABLE_NAME + " WHERE session_id = ?1 ",
             nativeQuery = true
     )
     void deleteBySessionId(String sessionId);
