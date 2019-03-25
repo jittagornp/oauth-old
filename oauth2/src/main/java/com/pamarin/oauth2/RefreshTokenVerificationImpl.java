@@ -11,16 +11,15 @@ import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/05
  */
 @Service
-@Transactional
 public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
 
     @Autowired
@@ -29,8 +28,28 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
     @Autowired
     private HashBasedToken hashBasedToken;
 
-    private UserDetailsService userDetailsService(OAuth2RefreshToken output) {
-        return id -> {
+    @Override
+    public OAuth2RefreshToken verify(String token) {
+        OAuth2RefreshToken output = OAuth2RefreshToken.builder().build();
+        if (!hashBasedToken.matches(token, new UserDetailsServiceImpl(refreshTokenRepo, output))) {
+            throw new UnauthorizedClientException("Invalid refresh token");
+        }
+        return output;
+    }
+
+    public static class UserDetailsServiceImpl implements UserDetailsService {
+
+        private final OAuth2RefreshTokenRepo refreshTokenRepo;
+
+        private final OAuth2RefreshToken output;
+
+        public UserDetailsServiceImpl(OAuth2RefreshTokenRepo refreshTokenRepo, OAuth2RefreshToken output) {
+            this.refreshTokenRepo = refreshTokenRepo;
+            this.output = output;
+        }
+
+        @Override
+        public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
             OAuth2RefreshToken refreshToken = refreshTokenRepo.findById(id);
             if (refreshToken == null) {
                 throw new UsernameNotFoundException("Not found refresh token");
@@ -41,16 +60,7 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
                     .username(refreshToken.getId())
                     .password(refreshToken.getSecretKey())
                     .build();
-        };
-    }
-
-    @Override
-    public OAuth2RefreshToken verify(String token) {
-        OAuth2RefreshToken output = OAuth2RefreshToken.builder().build();
-        if (!hashBasedToken.matches(token, userDetailsService(output))) {
-            throw new UnauthorizedClientException("Invalid refresh token");
         }
-        return output;
-    }
 
+    }
 }

@@ -11,6 +11,7 @@ import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,28 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
     @Autowired
     private HashBasedToken hashBasedToken;
 
-    private UserDetailsService userDetailsService(OAuth2AccessToken output) {
-        return id -> {
+    @Override
+    public OAuth2AccessToken verify(String accessToken) {
+        OAuth2AccessToken output = OAuth2AccessToken.builder().build();
+        if (!hashBasedToken.matches(accessToken, new UserDetailsServiceImpl(accessTokenRepo, output))) {
+            throw new InvalidTokenException("Invalid access token.");
+        }
+        return output;
+    }
+
+    public static class UserDetailsServiceImpl implements UserDetailsService {
+
+        private final OAuth2AccessTokenRepo accessTokenRepo;
+
+        private final OAuth2AccessToken output;
+
+        public UserDetailsServiceImpl(OAuth2AccessTokenRepo accessTokenRepo, OAuth2AccessToken output) {
+            this.accessTokenRepo = accessTokenRepo;
+            this.output = output;
+        }
+
+        @Override
+        public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
             OAuth2AccessToken token = accessTokenRepo.findById(id);
             if (token == null) {
                 throw new UsernameNotFoundException("Not found access token");
@@ -40,16 +61,7 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
                     .username(token.getId())
                     .password(token.getSecretKey())
                     .build();
-        };
-    }
-
-    @Override
-    public OAuth2AccessToken verify(String accessToken) {
-        OAuth2AccessToken output = OAuth2AccessToken.builder().build();
-        if (!hashBasedToken.matches(accessToken, userDetailsService(output))) {
-            throw new InvalidTokenException("Invalid access token.");
         }
-        return output;
-    }
 
+    }
 }
