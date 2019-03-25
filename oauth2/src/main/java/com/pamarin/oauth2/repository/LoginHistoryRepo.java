@@ -4,12 +4,12 @@
 package com.pamarin.oauth2.repository;
 
 import com.pamarin.oauth2.domain.LoginHistory;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**
  *
  * @author jitta
  */
-public interface LoginHistoryRepo extends JpaRepository<LoginHistory, String>{
+public interface LoginHistoryRepo extends MongoRepository<LoginHistory, String>{
     
 }
