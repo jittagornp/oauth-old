@@ -5,9 +5,10 @@ package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.HashBasedToken;
-import com.pamarin.commons.security.hashing.ShortHashing;
 import com.pamarin.commons.security.hashing.HmacSHA384Hashing;
 import java.util.UUID;
+import javax.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,7 +25,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConf extends WebSecurityConfigurerAdapter {
 
-    private static final String HASHBASED_KEY = "test";
+    @NotNull
+    @Value("${spring.token.secretKey}")
+    private String tokenSecretKey;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -62,7 +65,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     @Bean
     public HashBasedToken newHashBasedToken() {
-        return new DefaultHashBasedToken(new ShortHashing(new HmacSHA384Hashing(HASHBASED_KEY), 37));
+        return new DefaultHashBasedToken(new HmacSHA384Hashing(tokenSecretKey));
     }
 
 }
