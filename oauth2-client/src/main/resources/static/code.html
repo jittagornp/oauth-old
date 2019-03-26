@@ -4,26 +4,46 @@
         <title>Get Token</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css"/>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/languages/json.min.js"></script>
         <style>
             body{
-                word-break: break-all;
-                white-space: pre-line;
+                padding: 1rem;
+            }
+            
+            code{
+                margin: 0.5rem 0;
+            }
+            
+            a{
+                margin-right: 15px;
+                margin-top: 1rem;
+                display: inline-block;
             }
         </style>
+        <script>
+            function initSnippet() {
+              let codes = document.querySelectorAll('code');
+              console.log(codes);
+              for(let i=0; i<codes.length; i++){
+                hljs.highlightBlock(codes[i]);
+              }
+            }
+
+            addEventListener('load', initSnippet);
+          </script>
     </head>
     <body>
-        Code : 
-        <br/>
-        <span th:text="${code}" style="color: blue;"></span>
-        <br/>
-        Token Response : 
-        <br/>
-        <span th:text="${response}" style="color: red;"></span>        
-        <br/>
-        Session : 
-        <br/>
-        <span th:text="${loginSession}" style="color: green;"></span>    
-        <a href="/">Back to Home Page</a>
+        <h1>Token Info</h1>
+        <strong>Code</strong> 
+        <code th:text="${code}" style="color: blue;">code</code>
+        <strong>Token Response</strong>
+        <code th:text="${response}" style="color: red;">token</code>        
+        <strong>Session</strong>
+        <code th:text="${loginSession}" style="color: green;">session</code>    
+        
+        <a href="/"><< Back to Home Page</a>
         
         <a href="/logout">Logout</a>
 
