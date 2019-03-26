@@ -59,6 +59,13 @@ public class SimpleCtrl {
                 .replace("{scope}", "user:public_profile")
                 .replace("{state}", "xyz");
     }
+    
+    private String getLogoutUrl() throws UnsupportedEncodingException{
+        return "{oauth2_host}/logout?client_id={client_id}&redirect_uri={redirect_uri}"
+                .replace("{oauth2_host}", oauth2HostUrl)
+                .replace("{client_id}", CLIENT_ID)
+                .replace("{redirect_uri}", URLEncoder.encode(hostUrlProvider.provide(), "utf-8"));
+    }
 
     @GetMapping({"", "/"})
     public ModelAndView home() {
@@ -124,4 +131,8 @@ public class SimpleCtrl {
         return restTemplate.postForEntity(oauth2HostUrl + "/session", request, Map.class);
     }
 
+    @GetMapping("/logout")
+    public void logout(HttpServletResponse response) throws Exception{
+        response.sendRedirect(getLogoutUrl());
+    }
 }
