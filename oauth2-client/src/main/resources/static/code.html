@@ -12,10 +12,6 @@
                 padding: 1rem;
             }
             
-            code{
-                margin: 0.5rem 0;
-            }
-            
             a{
                 margin-right: 15px;
                 margin-top: 1rem;
@@ -37,11 +33,17 @@
     <body>
         <h1>Token Info</h1>
         <strong>Code</strong> 
-        <code th:text="${code}" style="color: blue;">code</code>
+        <pre>
+            <code th:text="${code}" class="json">code</code>
+        </pre>
         <strong>Token Response</strong>
-        <code th:text="${response}" style="color: red;">token</code>        
+        <pre>
+            <code th:text="${response}" class="json">token</code>    
+        </pre>    
         <strong>Session</strong>
-        <code th:text="${loginSession}" style="color: green;">session</code>    
+        <pre>
+            <code th:text="${loginSession}" class="json">session</code>   
+        </pre>
         
         <a href="/"><< Back to Home Page</a>
         
