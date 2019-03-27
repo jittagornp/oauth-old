@@ -36,17 +36,22 @@ public class PrincipalNameResolverTest {
         assertThat(output).isEqualTo(expected);
     }
 
-    @Test
-    public void shouldBeJittagornp_whenUserLoggedIn() {
-        Session input = mock(Session.class);
+    private SecurityContext getSecurityContext(String username) {
         SecurityContext context = new SecurityContextImpl();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(
                 DefaultUserDetails.builder()
-                        .username("jittagornp")
+                        .username(username)
                         .build(),
                 null
         ));
-        when(input.getAttribute("SPRING_SECURITY_CONTEXT")).thenReturn(context);
+        return context;
+    }
+
+    @Test
+    public void shouldBeJittagornp_whenUserLoggedIn() {
+        Session input = mock(Session.class);
+        when(input.getAttribute("SPRING_SECURITY_CONTEXT"))
+                .thenReturn(getSecurityContext("jittagornp"));
 
         String output = resolver.resolve(input);
         String expected = "jittagornp";
