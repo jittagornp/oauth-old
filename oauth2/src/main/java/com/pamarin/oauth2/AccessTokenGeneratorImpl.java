@@ -74,12 +74,12 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
         );
         String token = hashBasedToken.hash(
                 DefaultUserDetails.builder()
-                        .username(accessToken.getId())
+                        .username(accessToken.getTokenId())
                         .password(accessToken.getSecretKey())
                         .build(),
                 convert2LocalDateTime(new Date(accessToken.getExpiresAt()))
         );
-        instance.setId(accessToken.getId());
+        instance.setTokenId(accessToken.getTokenId());
         return AccessTokenResponse.builder()
                 .accessToken(token)
                 .expiresIn(accessToken.getExpireMinutes() * 60L)
@@ -114,14 +114,14 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     public AccessTokenResponse generate(RefreshAccessTokenRequest req) {
         clientVerification.verifyClientIdAndClientSecret(req.getClientId(), req.getClientSecret());
         OAuth2RefreshToken refreshToken = refreshTokenVerification.verify(req.getRefreshToken());
-        revokeToken(refreshToken.getId());
-        refreshToken.setId(null);
+        revokeToken(refreshToken.getTokenId());
+        refreshToken.setTokenId(null);
         refreshToken.setClientId(req.getClientId());
         return buildAccessTokenResponse(refreshToken);
     }
 
     private void revokeToken(String tokenId) {
-        refreshTokenRepo.deleteById(tokenId);
-        accessTokenRepo.deleteById(tokenId);
+        refreshTokenRepo.deleteByTokenId(tokenId);
+        accessTokenRepo.deleteByTokenId(tokenId);
     }
 }

@@ -43,7 +43,7 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
 
         String token = hashBasedToken.hash(
                 DefaultUserDetails.builder()
-                        .username(code.getId())
+                        .username(code.getTokenId())
                         .password(code.getSecretKey())
                         .build(),
                 convert2LocalDateTime(new Date(code.getExpiresAt()))

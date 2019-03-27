@@ -49,8 +49,8 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
         }
 
         @Override
-        public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-            OAuth2AccessToken token = accessTokenRepo.findById(id);
+        public UserDetails loadUserByUsername(String tokenId) throws UsernameNotFoundException {
+            OAuth2AccessToken token = accessTokenRepo.findByTokenId(tokenId);
             if (token == null) {
                 throw new UsernameNotFoundException("Not found access token");
             }
@@ -58,7 +58,7 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
             String[] ignoreProperties = new String[]{"secretKey"};
             BeanUtils.copyProperties(token, output, ignoreProperties);
             return DefaultUserDetails.builder()
-                    .username(token.getId())
+                    .username(token.getTokenId())
                     .password(token.getSecretKey())
                     .build();
         }

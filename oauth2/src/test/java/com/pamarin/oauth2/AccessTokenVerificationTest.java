@@ -48,11 +48,11 @@ public class AccessTokenVerificationTest {
                 hashBasedToken
         );
 
-        when(accessTokenRepo.findById("123456"))
+        when(accessTokenRepo.findByTokenId("123456"))
                 .thenReturn(null);
-        when(accessTokenRepo.findById("999999"))
+        when(accessTokenRepo.findByTokenId("999999"))
                 .thenReturn(OAuth2AccessToken.builder()
-                        .id("999999")
+                        .tokenId("999999")
                         .secretKey("999999")
                         .build());
     }
@@ -82,6 +82,6 @@ public class AccessTokenVerificationTest {
         String input = "999999";
         OAuth2AccessToken output = verification.verify(makeToken(input, LocalDateTime.now().plusDays(1)));
         String expected = input;
-        assertThat(output.getId()).isEqualTo(expected);
+        assertThat(output.getTokenId()).isEqualTo(expected);
     }
 }

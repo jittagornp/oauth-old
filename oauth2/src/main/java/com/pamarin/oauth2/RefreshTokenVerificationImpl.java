@@ -50,14 +50,14 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
 
         @Override
         public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-            OAuth2RefreshToken refreshToken = refreshTokenRepo.findById(id);
+            OAuth2RefreshToken refreshToken = refreshTokenRepo.findByTokenId(id);
             if (refreshToken == null) {
                 throw new UsernameNotFoundException("Not found refresh token");
             }
             String[] ignoreProperties = new String[]{"secretKey"};
             BeanUtils.copyProperties(refreshToken, output, ignoreProperties);
             return DefaultUserDetails.builder()
-                    .username(refreshToken.getId())
+                    .username(refreshToken.getTokenId())
                     .password(refreshToken.getSecretKey())
                     .build();
         }

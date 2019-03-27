@@ -68,7 +68,7 @@ public class RefreshTokenVerificationTest {
         exception.expect(UsernameNotFoundException.class);
         exception.expectMessage("Not found refresh token");
 
-        when(refreshTokenRepo.findById(any(String.class))).thenReturn(null);
+        when(refreshTokenRepo.findByTokenId(any(String.class))).thenReturn(null);
 
         String input = "test";
         userDetailsServiceImpl.loadUserByUsername(input);
@@ -79,7 +79,7 @@ public class RefreshTokenVerificationTest {
         OAuth2RefreshToken refreshToken = OAuth2RefreshToken.builder().build();
         refreshToken.setUserId("jittagornp");
         refreshToken.setSecretKey("xyz");
-        when(refreshTokenRepo.findById(any(String.class))).thenReturn(refreshToken);
+        when(refreshTokenRepo.findByTokenId(any(String.class))).thenReturn(refreshToken);
 
         String input = "test";
         userDetailsServiceImpl.loadUserByUsername(input);

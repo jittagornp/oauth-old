@@ -15,6 +15,7 @@ import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.repository.LoginHistoryRepo;
+import com.pamarin.oauth2.repository.MongodbOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -105,10 +106,13 @@ public class IntegrationTestBase {
     
     @MockBean
     protected LoginHistoryRepo loginHistoryRepo;
+    
+    @MockBean
+    protected MongodbOAuth2AccessTokenRepo mongodbOAuth2AccessTokenRepo;
 
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()
-                .id(UUID.randomUUID().toString().replace("-", ""))
+                .tokenId(UUID.randomUUID().toString().replace("-", ""))
                 .userId("00000000000000000000000000000000")
                 .clientId("00000000000000000000000000000000")
                 .build();
@@ -129,7 +133,7 @@ public class IntegrationTestBase {
     public void mockRefreshTokenRepo() {
         OAuth2RefreshToken refreshToken = stubRefreshToken();
         when(refreshTokenRepo.save(any(OAuth2RefreshToken.class))).thenReturn(refreshToken);
-        when(refreshTokenRepo.findById(any(String.class))).thenReturn(refreshToken);
+        when(refreshTokenRepo.findByTokenId(any(String.class))).thenReturn(refreshToken);
     }
 
     @Before
@@ -180,7 +184,7 @@ public class IntegrationTestBase {
         LocalDateTime expires = now.plusMinutes(30);
         when(accessTokenRepo.save(any(OAuth2AccessToken.class)))
                 .thenReturn(OAuth2AccessToken.builder()
-                        .id("abcdefghijklmnopqrstuvwxyz")
+                        .tokenId("abcdefghijklmnopqrstuvwxyz")
                         .userId(UUID.randomUUID().toString())
                         .clientId(UUID.randomUUID().toString())
                         .issuedAt(Timestamp.valueOf(now).getTime())
@@ -194,7 +198,7 @@ public class IntegrationTestBase {
         LocalDateTime expires = now.plusMinutes(30);
         when(authorizationCodeRepo.save(any(OAuth2AuthorizationCode.class)))
                 .thenReturn(OAuth2AuthorizationCode.builder()
-                        .id("00000000-0000-0000-0000-000000000000")
+                        .tokenId("00000000-0000-0000-0000-000000000000")
                         .userId(UUID.randomUUID().toString())
                         .clientId(UUID.randomUUID().toString())
                         .issuedAt(Timestamp.valueOf(now).getTime())

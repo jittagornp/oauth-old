@@ -30,7 +30,7 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
 
     private OAuth2RefreshToken generateRefreshToken(OAuth2Token token) {
         return refreshTokenRepo.save(OAuth2RefreshToken.builder()
-                .id(token.getId())
+                .tokenId(token.getTokenId())
                 .userId(token.getUserId())
                 .clientId(token.getClientId())
                 .sessionId(token.getSessionId())
@@ -42,7 +42,7 @@ public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
         OAuth2RefreshToken refreshToken = generateRefreshToken(token);
         return hashBasedToken.hash(
                 DefaultUserDetails.builder()
-                        .username(refreshToken.getId())
+                        .username(refreshToken.getTokenId())
                         .password(refreshToken.getSecretKey())
                         .build(),
                 convert2LocalDateTime(new Date(refreshToken.getExpiresAt()))

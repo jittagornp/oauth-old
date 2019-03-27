@@ -15,7 +15,7 @@ public interface OAuth2TokenRepo <TOKEN extends OAuth2Token> {
 
     TOKEN save(TOKEN token);
     
-    TOKEN findById(String id);
+    TOKEN findByTokenId(String tokenId);
     
-    void deleteById(String id);
+    void deleteByTokenId(String tokenId);
 }

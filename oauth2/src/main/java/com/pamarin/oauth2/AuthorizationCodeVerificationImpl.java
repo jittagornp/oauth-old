@@ -28,19 +28,19 @@ public class AuthorizationCodeVerificationImpl implements AuthorizationCodeVerif
     private HashBasedToken hashBasedToken;
 
     private UserDetailsService userDetailsService(OAuth2AuthorizationCode output) {
-        return id -> {
-            OAuth2AuthorizationCode code = authorizationCodeRepo.findById(id);
+        return tokenId -> {
+            OAuth2AuthorizationCode code = authorizationCodeRepo.findByTokenId(tokenId);
             if (code == null) {
                 throw new UsernameNotFoundException("Not found authorization code.");
             }
 
             //revoke code
-            authorizationCodeRepo.deleteById(id);
+            authorizationCodeRepo.deleteByTokenId(tokenId);
 
             String[] ignoreProperties = new String[]{"secretKey"};
             BeanUtils.copyProperties(code, output, ignoreProperties);
             return DefaultUserDetails.builder()
-                    .username(code.getId())
+                    .username(code.getTokenId())
                     .password(code.getSecretKey())
                     .build();
         };
