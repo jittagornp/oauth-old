@@ -14,8 +14,9 @@ import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.domain.User;
-import com.pamarin.oauth2.repository.LoginHistoryRepo;
-import com.pamarin.oauth2.repository.MongodbOAuth2AccessTokenRepo;
+import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepo;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepo;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -109,6 +110,9 @@ public class IntegrationTestBase {
     
     @MockBean
     protected MongodbOAuth2AccessTokenRepo mongodbOAuth2AccessTokenRepo;
+    
+    @MockBean
+    protected MongodbOAuth2RefreshTokenRepo mongodbOAuth2RefreshTokenRepo;
 
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()

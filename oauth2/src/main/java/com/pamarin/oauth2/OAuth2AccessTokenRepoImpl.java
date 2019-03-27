@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.repository.MongodbOAuth2AccessTokenRepo;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,6 @@ public class OAuth2AccessTokenRepoImpl implements OAuth2AccessTokenRepo {
     @Override
     public void deleteByTokenId(String id) {
         redisOAuth2AccessTokenRepo.deleteByTokenId(id);
-        mongodbOAuth2AccessTokenRepo.delete(id);
     }
 
 }

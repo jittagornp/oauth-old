@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * @author jitta
  */
 @Configuration
-@EnableMongoRepositories(basePackages = "com.pamarin.oauth2.repository")
+@EnableMongoRepositories(basePackages = "com.pamarin.oauth2.repository.mongodb")
 public class MongodbConf {
 
 }

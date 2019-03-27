@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2.repository;
+package com.pamarin.oauth2.repository.mongodb;
 
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import org.springframework.data.mongodb.repository.MongoRepository;

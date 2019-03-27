@@ -43,17 +43,17 @@ public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> imp
 
     protected abstract int getExpiresMinutes();
 
-    private String randomId() {
+    private String randomTokenId() {
         return UUID.randomUUID().toString();
     }
 
-    private String makeKey(String id) {
-        return getTokenProfix() + ":" + id;
+    private String makeKey(String tokenId) {
+        return getTokenProfix() + ":" + tokenId;
     }
 
-    private void setIdIfNotPresent(TOKEN clone) {
+    private void setTokenIdIfNotPresent(TOKEN clone) {
         if (clone.getTokenId() == null) {
-            clone.setTokenId(randomId());
+            clone.setTokenId(randomTokenId());
         }
     }
 
@@ -80,7 +80,7 @@ public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> imp
     public TOKEN save(TOKEN token) {
         try {
             TOKEN clone = (TOKEN) token.clone();
-            setIdIfNotPresent(clone);
+            setTokenIdIfNotPresent(clone);
             setExpirationTimeIfNotPresent(clone);
             setSecretKeyIfNotPresent(clone);
             String key = makeKey(clone.getTokenId());
@@ -96,9 +96,9 @@ public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> imp
     }
 
     @Override
-    public TOKEN findByTokenId(String id) {
+    public TOKEN findByTokenId(String tokenId) {
         try {
-            String key = makeKey(id);
+            String key = makeKey(tokenId);
             String value = redisTemplate.opsForValue().get(key);
             LOG.debug("Redis get \"{}\" = {}", key, value);
             if (value == null) {
@@ -111,8 +111,8 @@ public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> imp
     }
 
     @Override
-    public void deleteByTokenId(String id) {
-        redisTemplate.delete(makeKey(id));
+    public void deleteByTokenId(String tokenId) {
+        redisTemplate.delete(makeKey(tokenId));
     }
 
 }

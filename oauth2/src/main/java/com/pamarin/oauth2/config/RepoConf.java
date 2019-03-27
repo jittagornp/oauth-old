@@ -4,6 +4,7 @@
 package com.pamarin.oauth2.config;
 
 import com.pamarin.oauth2.OAuth2AccessTokenRepoImpl;
+import com.pamarin.oauth2.OAuth2RefreshTokenRepoImpl;
 import com.pamarin.oauth2.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.RedisOAuth2AuthorizationCodeRepo;
 import com.pamarin.oauth2.RedisOAuth2RefreshTokenRepo;
@@ -40,7 +41,7 @@ public class RepoConf {
     }
 
     @Bean
-    public OAuth2RefreshTokenRepo newOAuth2RefreshTokenRepo() {
+    public RedisOAuth2RefreshTokenRepo newRedisOAuth2RefreshTokenRepo() {
         return new RedisOAuth2RefreshTokenRepo(refreshTokenTimeout / 60);
     }
 
@@ -49,4 +50,8 @@ public class RepoConf {
         return new OAuth2AccessTokenRepoImpl();
     }
 
+    @Bean
+    public OAuth2RefreshTokenRepo newOAuth2RefreshTokenRepo() {
+        return new OAuth2RefreshTokenRepoImpl();
+    }
 }
