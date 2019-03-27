@@ -14,14 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OAuth2AccessTokenRepoImpl implements OAuth2AccessTokenRepo {
 
-    private final RedisOAuth2AccessTokenRepo redisOAuth2AccessTokenRepo;
+    @Autowired
+    private RedisOAuth2AccessTokenRepo redisOAuth2AccessTokenRepo;
 
     @Autowired
     private MongodbOAuth2AccessTokenRepo mongodbOAuth2AccessTokenRepo;
-
-    public OAuth2AccessTokenRepoImpl(RedisOAuth2AccessTokenRepo redisOAuth2AccessTokenRepo) {
-        this.redisOAuth2AccessTokenRepo = redisOAuth2AccessTokenRepo;
-    }
 
     @Override
     public OAuth2AccessToken save(OAuth2AccessToken token) {
