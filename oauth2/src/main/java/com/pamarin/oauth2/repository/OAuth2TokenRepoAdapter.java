@@ -74,7 +74,7 @@ public abstract class OAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> implemen
             setTokenIdIfNotPresent(clone);
             setExpirationTimeIfNotPresent(clone);
             setSecretKeyIfNotPresent(clone);
-            return doSave(token);
+            return doSave(clone);
         } catch (CloneNotSupportedException ex) {
             throw new RuntimeException("Can't clone token", ex);
         }
