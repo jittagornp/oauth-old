@@ -6,6 +6,7 @@ package com.pamarin.oauth2;
 import com.pamarin.oauth2.repository.UserSessionRepo;
 import com.pamarin.oauth2.service.RevokeSessionService;
 import com.pamarin.oauth2.service.RevokeSessionService;
+import com.pamarin.oauth2.service.RevokeTokenService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.SessionRepository;
@@ -28,11 +29,15 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     @Autowired
     private SessionRepository sessionRepository;
 
+    @Autowired
+    private RevokeTokenService revokeTokenService;
+
     @Override
     public void revokeBySessionId(String sessionId) {
         if (hasText(sessionId)) {
             sessionRepository.delete(sessionId);
             userSessionRepo.deleteBySessionId(sessionId);
+            revokeTokenService.revokeBySessionId(sessionId);
         }
     }
 

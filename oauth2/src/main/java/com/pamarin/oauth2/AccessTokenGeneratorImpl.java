@@ -26,10 +26,10 @@ import com.pamarin.oauth2.domain.OAuth2RefreshToken;
 import com.pamarin.oauth2.domain.OAuth2Token;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
-import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.AuthorizationCodeVerification;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
+import com.pamarin.oauth2.service.RevokeTokenService;
 import java.util.Date;
 
 /**
@@ -54,9 +54,6 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     private OAuth2AccessTokenRepo accessTokenRepo;
 
     @Autowired
-    private OAuth2RefreshTokenRepo refreshTokenRepo;
-
-    @Autowired
     private RefreshTokenGenerator refreshTokenGenerator;
 
     @Autowired
@@ -64,6 +61,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
 
     @Autowired
     private HashBasedToken hashBasedToken;
+
+    @Autowired
+    private RevokeTokenService revokeTokenService;
 
     private AccessTokenResponse buildAccessTokenResponse(OAuth2Token instance) {
         OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
@@ -114,14 +114,9 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     public AccessTokenResponse generate(RefreshAccessTokenRequest req) {
         clientVerification.verifyClientIdAndClientSecret(req.getClientId(), req.getClientSecret());
         OAuth2RefreshToken refreshToken = refreshTokenVerification.verify(req.getRefreshToken());
-        revokeToken(refreshToken.getTokenId());
+        revokeTokenService.revokeByTokenId(refreshToken.getTokenId());
         refreshToken.setTokenId(null);
         refreshToken.setClientId(req.getClientId());
         return buildAccessTokenResponse(refreshToken);
-    }
-
-    private void revokeToken(String tokenId) {
-        refreshTokenRepo.deleteByTokenId(tokenId);
-        accessTokenRepo.deleteByTokenId(tokenId);
     }
 }

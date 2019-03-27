@@ -44,6 +44,11 @@ import java.util.List;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.session.SessionRepository;
 import com.pamarin.oauth2.repository.UserAgentRepo;
+import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepo;
+import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.service.RevokeTokenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -101,18 +106,21 @@ public class IntegrationTestBase {
 
     @MockBean
     protected HttpServletRequestProvider httpServletRequestProvider;
-    
+
     @MockBean
     protected SessionRepository sessionRepository;
-    
+
     @MockBean
     protected LoginHistoryRepo loginHistoryRepo;
-    
+
     @MockBean
     protected MongodbOAuth2AccessTokenRepo mongodbOAuth2AccessTokenRepo;
-    
+
     @MockBean
     protected MongodbOAuth2RefreshTokenRepo mongodbOAuth2RefreshTokenRepo;
+    
+    @MockBean
+    protected RevokeTokenService revokeTokenService;
 
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()
