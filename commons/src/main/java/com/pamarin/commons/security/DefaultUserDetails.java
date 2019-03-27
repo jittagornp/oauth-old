@@ -3,13 +3,13 @@
  */
 package com.pamarin.commons.security;
 
+import com.pamarin.commons.util.ObjectEquals;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Builder;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,15 +17,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/19
  */
-@Setter
 @Builder
 public class DefaultUserDetails implements UserDetails {
-    
+
     private static final long serialVersionUID = 1L;
 
-    private String username;
+    private final String username;
 
-    private String password;
+    private final String password;
 
     private List<String> authorities;
 
@@ -76,26 +75,15 @@ public class DefaultUserDetails implements UserDetails {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 89 * hash + Objects.hashCode(this.username);
-        return hash;
+        return 89 * hash + Objects.hashCode(this.username);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DefaultUserDetails other = (DefaultUserDetails) obj;
-        if (!Objects.equals(this.username, other.username)) {
-            return false;
-        }
-        return true;
+        return ObjectEquals.of(this)
+                .equals(obj, (orgin, other) -> {
+                    return Objects.equals(orgin.getUsername(), other.getUsername());
+                });
     }
 
 }
