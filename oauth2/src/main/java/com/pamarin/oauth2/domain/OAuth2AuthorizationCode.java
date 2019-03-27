@@ -17,6 +17,8 @@ import lombok.Setter;
 @Setter
 @Builder
 public class OAuth2AuthorizationCode implements OAuth2Token {
+    
+    private String id;
 
     private String tokenId;
 

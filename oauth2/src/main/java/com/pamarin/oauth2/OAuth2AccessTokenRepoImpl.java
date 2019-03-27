@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
@@ -22,19 +23,18 @@ public class OAuth2AccessTokenRepoImpl implements OAuth2AccessTokenRepo {
 
     @Override
     public OAuth2AccessToken save(OAuth2AccessToken token) {
-        OAuth2AccessToken accessToken = redisOAuth2AccessTokenRepo.save(token);
-        mongodbOAuth2AccessTokenRepo.save(accessToken);
-        return accessToken;
+        return redisOAuth2AccessTokenRepo.save(mongodbOAuth2AccessTokenRepo.save(token));
     }
 
     @Override
-    public OAuth2AccessToken findByTokenId(String id) {
-        return redisOAuth2AccessTokenRepo.findByTokenId(id);
+    public OAuth2AccessToken findByTokenId(String tokenId) {
+        return redisOAuth2AccessTokenRepo.findByTokenId(tokenId);
     }
 
     @Override
-    public void deleteByTokenId(String id) {
-        redisOAuth2AccessTokenRepo.deleteByTokenId(id);
+    public void deleteByTokenId(String tokenId) {
+        redisOAuth2AccessTokenRepo.deleteByTokenId(tokenId);
+        mongodbOAuth2AccessTokenRepo.deleteByTokenId(tokenId);
     }
 
 }

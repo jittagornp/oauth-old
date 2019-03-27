@@ -8,6 +8,10 @@ package com.pamarin.oauth2.domain;
  */
 public interface OAuth2Token extends Cloneable {
 
+    String getId();
+
+    void setId(String id);
+
     String getTokenId();
 
     void setTokenId(String tokenId);

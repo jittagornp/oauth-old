@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2;
+package com.pamarin.oauth2.repository.redis;
 
 import com.pamarin.oauth2.domain.OAuth2RefreshToken;
 

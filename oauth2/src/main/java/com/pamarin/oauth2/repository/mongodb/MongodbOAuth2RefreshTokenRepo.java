@@ -4,12 +4,16 @@
 package com.pamarin.oauth2.repository.mongodb;
 
 import com.pamarin.oauth2.domain.OAuth2RefreshToken;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**
  *
  * @author jitta
  */
-public interface MongodbOAuth2RefreshTokenRepo extends MongoRepository<OAuth2RefreshToken, String>{
+public class MongodbOAuth2RefreshTokenRepo extends MongodbOAuth2TokenRepoAdapter<OAuth2RefreshToken>{
+
+    @Override
+    protected Class<OAuth2RefreshToken> getTokenClass() {
+        return OAuth2RefreshToken.class;
+    }
     
 }

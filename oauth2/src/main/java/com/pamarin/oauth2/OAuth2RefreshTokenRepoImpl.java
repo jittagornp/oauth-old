@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.domain.OAuth2RefreshToken;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2RefreshTokenRepo;
@@ -22,9 +23,7 @@ public class OAuth2RefreshTokenRepoImpl implements OAuth2RefreshTokenRepo {
 
     @Override
     public OAuth2RefreshToken save(OAuth2RefreshToken token) {
-        OAuth2RefreshToken accessToken = redisOAuth2RefreshTokenRepo.save(token);
-        mongodbOAuth2RefreshTokenRepo.save(accessToken);
-        return accessToken;
+        return mongodbOAuth2RefreshTokenRepo.save(redisOAuth2RefreshTokenRepo.save(token));
     }
 
     @Override
@@ -35,6 +34,7 @@ public class OAuth2RefreshTokenRepoImpl implements OAuth2RefreshTokenRepo {
     @Override
     public void deleteByTokenId(String tokenId) {
         redisOAuth2RefreshTokenRepo.deleteByTokenId(tokenId);
+        mongodbOAuth2RefreshTokenRepo.deleteByTokenId(tokenId);
     }
 
 }

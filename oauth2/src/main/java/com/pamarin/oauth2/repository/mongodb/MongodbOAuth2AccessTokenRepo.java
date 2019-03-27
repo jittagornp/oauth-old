@@ -4,12 +4,16 @@
 package com.pamarin.oauth2.repository.mongodb;
 
 import com.pamarin.oauth2.domain.OAuth2AccessToken;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**
  *
  * @author jitta
  */
-public interface MongodbOAuth2AccessTokenRepo extends MongoRepository<OAuth2AccessToken, String>{
+public class MongodbOAuth2AccessTokenRepo extends MongodbOAuth2TokenRepoAdapter<OAuth2AccessToken>{
+
+    @Override
+    protected Class<OAuth2AccessToken> getTokenClass() {
+        return OAuth2AccessToken.class;
+    }
     
 }
