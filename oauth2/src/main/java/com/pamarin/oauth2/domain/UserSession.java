@@ -3,14 +3,14 @@
  */
 package com.pamarin.oauth2.domain;
 
+import com.pamarin.commons.util.ObjectEquals;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  *
@@ -18,35 +18,42 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Entity
-@Table(name = UserSession.TABLE_NAME)
+@Builder
+@Document(collection = UserSession.COLLECTION_NAME)
 public class UserSession implements Serializable {
 
-    public static final String TABLE_NAME = "user_session";
+    public static final String COLLECTION_NAME = "user_session";
 
     @Id
     private String id;
 
-    @Column(name = "session_id", nullable = false, unique = true)
     private String sessionId;
 
-    @Column(name = "creation_time")
     private Long creationTime;
 
-    @Column(name = "max_inactive_interval")
     private Integer maxInactiveInterval;
 
-    @Column(name = "last_accessed_time")
     private Long lastAccessedTime;
 
-    @Column(name = "user_id")
     private String userId;
 
-    @Column(name = "agent_id")
     private String agentId;
 
-    @Column(name = "ip_address")
     private String ipAddress;
+
+    public UserSession() {
+    }
+
+    public UserSession(String id, String sessionId, Long creationTime, Integer maxInactiveInterval, Long lastAccessedTime, String userId, String agentId, String ipAddress) {
+        this.id = id;
+        this.sessionId = sessionId;
+        this.creationTime = creationTime;
+        this.maxInactiveInterval = maxInactiveInterval;
+        this.lastAccessedTime = lastAccessedTime;
+        this.userId = userId;
+        this.agentId = agentId;
+        this.ipAddress = ipAddress;
+    }
 
     @Override
     public int hashCode() {
@@ -57,19 +64,10 @@ public class UserSession implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final UserSession other = (UserSession) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return ObjectEquals.of(this)
+                .equals(obj, (origin, other) -> {
+                    return Objects.equals(origin.getId(), other.getId())
+                            || Objects.equals(origin.getSessionId(), other.getSessionId());
+                });
     }
 }
