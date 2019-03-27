@@ -3,10 +3,11 @@
  */
 package com.pamarin.oauth2.repository.mongodb;
 
-import com.pamarin.commons.generator.PrimaryKeyGenerator;
-import com.pamarin.commons.generator.UUIDGenerator;
+import com.mongodb.WriteResult;
 import com.pamarin.oauth2.domain.OAuth2Token;
-import com.pamarin.oauth2.repository.OAuth2TokenRepo;
+import com.pamarin.oauth2.repository.OAuth2TokenRepoAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -17,51 +18,35 @@ import org.springframework.data.mongodb.core.query.Query;
  * @author jitta
  * @param <TOKEN>
  */
-public abstract class MongodbOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> implements OAuth2TokenRepo<TOKEN> {
+public abstract class MongodbOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> extends OAuth2TokenRepoAdapter<TOKEN> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongodbOAuth2TokenRepoAdapter.class);
 
     @Autowired
     private MongoOperations mongoOps;
-
-    @Autowired
-    private UUIDGenerator uuidGenerator;
-
-    @Autowired
-    private PrimaryKeyGenerator primaryKeyGenerator;
-
-    protected abstract Class<TOKEN> getTokenClass();
 
     private Query makeTokenIdQuery(String tokenId) {
         return Query.query(Criteria.where("tokenId").is(tokenId));
     }
 
-    private void setIdIfNotPresent(TOKEN clone) {
-        if (clone.getId() == null) {
-            clone.setId(primaryKeyGenerator.generate());
-        }
-    }
-
-    private void setTokenIdIfNotPresent(TOKEN clone) {
-        if (clone.getTokenId() == null) {
-            clone.setTokenId(uuidGenerator.generate());
-        }
-    }
-
     @Override
-    public TOKEN save(TOKEN token) {
-        setIdIfNotPresent(token);
-        setTokenIdIfNotPresent(token);
+    public TOKEN doSave(TOKEN token) {
+        LOG.debug("Mongodb save \"{}\" = {}", token.getId(), token);
         mongoOps.save(token);
         return token;
     }
 
     @Override
     public TOKEN findByTokenId(String tokenId) {
-        return mongoOps.findOne(makeTokenIdQuery(tokenId), getTokenClass());
+        TOKEN token = mongoOps.findOne(makeTokenIdQuery(tokenId), getTokenClass());
+        LOG.debug("Mongodb findByTokenId \"{}\" = {}", tokenId, token);
+        return token;
     }
 
     @Override
     public void deleteByTokenId(String tokenId) {
-        mongoOps.remove(makeTokenIdQuery(tokenId), getTokenClass());
+        WriteResult result = mongoOps.remove(makeTokenIdQuery(tokenId), getTokenClass());
+        LOG.debug("Mongodb deleteByTokenId \"{}\" = {}", tokenId, result);
     }
 
 }

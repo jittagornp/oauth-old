@@ -11,6 +11,8 @@ import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepo;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepo;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2RefreshTokenRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +45,16 @@ public class RepoConf {
     @Bean
     public RedisOAuth2RefreshTokenRepo newRedisOAuth2RefreshTokenRepo() {
         return new RedisOAuth2RefreshTokenRepo(refreshTokenTimeout / 60);
+    }
+
+    @Bean
+    public MongodbOAuth2AccessTokenRepo newMongodbOAuth2AccessTokenRepo() {
+        return new MongodbOAuth2AccessTokenRepo(accessTokenTimeout / 60);
+    }
+
+    @Bean
+    public MongodbOAuth2RefreshTokenRepo newMongodbOAuth2RefreshTokenRepo() {
+        return new MongodbOAuth2RefreshTokenRepo(refreshTokenTimeout / 60);
     }
 
     @Bean

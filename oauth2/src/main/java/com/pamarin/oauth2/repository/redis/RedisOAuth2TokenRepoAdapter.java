@@ -6,93 +6,45 @@ package com.pamarin.oauth2.repository.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import com.pamarin.oauth2.domain.OAuth2Token;
-import com.pamarin.oauth2.repository.OAuth2TokenRepo;
-import java.security.SecureRandom;
-import java.util.Base64;
+import com.pamarin.oauth2.repository.OAuth2TokenRepoAdapter;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03
  * @param <TOKEN>
  */
-public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> implements OAuth2TokenRepo<TOKEN> {
+public abstract class RedisOAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> extends OAuth2TokenRepoAdapter<TOKEN> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisOAuth2TokenRepoAdapter.class);
 
-    private static final int SECRET_KEY_SIZE = 7;
-    
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
-    
-    private final SecureRandom secureRandom = new SecureRandom();
-
-    protected abstract Class<TOKEN> getTokenClass();
 
     protected abstract String getTokenProfix();
-
-    protected abstract int getExpiresMinutes();
-
-    private String randomTokenId() {
-        return UUID.randomUUID().toString();
-    }
-
+    
     private String makeKey(String tokenId) {
         return getTokenProfix() + ":" + tokenId;
     }
 
-    private void setTokenIdIfNotPresent(TOKEN clone) {
-        if (clone.getTokenId() == null) {
-            clone.setTokenId(randomTokenId());
-        }
-    }
-
-    private void setExpirationTimeIfNotPresent(TOKEN clone) {
-        clone.setExpireMinutes(getExpiresMinutes());
-        if (clone.getIssuedAt() < 1) {
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime expires = now.plusMinutes(getExpiresMinutes());
-            clone.setIssuedAt(Timestamp.valueOf(now).getTime());
-            clone.setExpiresAt(Timestamp.valueOf(expires).getTime());
-        }
-    }
-    
-    private void setSecretKeyIfNotPresent(TOKEN clone){
-        if(clone.getSecretKey() == null){
-            byte[] bytes = new byte[SECRET_KEY_SIZE];
-            secureRandom.nextBytes(bytes);
-            String secret = Base64.getEncoder().encodeToString(bytes);
-            clone.setSecretKey(secret);
-        }
-    }
-
     @Override
-    public TOKEN save(TOKEN token) {
+    public TOKEN doSave(TOKEN token) {
         try {
-            TOKEN clone = (TOKEN) token.clone();
-            setTokenIdIfNotPresent(clone);
-            setExpirationTimeIfNotPresent(clone);
-            setSecretKeyIfNotPresent(clone);
-            String key = makeKey(clone.getTokenId());
-            String value = objectMapper.writeValueAsString(clone);
+            String key = makeKey(token.getTokenId());
+            String value = objectMapper.writeValueAsString(token);
             LOG.debug("Redis set \"{}\" = {}", key, value);
             redisTemplate.opsForValue().set(key, value, getExpiresMinutes(), TimeUnit.MINUTES);
-            return clone;
+            return token;
         } catch (JsonProcessingException ex) {
             throw new RuntimeException("Can't parse object to JSON string", ex);
-        } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException("Can't clone token", ex);
-        }
+        } 
     }
 
     @Override
