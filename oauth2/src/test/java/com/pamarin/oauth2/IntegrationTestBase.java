@@ -44,16 +44,16 @@ import java.util.List;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.session.SessionRepository;
 import com.pamarin.oauth2.repository.UserAgentRepo;
-import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepo;
-import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.RevokeTokenService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
  */
 @ActiveProfiles("test")
+//@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 public class IntegrationTestBase {
 
     @MockBean

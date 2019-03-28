@@ -3,11 +3,14 @@
  */
 package com.pamarin.oauth2.collection;
 
+import com.pamarin.commons.util.ObjectEquals;
 import com.pamarin.oauth2.domain.OAuth2Token;
+import java.util.Objects;
 import javax.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -25,6 +28,7 @@ public class OAuth2RefreshToken implements OAuth2Token {
     @Id
     private String id;
 
+    @Indexed
     @Field("token_id")
     private String tokenId;
 
@@ -62,6 +66,22 @@ public class OAuth2RefreshToken implements OAuth2Token {
         this.expireMinutes = expireMinutes;
         this.secretKey = secretKey;
         this.sessionId = sessionId;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 43 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return ObjectEquals.of(this)
+                .equals(obj, (origin, other) -> {
+                    return Objects.equals(origin.getId(), other.getId())
+                            || Objects.equals(origin.getTokenId(), other.getTokenId());
+                });
     }
 
     @Override
