@@ -6,7 +6,7 @@ package com.pamarin.oauth2;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
 import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
-import com.pamarin.oauth2.domain.OAuth2RefreshToken;
+import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 import com.pamarin.oauth2.domain.OAuth2Token;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;

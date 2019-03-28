@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.repository.mongodb;
 
-import com.pamarin.oauth2.domain.LoginHistory;
+import com.pamarin.oauth2.collection.LoginHistory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**

@@ -5,7 +5,7 @@ package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepo;
-import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.repository.mongodb;
 
-import com.pamarin.oauth2.domain.UserSession;
+import com.pamarin.oauth2.collection.UserSession;
 import com.pamarin.oauth2.repository.UserSessionRepo;
 import static java.util.Collections.emptyList;
 import java.util.List;

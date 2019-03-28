@@ -4,7 +4,7 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.commons.provider.HttpSessionProvider;
-import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
 import com.pamarin.oauth2.service.OAuth2SessionService;

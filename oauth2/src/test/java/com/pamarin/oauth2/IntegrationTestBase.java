@@ -4,14 +4,14 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.commons.provider.HttpServletRequestProvider;
-import com.pamarin.oauth2.domain.OAuth2RefreshToken;
+import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 import com.pamarin.oauth2.repository.OAuth2AllowDomainRepo;
 import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.UserDetailsStub;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
-import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepo;

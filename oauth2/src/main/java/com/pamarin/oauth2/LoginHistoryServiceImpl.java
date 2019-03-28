@@ -6,7 +6,7 @@ package com.pamarin.oauth2;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.commons.security.LoginSession;
-import com.pamarin.oauth2.domain.LoginHistory;
+import com.pamarin.oauth2.collection.LoginHistory;
 import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepo;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import com.pamarin.oauth2.service.LoginHistoryService;

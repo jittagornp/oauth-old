@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.repository;
 
-import com.pamarin.oauth2.domain.UserSession;
+import com.pamarin.oauth2.collection.UserSession;
 import java.util.List;
 
 /**

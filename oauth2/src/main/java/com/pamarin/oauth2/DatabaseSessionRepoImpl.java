@@ -4,7 +4,7 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.commons.provider.HttpServletRequestProvider;
-import com.pamarin.oauth2.domain.UserSession;
+import com.pamarin.oauth2.collection.UserSession;
 import com.pamarin.oauth2.domain.UserAgentEntity;
 import com.pamarin.oauth2.repository.UserSessionRepo;
 import java.time.LocalDateTime;

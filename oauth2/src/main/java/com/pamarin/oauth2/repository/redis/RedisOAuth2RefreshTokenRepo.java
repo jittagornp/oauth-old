@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.repository.redis;
 
-import com.pamarin.oauth2.domain.OAuth2RefreshToken;
+import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12

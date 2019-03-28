@@ -13,7 +13,7 @@ import com.pamarin.commons.security.DefaultBase64AESEncryption;
 import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
 import com.pamarin.oauth2.constant.OAuth2Constant;
-import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import java.util.Arrays;

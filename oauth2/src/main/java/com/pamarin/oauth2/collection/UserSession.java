@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2.domain;
+package com.pamarin.oauth2.collection;
 
 import com.pamarin.commons.util.ObjectEquals;
 import java.io.Serializable;
@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  *
@@ -29,18 +30,25 @@ public class UserSession implements Serializable {
     private String id;
 
     @Indexed
+    @Field("session_id")
     private String sessionId;
 
+    @Field("creation_time")
     private Long creationTime;
 
+    @Field("max_inactive_interval")
     private Integer maxInactiveInterval;
 
+    @Field("last_accessed_time")
     private Long lastAccessedTime;
 
+    @Field("user_id")
     private String userId;
 
+    @Field("agent_id")
     private String agentId;
 
+    @Field("ip_address")
     private String ipAddress;
 
     public UserSession() {

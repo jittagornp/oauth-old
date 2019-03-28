@@ -7,7 +7,7 @@ import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.commons.security.hashing.SHA384Hashing;
-import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import java.time.LocalDateTime;

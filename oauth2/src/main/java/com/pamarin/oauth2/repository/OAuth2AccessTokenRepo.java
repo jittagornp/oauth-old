@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.repository;
 
-import com.pamarin.oauth2.domain.OAuth2AccessToken;
+import com.pamarin.oauth2.collection.OAuth2AccessToken;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03

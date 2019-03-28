@@ -3,8 +3,8 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.domain.OAuth2AccessToken;
-import com.pamarin.oauth2.domain.OAuth2RefreshToken;
+import com.pamarin.oauth2.collection.OAuth2AccessToken;
+import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepo;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.RevokeTokenService;
