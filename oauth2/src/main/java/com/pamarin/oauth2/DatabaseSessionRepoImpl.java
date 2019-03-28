@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.commons.generator.PrimaryKeyGenerator;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.oauth2.domain.UserSession;
 import com.pamarin.oauth2.domain.UserAgentEntity;
@@ -24,6 +23,7 @@ import com.pamarin.oauth2.repository.UserAgentRepo;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 import org.springframework.beans.BeanUtils;
+import com.pamarin.commons.generator.IdGenerator;
 
 /**
  *
@@ -65,7 +65,7 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
     private UserAgentResolver userAgentResolver;
     
     @Autowired
-    private PrimaryKeyGenerator primaryKeyGenerator; 
+    private IdGenerator idGenerator; 
 
     public DatabaseSessionRepoImpl(Integer sessionTimeout, Integer synchronizeTimeout) {
         this.sessionTimeout = sessionTimeout;
@@ -108,7 +108,7 @@ public class DatabaseSessionRepoImpl implements DatabaseSessionRepo {
         UserSession userSession = userSessionRepo.findBySessionId(session.getId());
         if (userSession == null) {
             userSession = new UserSession();
-            userSession.setId(primaryKeyGenerator.generate());
+            userSession.setId(idGenerator.generate());
             userSession.setSessionId(session.getId());
             userSession.setCreationTime(now);
         }

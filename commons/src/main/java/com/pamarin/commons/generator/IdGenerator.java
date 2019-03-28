@@ -7,7 +7,7 @@ package com.pamarin.commons.generator;
  *
  * @author jitta
  */
-public interface PrimaryKeyGenerator {
+public interface IdGenerator {
     
     String generate();
     

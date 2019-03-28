@@ -5,13 +5,11 @@ package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.repository.UserSessionRepo;
 import com.pamarin.oauth2.service.RevokeSessionService;
-import com.pamarin.oauth2.service.RevokeSessionService;
 import com.pamarin.oauth2.service.RevokeTokenService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -20,7 +18,6 @@ import static org.springframework.util.StringUtils.hasText;
  * @author jitta
  */
 @Service
-@Transactional
 public class RevokeSessionServiceImpl implements RevokeSessionService {
 
     @Autowired

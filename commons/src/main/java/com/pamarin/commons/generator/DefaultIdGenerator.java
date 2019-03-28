@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * @author jitta
  */
 @Component
-public class DefaultPrimaryKeyGenerator implements PrimaryKeyGenerator {
+public class DefaultIdGenerator implements IdGenerator {
 
     @Override
     public String generate() {

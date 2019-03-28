@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -27,6 +28,7 @@ public class UserSession implements Serializable {
     @Id
     private String id;
 
+    @Indexed
     private String sessionId;
 
     private Long creationTime;

@@ -11,13 +11,13 @@ import org.junit.Test;
  *
  * @author jitta
  */
-public class DefaultPrimaryKeyGeneratorTest {
+public class DefaultIdGeneratorTest {
 
-    private PrimaryKeyGenerator generator;
+    private IdGenerator generator;
 
     @Before
     public void before() {
-        generator = new DefaultPrimaryKeyGenerator();
+        generator = new DefaultIdGenerator();
     }
 
     @Test

@@ -5,7 +5,7 @@ package com.pamarin.oauth2.repository.mongodb;
 
 import com.pamarin.oauth2.domain.UserSession;
 import com.pamarin.oauth2.repository.UserSessionRepo;
-import java.util.Collections;
+import static java.util.Collections.emptyList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,15 +63,15 @@ public class MongodbUserSessionRepo implements UserSessionRepo {
     @Override
     public List<String> findAllSessionIdsOnSameUserAgentBySessionId(String sessionId) {
         if (!hasText(sessionId)) {
-            return Collections.emptyList();
+            return emptyList();
         }
         UserSession userSession = findBySessionId(sessionId);
         if (userSession == null) {
-            return Collections.emptyList();
+            return emptyList();
         }
         List<UserSession> userSessions = mongoOps.find(makeAgentIdQuery(userSession.getAgentId()), UserSession.class);
         if (isEmpty(userSessions)) {
-            return Collections.emptyList();
+            return emptyList();
         }
         return map(userSessions);
     }
@@ -88,7 +88,7 @@ public class MongodbUserSessionRepo implements UserSessionRepo {
     public List<String> findAllSessionIdsByUserId(String userId) {
         List<UserSession> userSessions = mongoOps.find(makeUserIdQuery(userId), UserSession.class);
         if (isEmpty(userSessions)) {
-            return Collections.emptyList();
+            return emptyList();
         }
         return map(userSessions);
     }

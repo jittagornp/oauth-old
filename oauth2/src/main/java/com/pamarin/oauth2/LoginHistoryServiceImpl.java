@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.commons.generator.PrimaryKeyGenerator;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.commons.security.LoginSession;
@@ -13,11 +12,11 @@ import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import com.pamarin.oauth2.service.LoginHistoryService;
 import java.time.LocalDateTime;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.util.StringUtils.hasText;
+import com.pamarin.commons.generator.IdGenerator;
 
 /**
  *
@@ -45,16 +44,13 @@ public class LoginHistoryServiceImpl implements LoginHistoryService {
     private LoginHistoryRepo loginHistoryRepo;
 
     @Autowired
-    private PrimaryKeyGenerator primaryKeyGenerator;
+    private IdGenerator idGenerator;
 
     @Override
     public void createHistory() {
-
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
-        HttpSession session = httpReq.getSession();
-
         LoginHistory history = new LoginHistory();
-        String id = primaryKeyGenerator.generate();
+        String id = idGenerator.generate();
         history.setId(id);
         history.setIpAddress(httpClientIPAddressResolver.resolve(httpReq));
         history.setLoginDate(LocalDateTime.now());
@@ -63,14 +59,13 @@ public class LoginHistoryServiceImpl implements LoginHistoryService {
         history.setUserId(loginSession.getUserDetails().getUsername());
         loginHistoryRepo.save(history);
 
-        session.setAttribute(LOGIN_HISTORY_ATTR, id);
+        httpReq.getSession().setAttribute(LOGIN_HISTORY_ATTR, id);
     }
 
     @Override
     public void stampLogout() {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
-        HttpSession session = httpReq.getSession();
-        String id = (String) session.getAttribute(LOGIN_HISTORY_ATTR);
+        String id = (String) httpReq.getSession().getAttribute(LOGIN_HISTORY_ATTR);
         if (hasText(id)) {
             LoginHistory history = loginHistoryRepo.findOne(id);
             if (history != null) {

@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.interceptor;
 
-import com.pamarin.commons.generator.PrimaryKeyGenerator;
 import com.pamarin.commons.util.CookieSpecBuilder;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -16,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.pamarin.commons.generator.IdGenerator;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/07
@@ -32,7 +32,7 @@ public class UserAgentTokenInterceptor extends HandlerInterceptorAdapter {
     private UserAgentTokenIdResolver userAgentTokenIdResolver;
     
     @Autowired
-    private PrimaryKeyGenerator primaryKeyGenerator;
+    private IdGenerator idGenerator;
 
     public UserAgentTokenInterceptor(String cookieName) {
         this.cookieName = cookieName;
@@ -50,7 +50,7 @@ public class UserAgentTokenInterceptor extends HandlerInterceptorAdapter {
     }
 
     private String makeToken() {
-        String id = primaryKeyGenerator.generate();
+        String id = idGenerator.generate();
         return Base64.getEncoder().encodeToString(id.getBytes());
     }
 

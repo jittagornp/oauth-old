@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.repository;
 
-import com.pamarin.commons.generator.PrimaryKeyGenerator;
 import com.pamarin.commons.generator.UUIDGenerator;
 import com.pamarin.oauth2.domain.OAuth2Token;
 import java.security.SecureRandom;
@@ -11,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.pamarin.commons.generator.IdGenerator;
 
 /**
  *
@@ -24,7 +24,7 @@ public abstract class OAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> implemen
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Autowired
-    private PrimaryKeyGenerator primaryKeyGenerator;
+    private IdGenerator idGenerator;
 
     @Autowired
     private UUIDGenerator uuidGenerator;
@@ -37,7 +37,7 @@ public abstract class OAuth2TokenRepoAdapter<TOKEN extends OAuth2Token> implemen
 
     private void setIdIfNotPresent(TOKEN clone) {
         if (clone.getId() == null) {
-            clone.setId(primaryKeyGenerator.generate());
+            clone.setId(idGenerator.generate());
         }
     }
 
