@@ -17,6 +17,9 @@ public class AuthenticationEntryPointImpl extends AuthenticationEntryPointAdapte
 
     @Value("${oauth2.authorization-server.hostUrl}")
     private String authorizationServerHostUrl;
+    
+    @Value("${server.hostUrl}")
+    private String hostUrl;
 
     @Override
     protected String getAuthorizationServerHostUrl() {
@@ -25,7 +28,7 @@ public class AuthenticationEntryPointImpl extends AuthenticationEntryPointAdapte
 
     @Override
     protected String getHostUrl() {
-        return "http://localhost:8080/callback";
+        return hostUrl + "/callback";
     }
 
     @Override
