@@ -29,6 +29,11 @@ public class DefaultOAuth2RefreshTokenResolver implements OAuth2RefreshTokenReso
             return token;
         }
 
+        String tokenAttr = (String) httpReq.getAttribute(REFRESH_TOKEN);
+        if (hasText(tokenAttr)) {
+            return tokenAttr;
+        }
+
         return httpCookieResolver.resolve(httpReq);
     }
 

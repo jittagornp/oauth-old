@@ -46,6 +46,11 @@ public class DefaultOAuth2AccessTokenResolver implements OAuth2AccessTokenResolv
             return token;
         }
 
+        String tokenAttr = (String) httpReq.getAttribute(ACCESS_TOKEN);
+        if (hasText(tokenAttr)) {
+            return tokenAttr;
+        }
+
         return httpCookieResolver.resolve(httpReq);
     }
 

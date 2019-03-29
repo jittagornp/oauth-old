@@ -66,9 +66,9 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         String code = httpReq.getParameter("code");
         if (hasText(code)) {
             getAccessTokenByAuthorizationCode(code, httpReq, httpResp);
-        } else {
-            getSession(httpReq, httpResp);
         }
+
+        getSession(httpReq, httpResp);
     }
 
     private void getAccessTokenByAuthorizationCode(String authorizationCode, HttpServletRequest httpReq, HttpServletResponse httpResp) {
