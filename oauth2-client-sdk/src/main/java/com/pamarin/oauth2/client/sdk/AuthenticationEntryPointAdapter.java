@@ -32,7 +32,7 @@ public abstract class AuthenticationEntryPointAdapter implements AuthenticationE
 
     private String getLoginUrl(HttpServletRequest httpReq) throws UnsupportedEncodingException {
         String state = UUID.randomUUID().toString();
-        httpReq.getSession().setAttribute("oauth2-authorization-state", state);
+        httpReq.getSession().setAttribute(OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE, state);
         return "{server}/authorize?".replace("{server}", getAuthorizationServerHostUrl())
                 + new QuerystringBuilder()
                         .addParameter("response_type", "code")
