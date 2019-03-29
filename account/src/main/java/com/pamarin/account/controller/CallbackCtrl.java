@@ -6,12 +6,9 @@
 package com.pamarin.account.controller;
 
 import com.pamarin.commons.provider.HostUrlProvider;
-import com.pamarin.commons.util.Base64Utils;
 import com.pamarin.oauth2.client.sdk.OAuth2AccessToken;
 import com.pamarin.oauth2.client.sdk.OAuth2Client;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
