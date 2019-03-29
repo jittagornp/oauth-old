@@ -24,6 +24,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
@@ -93,19 +94,17 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
         };
     }
 
-    @Bean("sessionFilter")
+    @Component
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public OncePerRequestFilter newSessionFilter() {
-        return new OncePerRequestFilter() {
+    public static class SessionFilter extends OncePerRequestFilter {
 
-            @Autowired
-            private OAuth2SessionRetriever oauth2SessionRetriever;
+        @Autowired
+        private OAuth2SessionRetriever oauth2SessionRetriever;
 
-            @Override
-            protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
-                oauth2SessionRetriever.retrieve(httpReq, httpResp);
-                chain.doFilter(httpReq, httpResp);
-            }
-        };
+        @Override
+        protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
+            oauth2SessionRetriever.retrieve(httpReq, httpResp);
+            chain.doFilter(httpReq, httpResp);
+        }
     }
 }
