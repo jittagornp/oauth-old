@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.pamarin.account.config;
+package com.pamarin.usermanagement.config;
 
 import javax.servlet.SessionCookieConfig;
 import org.springframework.beans.factory.annotation.Value;

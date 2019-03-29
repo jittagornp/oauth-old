@@ -63,3 +63,5 @@ hs_err_pid*
 /oauth2-client/target/
 /account/target/
 /oauth2-client-sdk/target/
+/account - Copy/target/
+/user-management/target/
