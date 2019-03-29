@@ -5,7 +5,7 @@
  */
 package com.pamarin.account.filter;
 
-import com.pamarin.account.security.OAuth2SessionRetriever;
+import com.pamarin.oauth2.client.sdk.OAuth2SessionRetriever;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

@@ -3,16 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.pamarin.account.security;
+package com.pamarin.oauth2.client.sdk;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
  * @author jitta
  */
-public class InvalidStateException extends RuntimeException {
+public interface OAuth2RefreshTokenResolver {
 
-    public InvalidStateException(String message) {
-        super(message);
-    }
+    String resolve(HttpServletRequest httpReq);
+    
+    String getTokenName();
 
 }

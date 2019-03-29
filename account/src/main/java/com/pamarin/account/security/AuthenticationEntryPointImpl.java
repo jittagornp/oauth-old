@@ -5,6 +5,7 @@
  */
 package com.pamarin.account.security;
 
+import com.pamarin.oauth2.client.sdk.AuthenticationEntryPointAdapter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

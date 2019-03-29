@@ -5,6 +5,9 @@
  */
 package com.pamarin.account.config;
 
+import javax.servlet.SessionCookieConfig;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -16,9 +19,21 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class WebConf {
 
+    @Value("${server.hostUrl}")
+    private String hostUrl;
+
     @Bean
     public RestTemplate newRestTemplate() {
         return new RestTemplate();
+    }
+
+    @Bean
+    public ServletContextInitializer servletContextInitializer() {
+        return servletContext -> {
+            SessionCookieConfig config = servletContext.getSessionCookieConfig();
+            config.setSecure(hostUrl.startsWith("https://"));
+            config.setName("session");
+        };
     }
 
 }

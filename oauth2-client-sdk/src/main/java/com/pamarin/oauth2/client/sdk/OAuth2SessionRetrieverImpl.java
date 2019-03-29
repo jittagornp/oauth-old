@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.pamarin.account.security;
+package com.pamarin.oauth2.client.sdk;
 
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.DefaultUserDetails;
