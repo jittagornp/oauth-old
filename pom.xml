@@ -10,6 +10,8 @@
         <module>commons</module>
         <module>firebase-authen</module>
         <module>oauth2-client</module>
+        <module>account</module>
+        <module>oauth2-client-sdk</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

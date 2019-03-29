@@ -33,6 +33,8 @@ import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 @EnableWebMvc
 public class WebConf extends WebMvcConfigurerAdapter {
 
+    private static final String USER_AGENT_COOKIE_NAME = "user-agent";
+
     @Value("${server.hostUrl}")
     private String hostUrl;
 
@@ -88,12 +90,12 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public UserAgentTokenInterceptor newUserSourceInterceptor() {
-        return new UserAgentTokenInterceptor("user-agent");
+        return new UserAgentTokenInterceptor(USER_AGENT_COOKIE_NAME);
     }
 
     @Bean
     public UserAgentTokenIdResolver newUserAgentTokenIdResolver() {
-        return new DefaultUserAgentTokenIdResolver("user-agent");
+        return new DefaultUserAgentTokenIdResolver(USER_AGENT_COOKIE_NAME);
     }
 
     @Bean
