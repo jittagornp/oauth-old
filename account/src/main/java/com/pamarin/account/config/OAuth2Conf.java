@@ -5,11 +5,11 @@
  */
 package com.pamarin.account.config;
 
-import com.pamarin.oauth2.client.sdk.OAuth2Client;
-import com.pamarin.oauth2.client.sdk.OAuth2ClientImpl;
+import com.pamarin.oauth2.client.sdk.DefaultOAuth2ClientOperations;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.pamarin.oauth2.client.sdk.OAuth2ClientOperations;
 
 /**
  *
@@ -22,10 +22,10 @@ public class OAuth2Conf {
     private String authorizationServerHostUrl;
 
     @Bean
-    public OAuth2Client newOAuth2Client() {
+    public OAuth2ClientOperations newOAuth2ClientOperations() {
         String clientId = "b98e21b4-ce2a-11e7-abc4-cec278b6b50a";
         String clientSecret = "password";
-        return new OAuth2ClientImpl(clientId, clientSecret, authorizationServerHostUrl);
+        return new DefaultOAuth2ClientOperations(clientId, clientSecret, authorizationServerHostUrl);
     }
 
 }

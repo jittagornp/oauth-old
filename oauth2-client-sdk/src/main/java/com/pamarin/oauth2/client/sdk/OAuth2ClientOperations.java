@@ -9,7 +9,7 @@ package com.pamarin.oauth2.client.sdk;
  *
  * @author jitta
  */
-public interface OAuth2Client {
+public interface OAuth2ClientOperations {
 
     OAuth2AccessToken getAccessTokenByAuthorizationCode(String authorizationCode);
 

@@ -6,11 +6,8 @@
 package com.pamarin.account.security;
 
 import com.pamarin.commons.provider.HostUrlProvider;
-import com.pamarin.commons.resolver.DefaultHttpCookieResolver;
-import com.pamarin.commons.resolver.HttpCookieResolver;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.oauth2.client.sdk.OAuth2AccessToken;
-import com.pamarin.oauth2.client.sdk.OAuth2Client;
 import com.pamarin.oauth2.client.sdk.OAuth2Session;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +23,8 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
 import static org.springframework.util.StringUtils.hasText;
 import org.springframework.web.client.HttpClientErrorException;
+import com.pamarin.oauth2.client.sdk.OAuth2ClientOperations;
+import java.util.Objects;
 
 /**
  *
@@ -40,7 +39,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
 
     private static final int ONE_DAY = 60 * 60 * 24;
 
-    private final OAuth2Client oauth2Client;
+    private final OAuth2ClientOperations oauth2Client;
 
     private final HostUrlProvider hostUrlProvider;
 
@@ -50,7 +49,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
 
     @Autowired
     public OAuth2SessionRetrieverImpl(
-            OAuth2Client oauth2Client,
+            OAuth2ClientOperations oauth2Client,
             HostUrlProvider hostUrlProvider,
             OAuth2AccessTokenResolver oauth2AccessTokenResolver,
             OAuth2RefreshTokenResolver oauth2RefreshTokenResolver
@@ -65,10 +64,27 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
     public void retrieve(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String code = httpReq.getParameter("code");
         if (hasText(code)) {
+            try {
+                verifyState(httpReq.getParameter("state"), httpReq);
+            } catch (InvalidStateException ex) {
+                clearSecurityContext(httpReq);
+                return;
+            }
+
             getAccessTokenByAuthorizationCode(code, httpReq, httpResp);
         }
 
         getSession(httpReq, httpResp);
+    }
+
+    private void verifyState(String state, HttpServletRequest httpReq) {
+        HttpSession session = httpReq.getSession(false);
+        if (session != null) {
+            String sessionState = (String) session.getAttribute("oauth2-authorization-state");
+            if (!Objects.equals(state, sessionState)) {
+                throw new InvalidStateException("Invalid state " + state);
+            }
+        }
     }
 
     private void getAccessTokenByAuthorizationCode(String authorizationCode, HttpServletRequest httpReq, HttpServletResponse httpResp) {

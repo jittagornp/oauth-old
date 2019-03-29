@@ -6,7 +6,6 @@
 package com.pamarin.oauth2.client.sdk;
 
 import java.util.Base64;
-import java.util.Collections;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author jitta
  */
-public class OAuth2ClientImpl implements OAuth2Client {
+public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
 
     private final String clientId;
 
@@ -27,7 +26,7 @@ public class OAuth2ClientImpl implements OAuth2Client {
 
     private final RestTemplate restTemplate;
 
-    public OAuth2ClientImpl(String clientId, String clientSecret, String authorizationServerHostUrl) {
+    public DefaultOAuth2ClientOperations(String clientId, String clientSecret, String authorizationServerHostUrl) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.authorizationServerHostUrl = authorizationServerHostUrl;
