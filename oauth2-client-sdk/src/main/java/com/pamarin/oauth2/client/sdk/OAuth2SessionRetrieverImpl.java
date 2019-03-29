@@ -95,6 +95,10 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         } catch (HttpClientErrorException ex) {
             LOG.debug("getAccessToken error => {}", ex);
             clearSecurityContext(httpReq);
+
+            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED) {
+                throw ex;
+            }
         }
     }
 
