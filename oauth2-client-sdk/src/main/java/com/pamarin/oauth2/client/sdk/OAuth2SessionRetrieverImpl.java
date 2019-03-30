@@ -103,6 +103,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         DefaultUserDetails userDetails = DefaultUserDetails.builder()
                 .username(user.getId())
                 .password(user.getId())
+                .authorities(user.getAuthorities())
                 .build();
 
         SecurityContext context = new SecurityContextImpl();
@@ -165,6 +166,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
     }
 
     private void saveToken(OAuth2AccessToken accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        //cookie
         httpResp.addCookie(buildCookie(
                 oauth2AccessTokenResolver.getTokenName(),
                 accessToken.getAccessToken(),
@@ -177,6 +179,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
                 ONE_DAY * 14
         ));
 
+        //request attribute
         httpReq.setAttribute(
                 oauth2RefreshTokenResolver.getTokenName(),
                 accessToken.getAccessToken()
