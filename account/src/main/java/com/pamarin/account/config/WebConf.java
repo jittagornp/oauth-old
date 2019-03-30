@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.web.client.RestTemplate;
@@ -32,6 +33,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
     }
 
     @Bean
+    @Primary
     public CookieSerializer newCookieSerializer() {
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
         cookieSerializer.setUseBase64Encoding(true);
