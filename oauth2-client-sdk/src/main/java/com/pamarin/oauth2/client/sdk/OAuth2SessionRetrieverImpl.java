@@ -61,24 +61,19 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
     public void retrieve(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String code = httpReq.getParameter("code");
         if (hasText(code)) {
-            try {
-                verifyState(httpReq.getParameter("state"), httpReq);
-            } catch (InvalidStateException ex) {
-                clearSecurityContext(httpReq);
-                throw ex;
-            }
-
+            verifyAuthorizationState(httpReq.getParameter("state"), httpReq);
             getAccessTokenByAuthorizationCode(code, httpReq, httpResp);
         }
 
         getSession(httpReq, httpResp);
     }
 
-    private void verifyState(String state, HttpServletRequest httpReq) {
+    private void verifyAuthorizationState(String state, HttpServletRequest httpReq) {
         HttpSession session = httpReq.getSession(false);
         if (session != null) {
             String sessionState = (String) session.getAttribute(OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE);
             if (!Objects.equals(state, sessionState)) {
+                clearSecurityContext(httpReq);
                 throw new InvalidStateException("Invalid state " + state);
             }
         }
@@ -92,7 +87,6 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         } catch (HttpClientErrorException ex) {
             LOG.debug("getAccessToken error => {}", ex);
             clearSecurityContext(httpReq);
-
             if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED) {
                 throw ex;
             }
@@ -136,7 +130,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
             SecurityContext context = buildSecurityContext(session.getUser());
             HttpSession httpSession = httpReq.getSession(true);
             httpSession.setAttribute(SPRING_SECURITY_CONTEXT, context);
-            httpReq.setAttribute("oauth2Session", session);
+            httpReq.setAttribute(OAuth2SdkConstant.OAUTH2_SESSION, session);
             return true;
         } catch (HttpClientErrorException ex) {
             LOG.debug("getOAuth2Session error => {}", ex);

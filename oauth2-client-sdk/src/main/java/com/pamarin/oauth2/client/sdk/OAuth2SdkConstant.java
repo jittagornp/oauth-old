@@ -17,4 +17,6 @@ public class OAuth2SdkConstant {
     
     public static final String OAUTH2_AUTHORIZATION_STATE = "OAUTH2_AUTHORIZATION_STATE";
     
+    public static final String OAUTH2_SESSION = "OAUTH2_SESSION";
+    
 }

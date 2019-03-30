@@ -5,7 +5,12 @@
  */
 package com.pamarin.oauth2.client.sdk;
 
-import java.util.Base64;
+import com.pamarin.commons.provider.DefaultHttpServletRequestProvider;
+import com.pamarin.commons.provider.HttpServletRequestProvider;
+import com.pamarin.commons.resolver.DefaultHttpClientIPAddressResolver;
+import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
+import com.pamarin.commons.util.Base64Utils;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
@@ -26,17 +31,34 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
 
     private final RestTemplate restTemplate;
 
+    private final HttpServletRequestProvider httpServletRequestProvider;
+
+    private final HttpClientIPAddressResolver httpClientIPAddressResolver;
+
     public DefaultOAuth2ClientOperations(String clientId, String clientSecret, String authorizationServerHostUrl) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.authorizationServerHostUrl = authorizationServerHostUrl;
         this.restTemplate = new RestTemplate();
+        this.httpServletRequestProvider = new DefaultHttpServletRequestProvider();
+        this.httpClientIPAddressResolver = new DefaultHttpClientIPAddressResolver();
+    }
+
+    private void addDefaultHeaders(MultiValueMap<String, String> headers) {
+        HttpServletRequest httpReq = httpServletRequestProvider.provide();
+        if (httpReq != null) {
+            headers.add("X-Forwarded-For", httpClientIPAddressResolver.resolve(httpReq));
+            headers.add("User-Agent", httpReq.getHeader("User-Agent"));
+            headers.add("Referer", httpReq.getHeader("Referer"));
+            headers.add("Host", httpReq.getHeader("Host"));
+        }
     }
 
     private MultiValueMap<String, String> buildAccessTokenHeaders() {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-        headers.add("Authorization", "Basic " + Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes()));
+        headers.add("Authorization", "Basic " + Base64Utils.encode(clientId + ":" + clientSecret));
+        addDefaultHeaders(headers);
         return headers;
     }
 
@@ -44,6 +66,7 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
         headers.add("Authorization", "Bearer " + accessToken);
+        addDefaultHeaders(headers);
         return headers;
     }
 

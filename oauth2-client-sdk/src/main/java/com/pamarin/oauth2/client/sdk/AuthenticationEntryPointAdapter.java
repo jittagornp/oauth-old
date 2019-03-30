@@ -5,10 +5,11 @@
  */
 package com.pamarin.oauth2.client.sdk;
 
+import com.pamarin.commons.util.Base64Utils;
 import com.pamarin.commons.util.QuerystringBuilder;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.UUID;
+import java.security.SecureRandom;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +23,10 @@ import org.springframework.security.web.AuthenticationEntryPoint;
  */
 public abstract class AuthenticationEntryPointAdapter implements AuthenticationEntryPoint {
 
+    private static final int STATE_SIZE = 11;
+
+    private final SecureRandom secureRandom = new SecureRandom();
+
     protected abstract String getAuthorizationServerHostUrl();
 
     protected abstract String getHostUrl();
@@ -29,9 +34,15 @@ public abstract class AuthenticationEntryPointAdapter implements AuthenticationE
     protected abstract String getClientId();
 
     protected abstract String getScope();
+    
+    private String randomState(){
+        byte[] bytes = new byte[STATE_SIZE];
+        secureRandom.nextBytes(bytes);
+        return Base64Utils.decode(bytes);
+    }
 
     private String getLoginUrl(HttpServletRequest httpReq) throws UnsupportedEncodingException {
-        String state = UUID.randomUUID().toString();
+        String state = randomState();
         httpReq.getSession().setAttribute(OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE, state);
         return "{server}/authorize?".replace("{server}", getAuthorizationServerHostUrl())
                 + new QuerystringBuilder()
