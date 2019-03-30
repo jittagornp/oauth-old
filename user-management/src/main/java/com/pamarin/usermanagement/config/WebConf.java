@@ -3,9 +3,7 @@
  */
 package com.pamarin.usermanagement.config;
 
-import javax.servlet.SessionCookieConfig;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.web.http.CookieSerializer;
@@ -38,6 +36,8 @@ public class WebConf extends WebMvcConfigurerAdapter {
         cookieSerializer.setUseHttpOnlyCookie(true);
         cookieSerializer.setUseSecureCookie(hostUrl.startsWith("https://"));
         cookieSerializer.setCookieName("session");
+        cookieSerializer.setDomainName(hostUrl);
+        cookieSerializer.setCookiePath("/");
         return cookieSerializer;
     }
 
