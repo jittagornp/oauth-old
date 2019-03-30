@@ -128,7 +128,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
             SecurityContext context = buildSecurityContext(session.getUser());
             HttpSession httpSession = httpReq.getSession(true);
             httpSession.setAttribute(SPRING_SECURITY_CONTEXT, context);
-            OAuth2ClientContext.setSession(session);
+            OAuth2SessionContext.setSession(session);
             return true;
         } catch (HttpClientErrorException ex) {
             LOG.debug("getOAuth2Session error => {}", ex);

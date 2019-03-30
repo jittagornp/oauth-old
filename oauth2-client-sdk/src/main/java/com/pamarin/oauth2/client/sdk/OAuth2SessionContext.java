@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author jitta
  */
-public class OAuth2ClientContext {
+public class OAuth2SessionContext {
 
     private static HttpServletRequestProvider httpServletRequestProvider;
 
-    private OAuth2ClientContext() {
+    private OAuth2SessionContext() {
 
     }
 
