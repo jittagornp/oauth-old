@@ -11,6 +11,7 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -37,6 +38,11 @@ public class WebConf extends WebMvcConfigurerAdapter {
             config.setSecure(hostUrl.startsWith("https://"));
             config.setName("session");
         };
+    }
+    
+    @Bean
+    public RequestContextListener newRequestContextListener() {
+        return new RequestContextListener();
     }
 
 }
