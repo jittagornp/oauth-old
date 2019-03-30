@@ -36,7 +36,7 @@ public abstract class AuthenticationEntryPointAdapter implements AuthenticationE
     private String randomState(){
         byte[] bytes = new byte[STATE_SIZE];
         secureRandom.nextBytes(bytes);
-        return Base64Utils.decode(bytes);
+        return Base64Utils.encode(bytes);
     }
 
     private String getLoginUrl(HttpServletRequest httpReq) throws UnsupportedEncodingException {
