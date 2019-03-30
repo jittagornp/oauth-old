@@ -34,7 +34,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
 
     private static final int ONE_DAY = 60 * 60 * 24;
 
-    private final OAuth2ClientOperations oauth2Client;
+    private final OAuth2ClientOperations oauth2ClientOperations;
 
     private final HostUrlProvider hostUrlProvider;
 
@@ -44,12 +44,12 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
 
     @Autowired
     public OAuth2SessionRetrieverImpl(
-            OAuth2ClientOperations oauth2Client,
+            OAuth2ClientOperations oauth2ClientOperations,
             HostUrlProvider hostUrlProvider,
             OAuth2AccessTokenResolver oauth2AccessTokenResolver,
             OAuth2RefreshTokenResolver oauth2RefreshTokenResolver
     ) {
-        this.oauth2Client = oauth2Client;
+        this.oauth2ClientOperations = oauth2ClientOperations;
         this.hostUrlProvider = hostUrlProvider;
         this.oauth2AccessTokenResolver = oauth2AccessTokenResolver;
         this.oauth2RefreshTokenResolver = oauth2RefreshTokenResolver;
@@ -58,8 +58,9 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
     @Override
     public void retrieve(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String code = httpReq.getParameter("code");
-        if (hasText(code)) {
-            verifyAuthorizationState(httpReq.getParameter("state"), httpReq);
+        String state = httpReq.getParameter("state");
+        if (hasText(code) && hasText(state)) {
+            verifyAuthorizationState(state, httpReq);
             getAccessTokenByAuthorizationCode(code, httpReq, httpResp);
         }
 
@@ -72,30 +73,34 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
             String sessionState = (String) session.getAttribute(OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE);
             if (!Objects.equals(state, sessionState)) {
                 clearSecurityContext(httpReq);
-                throw new InvalidStateException("Invalid state " + state);
+                throw new InvalidAuthorizationStateException("Invalid Authorization state " + state);
             }
+        }
+    }
+
+    private void throwIfNotUnauthorized(HttpClientErrorException ex) {
+        if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED) {
+            throw ex;
         }
     }
 
     private void getAccessTokenByAuthorizationCode(String authorizationCode, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         try {
             LOG.debug("authorizationCode => {}", authorizationCode);
-            OAuth2AccessToken accessToken = oauth2Client.getAccessTokenByAuthorizationCode(authorizationCode);
+            OAuth2AccessToken accessToken = oauth2ClientOperations.getAccessTokenByAuthorizationCode(authorizationCode);
             saveToken(accessToken, httpReq, httpResp);
         } catch (HttpClientErrorException ex) {
             LOG.debug("getAccessToken error => {}", ex);
             clearSecurityContext(httpReq);
-            if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED) {
-                throw ex;
-            }
+            throwIfNotUnauthorized(ex);
         }
     }
 
     private void getSession(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String accessToken = oauth2AccessTokenResolver.resolve(httpReq);
-        if (!getOAuth2Session(accessToken, httpReq, httpResp)) {
+        if (!retrieveSession(accessToken, httpReq, httpResp)) {
             accessToken = refreshToken(httpReq, httpResp);
-            getOAuth2Session(accessToken, httpReq, httpResp);
+            retrieveSession(accessToken, httpReq, httpResp);
         }
     }
 
@@ -116,7 +121,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         return context;
     }
 
-    private boolean getOAuth2Session(String accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private boolean retrieveSession(String accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         if (!hasText(accessToken)) {
             clearSecurityContext(httpReq);
             return false;
@@ -124,7 +129,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
 
         try {
             LOG.debug("accessToken => {}", accessToken);
-            OAuth2Session session = oauth2Client.getSession(accessToken);
+            OAuth2Session session = oauth2ClientOperations.getSession(accessToken);
             LOG.debug("loggedIn sessionId => {}", session.getId());
             SecurityContext context = buildSecurityContext(session.getUser());
             HttpSession httpSession = httpReq.getSession(true);
@@ -132,8 +137,9 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
             OAuth2SessionContext.setSession(session);
             return true;
         } catch (HttpClientErrorException ex) {
-            LOG.debug("getOAuth2Session error => {}", ex);
+            LOG.debug("retrieveSession error => {}", ex);
             clearSecurityContext(httpReq);
+            throwIfNotUnauthorized(ex);
             return false;
         }
     }
@@ -153,15 +159,13 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
 
         try {
             LOG.debug("refreshToken => {}", refreshToken);
-            OAuth2AccessToken accessToken = oauth2Client.getAccessTokenByRefreshToken(refreshToken);
+            OAuth2AccessToken accessToken = oauth2ClientOperations.getAccessTokenByRefreshToken(refreshToken);
             saveToken(accessToken, httpReq, httpResp);
             return accessToken.getAccessToken();
         } catch (HttpClientErrorException ex) {
             LOG.debug("refreshToken error => {}", ex);
-            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                return null;
-            }
-            throw ex;
+            throwIfNotUnauthorized(ex);
+            return null;
         }
     }
 

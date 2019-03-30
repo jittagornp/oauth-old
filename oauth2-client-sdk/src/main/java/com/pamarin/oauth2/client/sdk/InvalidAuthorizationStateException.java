@@ -7,9 +7,9 @@ package com.pamarin.oauth2.client.sdk;
  *
  * @author jitta
  */
-public class InvalidStateException extends RuntimeException {
+public class InvalidAuthorizationStateException extends RuntimeException {
 
-    public InvalidStateException(String message) {
+    public InvalidAuthorizationStateException(String message) {
         super(message);
     }
 
