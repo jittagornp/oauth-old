@@ -38,7 +38,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
         cookieSerializer.setUseHttpOnlyCookie(true);
         cookieSerializer.setUseSecureCookie(hostUrl.startsWith("https://"));
         cookieSerializer.setCookieName("session");
-        cookieSerializer.setDomainName(hostUrl);
+        //cookieSerializer.setDomainName(hostUrl);
         cookieSerializer.setCookiePath("/");
         return cookieSerializer;
     }
