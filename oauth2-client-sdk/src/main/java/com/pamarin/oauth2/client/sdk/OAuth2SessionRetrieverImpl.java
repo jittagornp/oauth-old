@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2017-2019 Pamarin.com
  */
 package com.pamarin.oauth2.client.sdk;
 
@@ -130,7 +128,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
             SecurityContext context = buildSecurityContext(session.getUser());
             HttpSession httpSession = httpReq.getSession(true);
             httpSession.setAttribute(SPRING_SECURITY_CONTEXT, context);
-            httpReq.setAttribute(OAuth2SdkConstant.OAUTH2_SESSION, session);
+            OAuth2ClientContext.setSession(session);
             return true;
         } catch (HttpClientErrorException ex) {
             LOG.debug("getOAuth2Session error => {}", ex);
