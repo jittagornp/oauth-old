@@ -8,10 +8,10 @@ import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.DefaultHttpClientIPAddressResolver;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.commons.util.Base64Utils;
+import com.pamarin.commons.util.MultiValueMapBuilder;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,50 +42,50 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
         this.httpClientIPAddressResolver = new DefaultHttpClientIPAddressResolver();
     }
 
-    private void addDefaultHeaders(MultiValueMap<String, String> headers) {
+    private MultiValueMapBuilder addDefaultHeaders(MultiValueMapBuilder<String, String> builder) {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         if (httpReq != null) {
-            headers.add("X-Forwarded-For", httpClientIPAddressResolver.resolve(httpReq));
-            headers.add("User-Agent", httpReq.getHeader("User-Agent"));
-            headers.add("Referer", httpReq.getHeader("Referer"));
-            headers.add("Host", httpReq.getHeader("Host"));
+            builder.add("X-Forwarded-For", httpClientIPAddressResolver.resolve(httpReq))
+                    .add("User-Agent", httpReq.getHeader("User-Agent"))
+                    .add("Referer", httpReq.getHeader("Referer"))
+                    .add("Host", httpReq.getHeader("Host"));
         }
+        return builder;
     }
 
     private MultiValueMap<String, String> buildAccessTokenHeaders() {
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-        headers.add("Authorization", "Basic " + Base64Utils.encode(clientId + ":" + clientSecret));
-        addDefaultHeaders(headers);
-        return headers;
+        return addDefaultHeaders(MultiValueMapBuilder.newLinkedMultiValueMap()
+                .add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .add("Authorization", "Basic " + Base64Utils.encode(clientId + ":" + clientSecret)))
+                .build();
     }
 
     private MultiValueMap<String, String> buildSessionHeaders(String accessToken) {
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-        headers.add("Authorization", "Bearer " + accessToken);
-        addDefaultHeaders(headers);
-        return headers;
+        return addDefaultHeaders(MultiValueMapBuilder.newLinkedMultiValueMap()
+                .add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .add("Authorization", "Bearer " + accessToken))
+                .build();
     }
 
     private MultiValueMap<String, String> buildAuthorizationCodeBody(String authorizationCode) {
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "authorization_code");
-        body.add("redirect_uri", "");
-        body.add("code", authorizationCode);
-        return body;
+        return MultiValueMapBuilder.newLinkedMultiValueMap()
+                .add("grant_type", "authorization_code")
+                .add("redirect_uri", "")
+                .add("code", authorizationCode)
+                .build();
     }
 
     private MultiValueMap<String, String> buildRefreshTokenBody(String refreshToken) {
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "refresh_token");
-        body.add("redirect_uri", "");
-        body.add("refresh_token", refreshToken);
-        return body;
+        return MultiValueMapBuilder.newLinkedMultiValueMap()
+                .add("grant_type", "refresh_token")
+                .add("redirect_uri", "")
+                .add("refresh_token", refreshToken)
+                .build();
     }
 
     @Override
-    public OAuth2AccessToken getAccessTokenByAuthorizationCode(String authorizationCode) {
+    public OAuth2AccessToken
+            getAccessTokenByAuthorizationCode(String authorizationCode) {
         return restTemplate.postForEntity(authorizationServerHostUrl + "/token",
                 new HttpEntity<>(buildAuthorizationCodeBody(authorizationCode), buildAccessTokenHeaders()),
                 OAuth2AccessToken.class
@@ -93,7 +93,8 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     }
 
     @Override
-    public OAuth2AccessToken getAccessTokenByRefreshToken(String refreshToken) {
+    public OAuth2AccessToken
+            getAccessTokenByRefreshToken(String refreshToken) {
         return restTemplate.postForEntity(authorizationServerHostUrl + "/token",
                 new HttpEntity<>(buildRefreshTokenBody(refreshToken), buildAccessTokenHeaders()),
                 OAuth2AccessToken.class
@@ -101,7 +102,8 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     }
 
     @Override
-    public OAuth2Session getSession(String accessToken) {
+    public OAuth2Session
+            getSession(String accessToken) {
         return restTemplate.postForEntity(authorizationServerHostUrl + "/session",
                 new HttpEntity<>(null, buildSessionHeaders(accessToken)),
                 OAuth2Session.class
