@@ -15,4 +15,8 @@ public interface OAuth2ClientOperations {
 
     OAuth2Session getSession(String accessToken);
 
+    <T> T get(String url, Class<T> responseType, String accessToken);
+
+    <T> T post(String url, Object request, Class<T> responseType, String accessToken);
+
 }

@@ -11,6 +11,7 @@ import com.pamarin.commons.util.Base64Utils;
 import com.pamarin.commons.util.MultiValueMapBuilder;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -59,7 +60,7 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
                 .build();
     }
 
-    private MultiValueMap<String, String> buildSessionHeaders(String accessToken) {
+    private MultiValueMap<String, String> buildHeaders(String accessToken) {
         return addDefaultHeaders(MultiValueMapBuilder.newLinkedMultiValueMap()
                 .add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .add("Authorization", "Bearer " + accessToken))
@@ -101,8 +102,28 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     @Override
     public OAuth2Session getSession(String accessToken) {
         return restTemplate.postForEntity(authorizationServerHostUrl + "/session",
-                new HttpEntity<>(null, buildSessionHeaders(accessToken)),
+                new HttpEntity<>(null, buildHeaders(accessToken)),
                 OAuth2Session.class
+        ).getBody();
+    }
+
+    @Override
+    public <T> T get(String url, Class<T> responseType, String accessToken) {
+        return restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(null, buildHeaders(accessToken)),
+                responseType
+        ).getBody();
+    }
+
+    @Override
+    public <T> T post(String url, Object request, Class<T> responseType, String accessToken) {
+        return restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                new HttpEntity<>(request, buildHeaders(accessToken)),
+                responseType
         ).getBody();
     }
 
