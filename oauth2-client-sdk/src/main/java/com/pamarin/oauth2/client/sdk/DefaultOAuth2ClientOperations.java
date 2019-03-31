@@ -84,8 +84,7 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     }
 
     @Override
-    public OAuth2AccessToken
-            getAccessTokenByAuthorizationCode(String authorizationCode) {
+    public OAuth2AccessToken getAccessTokenByAuthorizationCode(String authorizationCode) {
         return restTemplate.postForEntity(authorizationServerHostUrl + "/token",
                 new HttpEntity<>(buildAuthorizationCodeBody(authorizationCode), buildAccessTokenHeaders()),
                 OAuth2AccessToken.class
@@ -93,8 +92,7 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     }
 
     @Override
-    public OAuth2AccessToken
-            getAccessTokenByRefreshToken(String refreshToken) {
+    public OAuth2AccessToken getAccessTokenByRefreshToken(String refreshToken) {
         return restTemplate.postForEntity(authorizationServerHostUrl + "/token",
                 new HttpEntity<>(buildRefreshTokenBody(refreshToken), buildAccessTokenHeaders()),
                 OAuth2AccessToken.class
@@ -102,8 +100,7 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     }
 
     @Override
-    public OAuth2Session
-            getSession(String accessToken) {
+    public OAuth2Session getSession(String accessToken) {
         return restTemplate.postForEntity(authorizationServerHostUrl + "/session",
                 new HttpEntity<>(null, buildSessionHeaders(accessToken)),
                 OAuth2Session.class
