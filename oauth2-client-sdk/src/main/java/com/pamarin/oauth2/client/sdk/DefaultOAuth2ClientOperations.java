@@ -21,9 +21,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
 
-    private final String clientId;
-
-    private final String clientSecret;
+    private final String basicAuthorization;
 
     private final String authorizationServerHostUrl;
 
@@ -34,8 +32,7 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     private final HttpClientIPAddressResolver httpClientIPAddressResolver;
 
     public DefaultOAuth2ClientOperations(String clientId, String clientSecret, String authorizationServerHostUrl) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+        this.basicAuthorization = Base64Utils.encode(clientId + ":" + clientSecret);
         this.authorizationServerHostUrl = authorizationServerHostUrl;
         this.restTemplate = new RestTemplate();
         this.httpServletRequestProvider = new DefaultHttpServletRequestProvider();
@@ -45,7 +42,9 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     private MultiValueMapBuilder addDefaultHeaders(MultiValueMapBuilder<String, String> builder) {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         if (httpReq != null) {
-            builder.add("X-Forwarded-For", httpClientIPAddressResolver.resolve(httpReq))
+            String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
+            builder.add("X-Forwarded-For", ipAddress)
+                    .add("REMOTE_ADDR", ipAddress)
                     .add("User-Agent", httpReq.getHeader("User-Agent"))
                     .add("Referer", httpReq.getHeader("Referer"))
                     .add("Host", httpReq.getHeader("Host"));
@@ -56,7 +55,7 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
     private MultiValueMap<String, String> buildAccessTokenHeaders() {
         return addDefaultHeaders(MultiValueMapBuilder.newLinkedMultiValueMap()
                 .add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .add("Authorization", "Basic " + Base64Utils.encode(clientId + ":" + clientSecret)))
+                .add("Authorization", "Basic " + basicAuthorization))
                 .build();
     }
 

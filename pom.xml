@@ -12,6 +12,7 @@
         <module>oauth2-client</module>
         <module>account</module>
         <module>user-management</module>
+        <module>api</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
