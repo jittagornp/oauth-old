@@ -26,13 +26,15 @@ public class OAuth2SessionContext {
         return httpServletRequestProvider;
     }
 
-    public static OAuth2Session getSession() {
-        HttpServletRequest httpReq = getHttpServletRequestProvider().provide();
-        return (OAuth2Session) httpReq.getAttribute(OAuth2SdkConstant.OAUTH2_SESSION);
+    private static HttpServletRequest request() {
+        return getHttpServletRequestProvider().provide();
     }
-    
-    public static void setSession(OAuth2Session session){
-        HttpServletRequest httpReq = getHttpServletRequestProvider().provide();
-        httpReq.setAttribute(OAuth2SdkConstant.OAUTH2_SESSION, session);
+
+    public static OAuth2Session getSession() {
+        return (OAuth2Session) request().getAttribute(OAuth2SdkConstant.OAUTH2_SESSION);
+    }
+
+    public static void setSession(OAuth2Session session) {
+        request().setAttribute(OAuth2SdkConstant.OAUTH2_SESSION, session);
     }
 }
