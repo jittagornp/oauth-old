@@ -6,8 +6,6 @@ package com.pamarin.oauth2.client.sdk;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,7 +74,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         String accessToken = getTokenHeader(httpReq.getHeader("Authorization"));
         if (hasText(accessToken)) {
             if (!retrieveSession(accessToken, httpReq, httpResp)) {
-                sendUnauthorizedError(httpResp);
+                error401Unauthorized(httpResp);
             }
         } else {
             String code = httpReq.getParameter("code");
@@ -124,7 +122,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         if (!retrieveSession(accessToken, httpReq, httpResp)) {
             accessToken = refreshToken(httpReq, httpResp);
             if (!retrieveSession(accessToken, httpReq, httpResp)) {
-                sendUnauthorizedError(httpResp);
+                error401Unauthorized(httpResp);
             }
         }
     }
@@ -232,7 +230,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         return cookie;
     }
 
-    private void sendUnauthorizedError(HttpServletResponse httpResp) {
+    private void error401Unauthorized(HttpServletResponse httpResp) {
         httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }
