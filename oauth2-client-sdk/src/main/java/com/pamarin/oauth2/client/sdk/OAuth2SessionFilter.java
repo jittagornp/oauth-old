@@ -140,7 +140,9 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         HttpSession session = httpReq.getSession(false);
         if (session != null) {
             String sessionState = (String) session.getAttribute(OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE);
-            if (!Objects.equals(state, sessionState)) {
+            if (Objects.equals(state, sessionState)) {
+                session.removeAttribute(OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE);
+            } else {
                 clearSecurityContext(httpReq);
                 throw new InvalidAuthorizationStateException("Invalid Authorization state " + state);
             }
