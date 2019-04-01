@@ -84,7 +84,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
                 getAccessTokenByAuthorizationCode(code, httpReq, httpResp);
             }
 
-            getSession(httpReq, httpResp);
+            retrieveSession(httpReq, httpResp);
         }
     }
 
@@ -117,7 +117,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         }
     }
 
-    private void getSession(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private void retrieveSession(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String accessToken = oauth2AccessTokenResolver.resolve(httpReq);
         if (!retrieveSession(accessToken, httpReq, httpResp)) {
             accessToken = refreshToken(httpReq, httpResp);
@@ -125,23 +125,6 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
                 sendUnauthorizedError(httpResp);
             }
         }
-    }
-
-    private SecurityContext buildSecurityContext(OAuth2Session.User user) {
-        DefaultUserDetails userDetails = DefaultUserDetails.builder()
-                .username(user.getId())
-                .password(user.getId())
-                .authorities(user.getAuthorities())
-                .build();
-
-        SecurityContext context = new SecurityContextImpl();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities()
-        );
-        context.setAuthentication(token);
-        return context;
     }
 
     private boolean retrieveSession(String accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
@@ -154,10 +137,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
             LOG.debug("accessToken => {}", accessToken);
             OAuth2Session session = oauth2ClientOperations.getSession(accessToken);
             LOG.debug("loggedIn sessionId => {}", session.getId());
-            SecurityContext context = buildSecurityContext(session.getUser());
-            HttpSession httpSession = httpReq.getSession(true);
-            httpSession.setAttribute(SPRING_SECURITY_CONTEXT, context);
-            OAuth2SessionContext.setSession(session);
+            saveSession(session, httpReq);
             return true;
         } catch (HttpClientErrorException ex) {
             LOG.debug("retrieveSession error => {}", ex);
@@ -190,6 +170,30 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
             throwIfNotUnauthorized(ex);
             return null;
         }
+    }
+
+    private SecurityContext buildSecurityContext(OAuth2Session.User user) {
+        DefaultUserDetails userDetails = DefaultUserDetails.builder()
+                .username(user.getId())
+                .password("")
+                .authorities(user.getAuthorities())
+                .build();
+
+        SecurityContext context = new SecurityContextImpl();
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+        context.setAuthentication(token);
+        return context;
+    }
+
+    private void saveSession(OAuth2Session session, HttpServletRequest httpReq) {
+        SecurityContext context = buildSecurityContext(session.getUser());
+        HttpSession httpSession = httpReq.getSession(true);
+        httpSession.setAttribute(SPRING_SECURITY_CONTEXT, context);
+        OAuth2SessionContext.setSession(session);
     }
 
     private void saveToken(OAuth2AccessToken accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
