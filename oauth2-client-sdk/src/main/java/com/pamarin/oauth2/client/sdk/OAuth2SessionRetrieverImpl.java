@@ -35,7 +35,9 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
-    private static final int ONE_DAY = 60 * 60 * 24;
+    private static final int ONE_DAY_SECONDS = 60 * 60 * 24;
+
+    private static final int FOURTEEN_DAYS_SECONDS = ONE_DAY_SECONDS * 14;
 
     private final OAuth2ClientOperations oauth2ClientOperations;
 
@@ -201,13 +203,13 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         httpResp.addCookie(buildCookie(
                 oauth2AccessTokenResolver.getTokenName(),
                 accessToken.getAccessToken(),
-                ONE_DAY
+                ONE_DAY_SECONDS
         ));
 
         httpResp.addCookie(buildCookie(
                 oauth2RefreshTokenResolver.getTokenName(),
                 accessToken.getRefreshToken(),
-                ONE_DAY * 14
+                FOURTEEN_DAYS_SECONDS
         ));
 
         //request attribute
@@ -231,10 +233,6 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
     }
 
     private void sendUnauthorizedError(HttpServletResponse httpResp) {
-        try {
-            httpResp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }
