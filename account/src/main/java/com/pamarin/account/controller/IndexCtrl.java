@@ -30,15 +30,12 @@ public class IndexCtrl {
     @GetMapping({"", "/"})
     public ModelAndView index(HttpServletRequest httpReq) {
 
-        User user = User.builder().build();
         String acccessToken = oauth2AccessTokenResolver.resolve(httpReq);
-        if (hasText(acccessToken)) {
-            user = oauth2ClientOperations.get(
-                    "https://api-pamarin.herokuapp.com/me",
-                    User.class,
-                    oauth2AccessTokenResolver.resolve(httpReq)
-            );
-        }
+        User user = oauth2ClientOperations.get(
+                "https://api-pamarin.herokuapp.com/me",
+                User.class,
+                acccessToken
+        );
 
         return new ModelAndViewBuilder()
                 .setName("index")

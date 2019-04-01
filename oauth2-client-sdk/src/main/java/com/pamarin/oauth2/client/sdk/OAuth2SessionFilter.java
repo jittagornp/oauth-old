@@ -100,9 +100,9 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             if (hasText(code) && hasText(state)) {
                 verifyAuthorizationState(state, httpReq);
                 getAccessTokenByAuthorizationCode(code, httpReq, httpResp);
+            } else {
+                retrieveSession(httpReq, httpResp);
             }
-
-            retrieveSession(httpReq, httpResp);
         }
     }
 
@@ -119,7 +119,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                 + new QuerystringBuilder()
                         .addParameter("response_type", "code")
                         .addParameter("client_id", oauth2ClientOperations.getClientId())
-                        .addParameter("redirect_uri", hostUrlProvider.provide())
+                        .addParameter("redirect_uri", hostUrlProvider.provide() + "/callback")
                         .addParameter("scope", oauth2ClientOperations.getScope())
                         .addParameter("state", state)
                         .build();
