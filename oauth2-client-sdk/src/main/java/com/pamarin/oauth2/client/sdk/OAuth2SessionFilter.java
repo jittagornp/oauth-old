@@ -3,9 +3,11 @@
  */
 package com.pamarin.oauth2.client.sdk;
 
+import com.pamarin.commons.exception.AuthenticationException;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
+import java.io.IOException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,15 +23,21 @@ import org.springframework.stereotype.Component;
 import static org.springframework.util.StringUtils.hasText;
 import org.springframework.web.client.HttpClientErrorException;
 import java.util.Objects;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  *
  * @author jitta
  */
 @Component
-public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class OAuth2SessionFilter extends OncePerRequestFilter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OAuth2SessionRetrieverImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OAuth2SessionFilter.class);
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
@@ -48,7 +56,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
     private final HttpAuthorizeBearerParser httpAuthorizeBearerParser;
 
     @Autowired
-    public OAuth2SessionRetrieverImpl(
+    public OAuth2SessionFilter(
             OAuth2ClientOperations oauth2ClientOperations,
             HostUrlProvider hostUrlProvider,
             OAuth2AccessTokenResolver oauth2AccessTokenResolver,
@@ -62,19 +70,21 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         this.httpAuthorizeBearerParser = httpAuthorizeBearerParser;
     }
 
-    private String getTokenHeader(String authorization) {
-        if (!hasText(authorization)) {
-            return null;
+    @Override
+    protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
+        try {
+            doFilter(httpReq, httpResp);
+            chain.doFilter(httpReq, httpResp);
+        } catch (AuthenticationException ex) {
+            error401Unauthorized(httpResp);
         }
-        return httpAuthorizeBearerParser.parse(authorization);
     }
 
-    @Override
-    public void retrieve(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private void doFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String accessToken = getTokenHeader(httpReq.getHeader("Authorization"));
         if (hasText(accessToken)) {
             if (!retrieveSession(accessToken, httpReq, httpResp)) {
-                error401Unauthorized(httpResp);
+                throw new AuthenticationException("Please login");
             }
         } else {
             String code = httpReq.getParameter("code");
@@ -86,6 +96,13 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
 
             retrieveSession(httpReq, httpResp);
         }
+    }
+
+    private String getTokenHeader(String authorization) {
+        if (!hasText(authorization)) {
+            return null;
+        }
+        return httpAuthorizeBearerParser.parse(authorization);
     }
 
     private void verifyAuthorizationState(String state, HttpServletRequest httpReq) {
@@ -122,7 +139,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         if (!retrieveSession(accessToken, httpReq, httpResp)) {
             accessToken = refreshToken(httpReq, httpResp);
             if (!retrieveSession(accessToken, httpReq, httpResp)) {
-                error401Unauthorized(httpResp);
+                throw new AuthenticationException("Please login");
             }
         }
     }
@@ -230,7 +247,7 @@ public class OAuth2SessionRetrieverImpl implements OAuth2SessionRetriever {
         return cookie;
     }
 
-    private void error401Unauthorized(HttpServletResponse httpResp) {
-        httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    private void error401Unauthorized(HttpServletResponse httpResp) throws IOException {
+        httpResp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }

@@ -4,26 +4,15 @@
 package com.pamarin.usermanagement.config;
 
 import com.pamarin.oauth2.client.sdk.AuthenticationEntryPointAdapter;
-import com.pamarin.oauth2.client.sdk.OAuth2SessionRetriever;
-import java.io.IOException;
 import java.util.UUID;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  *
@@ -90,19 +79,5 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
             }
 
         };
-    }
-
-    @Component
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    public static class SessionFilter extends OncePerRequestFilter {
-
-        @Autowired
-        private OAuth2SessionRetriever oauth2SessionRetriever;
-
-        @Override
-        protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
-            oauth2SessionRetriever.retrieve(httpReq, httpResp);
-            chain.doFilter(httpReq, httpResp);
-        }
     }
 }
