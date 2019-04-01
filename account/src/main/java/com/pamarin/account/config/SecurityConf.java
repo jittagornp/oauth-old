@@ -29,8 +29,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         "/public/**",
                         "/static/**",
                         "/assets/**",
-                        "/favicon.ico",
-                        "/callback"
+                        "/favicon.ico"
                 )
                 .permitAll()
                 .anyRequest()

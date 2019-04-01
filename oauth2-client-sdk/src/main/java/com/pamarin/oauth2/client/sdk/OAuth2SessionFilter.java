@@ -85,13 +85,15 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             chain.doFilter(httpReq, httpResp);
         } catch (AuthenticationException ex) {
             httpResp.sendRedirect(getAuthorizationUrl(httpReq));
+        } catch (RequireRedirectException ex) {
+            httpResp.sendRedirect("/");
         }
     }
 
     private void doFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException {
-        String accessToken = getTokenHeader(httpReq.getHeader("Authorization"));
+        String accessToken = getAccessTokenHeader(httpReq.getHeader("Authorization"));
         if (hasText(accessToken)) {
-            if (!retrieveSession(accessToken, httpReq, httpResp)) {
+            if (!getSession(accessToken, httpReq, httpResp)) {
                 error401Unauthorized(httpResp);
             }
         } else {
@@ -99,9 +101,11 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             String state = httpReq.getParameter("state");
             if (hasText(code) && hasText(state)) {
                 verifyAuthorizationState(state, httpReq);
-                getAccessTokenByAuthorizationCode(code, httpReq, httpResp);
+                if (getAccessTokenByAuthorizationCode(code, httpReq, httpResp)) {
+                    throw new RequireRedirectException("Get accessToken from authorizationCode success.");
+                }
             } else {
-                retrieveSession(httpReq, httpResp);
+                getSession(httpReq, httpResp);
             }
         }
     }
@@ -125,7 +129,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                         .build();
     }
 
-    private String getTokenHeader(String authorization) {
+    private String getAccessTokenHeader(String authorization) {
         if (!hasText(authorization)) {
             return null;
         }
@@ -149,29 +153,31 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         }
     }
 
-    private void getAccessTokenByAuthorizationCode(String authorizationCode, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private boolean getAccessTokenByAuthorizationCode(String authorizationCode, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         try {
             LOG.debug("authorizationCode => {}", authorizationCode);
             OAuth2AccessToken accessToken = oauth2ClientOperations.getAccessTokenByAuthorizationCode(authorizationCode);
             saveToken(accessToken, httpReq, httpResp);
+            return true;
         } catch (HttpClientErrorException ex) {
             LOG.debug("getAccessToken error => {}", ex);
             clearSecurityContext(httpReq);
             throwIfNotUnauthorized(ex);
+            return false;
         }
     }
 
-    private void retrieveSession(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private void getSession(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String accessToken = oauth2AccessTokenResolver.resolve(httpReq);
-        if (!retrieveSession(accessToken, httpReq, httpResp)) {
+        if (!getSession(accessToken, httpReq, httpResp)) {
             accessToken = refreshToken(httpReq, httpResp);
-            if (!retrieveSession(accessToken, httpReq, httpResp)) {
+            if (!getSession(accessToken, httpReq, httpResp)) {
                 throw new AuthenticationException("Please login");
             }
         }
     }
 
-    private boolean retrieveSession(String accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private boolean getSession(String accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         if (!hasText(accessToken)) {
             clearSecurityContext(httpReq);
             return false;
@@ -184,7 +190,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             saveSession(session, httpReq);
             return true;
         } catch (HttpClientErrorException ex) {
-            LOG.debug("retrieveSession error => {}", ex);
+            LOG.debug("getSession error => {}", ex);
             clearSecurityContext(httpReq);
             throwIfNotUnauthorized(ex);
             return false;
