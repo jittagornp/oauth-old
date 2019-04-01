@@ -65,14 +65,14 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
 
     @Autowired
     public OAuth2SessionFilter(
-            OAuth2ClientOperations oauth2ClientOperations,
             HostUrlProvider hostUrlProvider,
+            OAuth2ClientOperations oauth2ClientOperations,
             OAuth2AccessTokenResolver oauth2AccessTokenResolver,
             OAuth2RefreshTokenResolver oauth2RefreshTokenResolver,
             HttpAuthorizeBearerParser httpAuthorizeBearerParser
     ) {
-        this.oauth2ClientOperations = oauth2ClientOperations;
         this.hostUrlProvider = hostUrlProvider;
+        this.oauth2ClientOperations = oauth2ClientOperations;
         this.oauth2AccessTokenResolver = oauth2AccessTokenResolver;
         this.oauth2RefreshTokenResolver = oauth2RefreshTokenResolver;
         this.httpAuthorizeBearerParser = httpAuthorizeBearerParser;
@@ -123,7 +123,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                 + new QuerystringBuilder()
                         .addParameter("response_type", "code")
                         .addParameter("client_id", oauth2ClientOperations.getClientId())
-                        .addParameter("redirect_uri", hostUrlProvider.provide() + "/callback")
+                        .addParameter("redirect_uri", hostUrlProvider.provide())
                         .addParameter("scope", oauth2ClientOperations.getScope())
                         .addParameter("state", state)
                         .build();
