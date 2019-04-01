@@ -22,9 +22,13 @@ import org.springframework.web.client.RestTemplate;
  */
 public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
 
+    private final String clientId;
+
     private final String basicAuthorization;
 
     private final String authorizationServerHostUrl;
+
+    private final String scope;
 
     private final RestTemplate restTemplate;
 
@@ -32,9 +36,11 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
 
     private final HttpClientIPAddressResolver httpClientIPAddressResolver;
 
-    public DefaultOAuth2ClientOperations(String clientId, String clientSecret, String authorizationServerHostUrl) {
+    public DefaultOAuth2ClientOperations(String clientId, String clientSecret, String authorizationServerHostUrl, String scope) {
+        this.clientId = clientId;
         this.basicAuthorization = Base64Utils.encode(clientId + ":" + clientSecret);
         this.authorizationServerHostUrl = authorizationServerHostUrl;
+        this.scope = scope;
         this.restTemplate = new RestTemplate();
         this.httpServletRequestProvider = new DefaultHttpServletRequestProvider();
         this.httpClientIPAddressResolver = new DefaultHttpClientIPAddressResolver();
@@ -125,6 +131,21 @@ public class DefaultOAuth2ClientOperations implements OAuth2ClientOperations {
                 new HttpEntity<>(request, buildHeaders(accessToken)),
                 responseType
         ).getBody();
+    }
+
+    @Override
+    public String getClientId() {
+        return clientId;
+    }
+
+    @Override
+    public String getAuthorizationServerHostUrl() {
+        return authorizationServerHostUrl;
+    }
+
+    @Override
+    public String getScope() {
+        return scope;
     }
 
 }

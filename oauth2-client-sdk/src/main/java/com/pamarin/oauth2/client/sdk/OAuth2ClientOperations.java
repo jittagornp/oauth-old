@@ -9,6 +9,12 @@ package com.pamarin.oauth2.client.sdk;
  */
 public interface OAuth2ClientOperations {
 
+    String getClientId();
+
+    String getAuthorizationServerHostUrl();
+
+    String getScope();
+
     OAuth2AccessToken getAccessTokenByAuthorizationCode(String authorizationCode);
 
     OAuth2AccessToken getAccessTokenByRefreshToken(String refreshToken);

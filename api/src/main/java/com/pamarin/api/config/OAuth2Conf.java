@@ -23,7 +23,12 @@ public class OAuth2Conf {
     public OAuth2ClientOperations newOAuth2ClientOperations() {
         String clientId = "b98e21b4-ce2a-11e7-abc4-cec278b6b50a";
         String clientSecret = "password";
-        return new DefaultOAuth2ClientOperations(clientId, clientSecret, authorizationServerHostUrl);
+        return new DefaultOAuth2ClientOperations(
+                clientId,
+                clientSecret,
+                authorizationServerHostUrl,
+                "user:public_profile"
+        );
     }
 
 }
