@@ -70,21 +70,21 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenExchangeByHttpGet() throws Exception {
         this.mockMvc.perform(get("/token"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_description\":\"Not support http 'GET'\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Not support http 'GET'\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenNotSetMediaType() throws Exception {
         this.mockMvc.perform(post("/token"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_description\":\"Not support media type 'null'\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Not support media type 'null'\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenEmptyGrantTypeParameter() throws Exception {
         this.mockMvc.perform(post("/token").contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_grant\",\"error_description\":\"Require parameter 'grant_type=authorization_code or grant_type=refresh_token'\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_grant\",\"error_code\":400,\"error_description\":\"Require parameter 'grant_type=authorization_code or grant_type=refresh_token'\"}"));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         )
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_description\":\"Require header 'Authorization' as http basic\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require header 'Authorization' as http basic\"}"));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
                         .with(httpBasic("test", "password"))
         )
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_description\":\"Require parameter code (String)\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter code (String)\"}"));
     }
 
     @Test
@@ -116,7 +116,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
                         .with(httpBasic("test", "password"))
         )
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_description\":\"Require parameter redirect_uri (String)\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter redirect_uri (String)\"}"));
     }
 
     @Test
@@ -127,7 +127,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
                         .with(httpBasic("test", "password"))
         )
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_description\":\"Require parameter refresh_token (String)\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter refresh_token (String)\"}"));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
                         .with(httpBasic("test", "password"))
         )
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_description\":\"Require parameter redirect_uri (String)\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter redirect_uri (String)\"}"));
     }
 
     @Test

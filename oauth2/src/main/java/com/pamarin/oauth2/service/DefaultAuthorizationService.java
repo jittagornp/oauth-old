@@ -10,6 +10,7 @@ import com.pamarin.oauth2.model.AccessTokenResponse;
 import com.pamarin.oauth2.model.AuthorizationResponse;
 import com.pamarin.oauth2.model.ErrorResponse;
 import com.pamarin.commons.provider.HostUrlProvider;
+import com.pamarin.commons.util.QuerystringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,11 +95,12 @@ class DefaultAuthorizationService implements AuthorizationService {
     public String notApprove(AuthorizationRequest req) {
         requestVerification.verify(req);
         String uri = req.getRedirectUri();
-        return uri + (uri.contains("?") ? "&" : "?") + new ErrorResponse.Builder()
-                .setError("not_approve")
-                .setState(req.getState())
-                .build()
-                .buildQuerystring();
+        return uri + (uri.contains("?") ? "&" : "?")
+                + new QuerystringBuilder()
+                        .addParameter("error", "not_approve")
+                        .addParameter("error_code", "403")
+                        .addParameter("state", req.getState())
+                        .build();
     }
 
 }

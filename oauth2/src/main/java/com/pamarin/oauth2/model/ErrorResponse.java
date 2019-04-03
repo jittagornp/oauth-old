@@ -5,29 +5,26 @@ package com.pamarin.oauth2.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pamarin.commons.util.QuerystringBuilder;
-import com.pamarin.commons.validator.ValidUri;
-import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import static org.springframework.util.StringUtils.hasText;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
 /**
  * @author jittagornp <http://jittagornp.me>
  * create : 2017/09/26
  */
+@Getter
+@Setter
+@Builder
 public class ErrorResponse {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ErrorResponse.class);
-
-    private final ValidUri.Validator validUriValidator = new ValidUri.Validator();
-
     private String error;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("error_code")
+    private Integer errorCode;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("error_description")
@@ -40,12 +37,31 @@ public class ErrorResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String state;
 
+    public ErrorResponse() {
+    }
+
+    public ErrorResponse(String error, Integer errorCode, String errorDescription, String errorUri, String state) {
+        this.error = error;
+        this.errorCode = errorCode;
+        this.errorDescription = errorDescription;
+        this.errorUri = errorUri;
+        this.state = state;
+    }
+
     public String getError() {
         return error;
     }
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public Integer getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(Integer errorCode) {
+        this.errorCode = errorCode;
     }
 
     public String getErrorDescription() {
@@ -72,87 +88,6 @@ public class ErrorResponse {
         this.state = state;
     }
 
-    public String toJSON() throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(this);
-    }
-
-    public String buildQuerystring() {
-        return new QuerystringBuilder()
-                .addParameter("error", getError())
-                .addParameter("error_description", getErrorDescription())
-                .addParameter("error_uri", getErrorUri())
-                .addParameter("state", getState())
-                .build();
-    }
-
-    public static class Builder {
-
-        private String error;
-
-        private String errorDescription;
-
-        private String errorUri;
-
-        private String state;
-
-        public Builder setError(String error) {
-            this.error = error;
-            return this;
-        }
-
-        public Builder setErrorDescription(String errorDescription) {
-            this.errorDescription = errorDescription;
-            return this;
-        }
-
-        public Builder setErrorUri(String errorUri) {
-            this.errorUri = errorUri;
-            return this;
-        }
-
-        public Builder setState(String state) {
-            this.state = state;
-            return this;
-        }
-
-        public ErrorResponse build() {
-            ErrorResponse resp = new ErrorResponse();
-            resp.setError(error);
-            resp.setErrorDescription(errorDescription);
-            resp.setErrorUri(errorUri);
-            resp.setState(state);
-            return resp;
-        }
-    }
-
-    public String makeRedirectUri(String redirectUri) {
-        if (!hasText(redirectUri)) {
-            throw new IllegalArgumentException("Required redirectUri.");
-        }
-        return redirectUri + (redirectUri.contains("?") ? "&" : "?")
-                + buildQuerystring();
-    }
-
-    public void returnError(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (isProduceJSON(request)) {
-            response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-            response.getWriter().print(this.toJSON());
-        } else {
-            String uri = request.getParameter("redirect_uri");
-            if (hasText(uri) && validUriValidator.isValid(uri)) {
-                response.sendRedirect(makeRedirectUri(uri));
-            } else {
-                response.setContentType(MediaType.TEXT_HTML_VALUE);
-                response.getWriter().print(getError());
-            }
-        }
-    }
-
-    private boolean isProduceJSON(HttpServletRequest request) {
-        return request.getRequestURI()
-                .matches("/token");
-    }
-
     /**
      * The request is missing a required parameter, includes an unsupported
      * parameter value (other than grant type), repeats a parameter, includes
@@ -162,8 +97,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse invalidRequest() {
-        return new Builder()
-                .setError("invalid_request")
+        return builder()
+                .error("invalid_request")
+                .errorCode(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
@@ -173,8 +109,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse accessDenied() {
-        return new Builder()
-                .setError("access_denied")
+        return builder()
+                .error("access_denied")
+                .errorCode(HttpStatus.FORBIDDEN.value())
                 .build();
     }
 
@@ -185,8 +122,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse unsupportedResponseType() {
-        return new Builder()
-                .setError("unsupported_response_type")
+        return builder()
+                .error("unsupported_response_type")
+                .errorCode(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
@@ -199,8 +137,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse serverError() {
-        return new Builder()
-                .setError("server_error")
+        return builder()
+                .error("server_error")
+                .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .build();
     }
 
@@ -213,8 +152,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse temporarilyUnavailable() {
-        return new Builder()
-                .setError("temporarily_unavailable")
+        return builder()
+                .error("temporarily_unavailable")
+                .errorCode(HttpStatus.SERVICE_UNAVAILABLE.value())
                 .build();
     }
 
@@ -231,8 +171,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse invalidClient() {
-        return new Builder()
-                .setError("invalid_client")
+        return builder()
+                .error("invalid_client")
+                .errorCode(HttpStatus.UNAUTHORIZED.value())
                 .build();
     }
 
@@ -245,8 +186,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse invalidGrant() {
-        return new Builder()
-                .setError("invalid_grant")
+        return builder()
+                .errorCode(HttpStatus.BAD_REQUEST.value())
+                .error("invalid_grant")
                 .build();
     }
 
@@ -257,8 +199,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse unauthorizedClient() {
-        return new Builder()
-                .setError("unauthorized_client")
+        return builder()
+                .error("unauthorized_client")
+                .errorCode(HttpStatus.UNAUTHORIZED.value())
                 .build();
     }
 
@@ -269,8 +212,9 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse unsupportedGrantType() {
-        return new Builder()
-                .setError("unsupported_grant_type")
+        return builder()
+                .error("unsupported_grant_type")
+                .errorCode(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
@@ -281,8 +225,19 @@ public class ErrorResponse {
      * @return response
      */
     public static ErrorResponse invalidScope() {
-        return new Builder()
-                .setError("invalid_scope")
+        return builder()
+                .error("invalid_scope")
+                .errorCode(HttpStatus.BAD_REQUEST.value())
+                .build();
+    }
+
+    public String toQueryString() {
+        return new QuerystringBuilder()
+                .addParameter("error", error)
+                .addParameter("error_code", errorCode == null ? null : ("" + errorCode))
+                .addParameter("error_description", errorDescription)
+                .addParameter("error_uri", errorUri)
+                .addParameter("state", state)
                 .build();
     }
 }

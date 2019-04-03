@@ -44,42 +44,42 @@ public class LoginCtrl_getLoginTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenResponseTypeIsAAA() throws Exception {
         this.mockMvc.perform(get("/login?response_type=AAA"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("invalid_request"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter client_id (String)\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenClientIdIs000000AndRedirectUriIsEmpty() throws Exception {
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("invalid_request"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter redirect_uri (String)\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenEmptyClientIdAndRedirectUriIsAAA() throws Exception {
         this.mockMvc.perform(get("/login?response_type=code&redirect_uri=AAA"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("invalid_request"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter client_id (String)\"}"));
     }
 
     @Test
     public void shouldBeErrorUnsupportResponseType_whenInvalidRedirectUri() throws Exception {
         this.mockMvc.perform(get("/login?response_type=AAA&client_id=000000&redirect_uri=http://localhost/callback"))
-                .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost/callback?error=unsupported_response_type"));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("{\"error\":\"unsupported_response_type\",\"error_code\":400}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenInvalidRedirectUri() throws Exception {
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=AAA"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("invalid_request"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Invalid format 'AAA'\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidScope_whenInvalidScope() throws Exception {
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=write"))
-                .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost/callback?error=invalid_scope"));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("{\"error\":\"invalid_scope\",\"error_code\":400}"));
     }
 
 //    @Test
