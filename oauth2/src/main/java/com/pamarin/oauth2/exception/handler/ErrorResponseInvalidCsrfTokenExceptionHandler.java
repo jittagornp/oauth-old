@@ -7,6 +7,7 @@ import com.pamarin.commons.exception.InvalidCsrfTokenException;
 import com.pamarin.oauth2.model.ErrorResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,7 +24,10 @@ public class ErrorResponseInvalidCsrfTokenExceptionHandler extends ErrorResponse
 
     @Override
     protected ErrorResponse buildError(InvalidCsrfTokenException ex, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        return ErrorResponse.unauthorizedClient();
+        return ErrorResponse.builder()
+                .error("invalid_csrf_token")
+                .errorCode(HttpStatus.FORBIDDEN.value())
+                .build();
     }
 
 }
