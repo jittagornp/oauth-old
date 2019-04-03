@@ -17,7 +17,6 @@ public abstract class ErrorResponseExceptionHandlerAdapter<E extends Exception> 
     protected abstract ErrorResponse buildError(E ex, HttpServletRequest httpReq, HttpServletResponse httpResp);
 
     private ErrorResponse additional(ErrorResponse err, HttpServletResponse httpResp) {
-        //httpResp.setStatus(err.getErrorCode());
         return err;
     }
 

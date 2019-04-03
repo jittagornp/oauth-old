@@ -42,7 +42,6 @@ public class GlobalExceptionHandler {
         if (isRedirectError(httpReq)) {
             String redirectUri = httpReq.getParameter("redirect_uri");
             boolean hasQueryString = redirectUri.contains("?");
-            //httpResp.setStatus(HttpServletResponse.SC_FOUND);
             httpResp.sendRedirect(redirectUri + (hasQueryString ? "&" : "?") + err.toQueryString());
         } else {
             String json = objectMapper.writeValueAsString(err);
