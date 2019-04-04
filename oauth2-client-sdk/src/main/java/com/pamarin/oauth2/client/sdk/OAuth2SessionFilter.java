@@ -96,7 +96,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         } catch (InvalidAuthorizationStateException ex) {
             httpResp.sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
         } catch (OAuth2ErrorException ex) {
-            httpResp.sendError(Integer.parseInt(ex.getErrorCode()), ex.getMessage());
+            httpResp.sendError(ex.getErrorStatus(), ex.getMessage());
         }
     }
 
@@ -116,10 +116,11 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                 }
             } else {
                 String error = httpReq.getParameter("error");
-                String errorCode = httpReq.getParameter("error_code");
+                String errorStatus = httpReq.getParameter("error_status");
                 String errorDescription = httpReq.getParameter("error_description");
-                if (hasText(error) && hasText(errorCode)) {
-                    throw new OAuth2ErrorException(error, errorCode, errorDescription);
+                if (hasText(error) && hasText(errorStatus)) {
+                    verifyAuthorizationState(state, httpReq);
+                    throw new OAuth2ErrorException(error, Integer.valueOf(errorStatus), errorDescription);
                 } else {
                     getSession(httpReq, httpResp);
                 }

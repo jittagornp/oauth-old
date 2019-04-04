@@ -44,21 +44,21 @@ public class AuthorizeEndpointCtrl_authorizeTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenEmptyParameter() throws Exception {
         this.mockMvc.perform(get("/authorize"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter response_type (String)\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter response_type (String)\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenInvalidParameter1() throws Exception {
         this.mockMvc.perform(get("/authorize?response_type=code"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter client_id (String)\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter client_id (String)\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenInvalidParameter2() throws Exception {
         this.mockMvc.perform(get("/authorize?response_type=code&client_id=123456"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter redirect_uri (String)\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter redirect_uri (String)\"}"));
     }
 
 //    @Test
@@ -76,7 +76,7 @@ public class AuthorizeEndpointCtrl_authorizeTest extends IntegrationTestBase {
                 .thenThrow(new InvalidRedirectUriException("/callback", "Invalid redirect_uri."));
         this.mockMvc.perform(get("/authorize?response_type=AAA&client_id=123456&redirect_uri=/callback"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Invalid format '/callback'\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Invalid format '/callback'\"}"));
     }
 
     @Test

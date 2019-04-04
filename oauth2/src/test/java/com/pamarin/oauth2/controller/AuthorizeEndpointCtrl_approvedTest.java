@@ -38,14 +38,14 @@ public class AuthorizeEndpointCtrl_approvedTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenEmptyParameter() throws Exception {
         this.mockMvc.perform(post("/authorize"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter 'answer=approved or answer=not_approve'\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter 'answer=approved or answer=not_approve'\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenInvalidAnswer() throws Exception {
         this.mockMvc.perform(post("/authorize?response_type=code&client_id=123456&redirect_uri=http://localhost/callback"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_code\":400,\"error_description\":\"Require parameter 'answer=approved or answer=not_approve'\"}"));
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter 'answer=approved or answer=not_approve'\"}"));
     }
 
     @Test

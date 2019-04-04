@@ -23,8 +23,8 @@ public class ErrorResponse {
     private String error;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("error_code")
-    private Integer errorCode;
+    @JsonProperty("error_status")
+    private Integer errorStatus;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("error_description")
@@ -40,9 +40,9 @@ public class ErrorResponse {
     public ErrorResponse() {
     }
 
-    public ErrorResponse(String error, Integer errorCode, String errorDescription, String errorUri, String state) {
+    public ErrorResponse(String error, Integer errorStatus, String errorDescription, String errorUri, String state) {
         this.error = error;
-        this.errorCode = errorCode;
+        this.errorStatus = errorStatus;
         this.errorDescription = errorDescription;
         this.errorUri = errorUri;
         this.state = state;
@@ -56,12 +56,12 @@ public class ErrorResponse {
         this.error = error;
     }
 
-    public Integer getErrorCode() {
-        return errorCode;
+    public Integer getErrorStatus() {
+        return errorStatus;
     }
 
-    public void setErrorCode(Integer errorCode) {
-        this.errorCode = errorCode;
+    public void setErrorStatus(Integer errorStatus) {
+        this.errorStatus = errorStatus;
     }
 
     public String getErrorDescription() {
@@ -99,7 +99,7 @@ public class ErrorResponse {
     public static ErrorResponse invalidRequest() {
         return builder()
                 .error("invalid_request")
-                .errorCode(HttpStatus.BAD_REQUEST.value())
+                .errorStatus(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
@@ -111,7 +111,7 @@ public class ErrorResponse {
     public static ErrorResponse accessDenied() {
         return builder()
                 .error("access_denied")
-                .errorCode(HttpStatus.FORBIDDEN.value())
+                .errorStatus(HttpStatus.FORBIDDEN.value())
                 .build();
     }
 
@@ -124,7 +124,7 @@ public class ErrorResponse {
     public static ErrorResponse unsupportedResponseType() {
         return builder()
                 .error("unsupported_response_type")
-                .errorCode(HttpStatus.BAD_REQUEST.value())
+                .errorStatus(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
@@ -139,7 +139,7 @@ public class ErrorResponse {
     public static ErrorResponse serverError() {
         return builder()
                 .error("server_error")
-                .errorCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .errorStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .build();
     }
 
@@ -154,7 +154,7 @@ public class ErrorResponse {
     public static ErrorResponse temporarilyUnavailable() {
         return builder()
                 .error("temporarily_unavailable")
-                .errorCode(HttpStatus.SERVICE_UNAVAILABLE.value())
+                .errorStatus(HttpStatus.SERVICE_UNAVAILABLE.value())
                 .build();
     }
 
@@ -173,7 +173,7 @@ public class ErrorResponse {
     public static ErrorResponse invalidClient() {
         return builder()
                 .error("invalid_client")
-                .errorCode(HttpStatus.UNAUTHORIZED.value())
+                .errorStatus(HttpStatus.UNAUTHORIZED.value())
                 .build();
     }
 
@@ -187,7 +187,7 @@ public class ErrorResponse {
      */
     public static ErrorResponse invalidGrant() {
         return builder()
-                .errorCode(HttpStatus.BAD_REQUEST.value())
+                .errorStatus(HttpStatus.BAD_REQUEST.value())
                 .error("invalid_grant")
                 .build();
     }
@@ -201,7 +201,7 @@ public class ErrorResponse {
     public static ErrorResponse unauthorizedClient() {
         return builder()
                 .error("unauthorized_client")
-                .errorCode(HttpStatus.UNAUTHORIZED.value())
+                .errorStatus(HttpStatus.UNAUTHORIZED.value())
                 .build();
     }
 
@@ -214,7 +214,7 @@ public class ErrorResponse {
     public static ErrorResponse unsupportedGrantType() {
         return builder()
                 .error("unsupported_grant_type")
-                .errorCode(HttpStatus.BAD_REQUEST.value())
+                .errorStatus(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
@@ -227,14 +227,14 @@ public class ErrorResponse {
     public static ErrorResponse invalidScope() {
         return builder()
                 .error("invalid_scope")
-                .errorCode(HttpStatus.BAD_REQUEST.value())
+                .errorStatus(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
     public String toQueryString() {
         return new QuerystringBuilder()
                 .addParameter("error", error)
-                .addParameter("error_code", errorCode == null ? null : ("" + errorCode))
+                .addParameter("error_status", errorStatus == null ? null : ("" + errorStatus))
                 .addParameter("error_description", errorDescription)
                 .addParameter("error_uri", errorUri)
                 .addParameter("state", state)

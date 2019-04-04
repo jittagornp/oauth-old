@@ -45,7 +45,6 @@ public class GlobalExceptionHandler {
             httpResp.sendRedirect(redirectUri + (hasQueryString ? "&" : "?") + err.toQueryString());
         } else {
             String json = objectMapper.writeValueAsString(err);
-            httpResp.setStatus(err.getErrorCode());
             httpResp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
             httpResp.setCharacterEncoding("utf-8");
             httpResp.setContentLength(json.getBytes().length);

@@ -13,14 +13,14 @@ public class OAuth2ErrorException extends RuntimeException {
 
     private final String error;
 
-    private final String errorCode;
+    private final Integer errorStatus;
 
     private final String errorDescription;
 
-    public OAuth2ErrorException(String error, String errorCode, String errorDescription) {
+    public OAuth2ErrorException(String error, Integer errorStatus, String errorDescription) {
         super(hasText(errorDescription) ? errorDescription : error);
         this.error = error;
-        this.errorCode = errorCode;
+        this.errorStatus = errorStatus;
         this.errorDescription = errorDescription;
     }
 
@@ -28,8 +28,8 @@ public class OAuth2ErrorException extends RuntimeException {
         return error;
     }
 
-    public String getErrorCode() {
-        return errorCode;
+    public Integer getErrorStatus() {
+        return errorStatus;
     }
 
     public String getErrorDescription() {

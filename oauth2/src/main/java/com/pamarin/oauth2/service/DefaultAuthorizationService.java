@@ -98,7 +98,7 @@ class DefaultAuthorizationService implements AuthorizationService {
         return uri + (uri.contains("?") ? "&" : "?")
                 + new QuerystringBuilder()
                         .addParameter("error", "not_approve")
-                        .addParameter("error_code", "403")
+                        .addParameter("error_status", "403")
                         .addParameter("state", req.getState())
                         .build();
     }

@@ -32,7 +32,7 @@
 //                .setErrorUri("CCC")
 //                .build();
 //        String output = input.toJSON();
-//        String expected = "{\"error\":\"AAA\",\"error_code\":401,\"error_description\":\"BBB\",\"error_uri\":\"CCC\"}";
+//        String expected = "{\"error\":\"AAA\",\"error_status\":401,\"error_description\":\"BBB\",\"error_uri\":\"CCC\"}";
 //
 //        assertThat(output).isEqualTo(expected);
 //    }

@@ -16,13 +16,15 @@ public abstract class ErrorResponseExceptionHandlerAdapter<E extends Exception> 
 
     protected abstract ErrorResponse buildError(E ex, HttpServletRequest httpReq, HttpServletResponse httpResp);
 
-    private ErrorResponse additional(ErrorResponse err, HttpServletResponse httpResp) {
+    private ErrorResponse additional(ErrorResponse err, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        err.setState(httpReq.getParameter("state"));
+        httpResp.setStatus(err.getErrorStatus() == null ? HttpServletResponse.SC_INTERNAL_SERVER_ERROR : err.getErrorStatus());
         return err;
     }
 
     @Override
     public ErrorResponse handle(E ex, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        return additional(buildError(ex, httpReq, httpResp), httpResp);
+        return additional(buildError(ex, httpReq, httpResp), httpReq, httpResp);
     }
 
 }
