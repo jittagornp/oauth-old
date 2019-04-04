@@ -9,6 +9,8 @@ import com.pamarin.oauth2.model.ErrorResponse;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import static org.springframework.util.StringUtils.hasText;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private final ErrorResponseExceptionHandlerResolver resolver;
 
@@ -37,7 +41,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public void handle(Exception ex, HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException {
+    public void handle(Exception ex, HttpServletRequest httpReq, HttpServletResponse httpResp, Object handler) throws IOException {
+        LOG.debug("handler => {} {}", handler, (handler == null ? "" : handler.getClass().getName()));
+        
         ErrorResponse err = resolver.resolve(ex).handle(ex, httpReq, httpResp);
         if (isRedirectError(httpReq)) {
             String redirectUri = httpReq.getParameter("redirect_uri");
