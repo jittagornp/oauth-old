@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.controller;
 
+import com.pamarin.commons.exception.InvalidSignatureException;
 import com.pamarin.oauth2.converter.HttpServletRequest2AuthorizationRequestConverter;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
@@ -10,6 +11,7 @@ import com.pamarin.oauth2.model.LoginCredential;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.GetCsrfToken;
 import com.pamarin.commons.security.LoginSession;
+import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.oauth2.service.AuthorizationRequestVerification;
 import com.pamarin.commons.view.ModelAndViewBuilder;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.pamarin.oauth2.service.LoginService;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -49,6 +52,9 @@ public class LoginCtrl {
     @Autowired
     private LoginSession loginSession;
 
+    @Autowired
+    private Hashing hashing;
+
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);
         req.requireParameters();
@@ -56,17 +62,28 @@ public class LoginCtrl {
         return req;
     }
 
+    private void verifySignature(String querystring, String signature) throws MissingServletRequestParameterException {
+        if (!hasText(signature)) {
+            throw new MissingServletRequestParameterException("signature", "String");
+        }
+        if (!hashing.matches(querystring.getBytes(), signature)) {
+            throw new InvalidSignatureException("Invalid signature \"" + signature + "\".");
+        }
+    }
+
     @GetCsrfToken
     @GetMapping("/login")
     public ModelAndView login(HttpServletRequest httpReq, HttpServletResponse httpResp) throws MissingServletRequestParameterException, IOException {
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
+        String querystring = req.buildQuerystring();
+        verifySignature(querystring, httpReq.getParameter("signature"));
         if (loginSession.wasCreated()) {
-            httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + req.buildQuerystring());
+            httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + querystring);
         }
         return new ModelAndViewBuilder()
                 .setName("login")
                 .addAttribute("error", httpReq.getParameter("error"))
-                .addAttribute("processUrl", hostUrlProvider.provide() + "/login" + (req.haveSomeParameters() ? ("?" + req.buildQuerystring()) : ""))
+                .addAttribute("processUrl", hostUrlProvider.provide() + "/login" + (req.haveSomeParameters() ? ("?" + querystring) : ""))
                 .build();
     }
 

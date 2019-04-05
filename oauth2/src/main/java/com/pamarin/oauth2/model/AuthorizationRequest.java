@@ -79,10 +79,6 @@ public class AuthorizationRequest implements ClientDetails {
         return "code".equals(responseType);
     }
 
-    public boolean responseTypeIsToken() {
-        return "token".equals(responseType);
-    }
-
     public String buildQuerystring() {
         return new QuerystringBuilder()
                 .addParameter("response_type", responseType)

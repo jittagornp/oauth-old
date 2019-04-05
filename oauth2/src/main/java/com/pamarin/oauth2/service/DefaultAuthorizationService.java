@@ -8,6 +8,7 @@ import com.pamarin.oauth2.exception.RequireApprovalException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.AuthorizationResponse;
 import com.pamarin.commons.provider.HostUrlProvider;
+import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.commons.util.QuerystringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ class DefaultAuthorizationService implements AuthorizationService {
 
     @Autowired
     private AuthorizationRequestVerification requestVerification;
+    
+    @Autowired
+    private Hashing hashing;
 
     private boolean wasApprovedClient(String clientId) {
         return approvalService.wasApprovedByUserIdAndClientId(
@@ -52,7 +56,9 @@ class DefaultAuthorizationService implements AuthorizationService {
             }
             return obtainingAuthorization(req);
         } else {
-            return hostUrlProvider.provide() + "/login?" + req.buildQuerystring();
+            String queryString = req.buildQuerystring();
+            String signature = hashing.hash(queryString.getBytes());
+            return hostUrlProvider.provide() + "/login?" + queryString + "&signature=" + signature;
         }
     }
 

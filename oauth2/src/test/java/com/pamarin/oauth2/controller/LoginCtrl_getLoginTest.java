@@ -5,10 +5,12 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.commons.provider.HostUrlProvider;
+import com.pamarin.commons.security.hashing.Hashing;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,6 +39,9 @@ public class LoginCtrl_getLoginTest extends IntegrationTestBase {
     @MockBean
     private HostUrlProvider hostUrlProvider;
 
+    @MockBean
+    private Hashing hashing;
+    
     @Before
     public void before() {
         when(hostUrlProvider.provide()).thenReturn("http://localhost");
@@ -101,17 +106,31 @@ public class LoginCtrl_getLoginTest extends IntegrationTestBase {
                     assertThat(string).contains("{&quot;error&quot;:&quot;invalid_scope&quot;,&quot;error_status&quot;:400}");
                 });
     }
+    
+    @Test
+    public void shouldBeErrorInvalidRequest_whenSignatureIsNull() throws Exception {
+        this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read"))
+                .andExpect(status().isBadRequest())
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Require parameter signature (String)&quot;}");
+                });
+    }
+    
+    @Test
+    public void shouldBeErrorInvalidSignature_whenSignatureIsAAAAA() throws Exception {
+        this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read&signature=AAAAA"))
+                .andExpect(status().isForbidden())
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_signature&quot;,&quot;error_status&quot;:403,&quot;error_description&quot;:&quot;Invalid signature \\&quot;AAAAA\\&quot;.&quot;}");
+                });
+    }
 
-//    @Test
-//    public void shouldBeOk_whenEmptyScope() throws Exception {
-//        this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback"))
-//                .andExpect(status().isOk())
-//                .andExpect(view().name("login"))
-//                .andExpect(model().attribute("processUrl", "http://localhost/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read"));
-//    }
     @Test
     public void shouldBeOk_whenScopeIsRead() throws Exception {
-        this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read"))
+        when(hashing.matches(any(byte[].class), any(String.class))).thenReturn(true);
+        this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read&signature=BBBBB"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("login"))
                 .andExpect(model().attribute("processUrl", "http://localhost/login?response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));

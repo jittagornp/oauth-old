@@ -5,6 +5,7 @@ package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.HashBasedToken;
+import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.commons.security.hashing.HmacSHA384Hashing;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -65,7 +66,11 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     @Bean
     public HashBasedToken newHashBasedToken() {
-        return new DefaultHashBasedToken(new HmacSHA384Hashing(tokenSecretKey));
+        return new DefaultHashBasedToken(newHashing());
     }
 
+    @Bean
+    public Hashing newHashing(){
+        return new HmacSHA384Hashing(tokenSecretKey);
+    }
 }

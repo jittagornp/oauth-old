@@ -31,25 +31,4 @@ public class AuthorizationRequest_responseTypeIsXXXTest {
         boolean expected = true;
         assertThat(output).isEqualTo(expected);
     }
-
-    @Test
-    public void shouldBeFalse_whenResponseTypeIsBBB() {
-        AuthorizationRequest input = AuthorizationRequest.builder()
-                .responseType("BBB")
-                .build();
-        boolean output = input.responseTypeIsToken();
-        boolean expected = false;
-        assertThat(output).isEqualTo(expected);
-    }
-
-    @Test
-    public void shouldBTrue_whenResponseTypeIsToken() {
-        AuthorizationRequest input = AuthorizationRequest.builder()
-                .responseType("token")
-                .build();
-        boolean output = input.responseTypeIsToken();
-        boolean expected = true;
-        assertThat(output).isEqualTo(expected);
-    }
-
 }

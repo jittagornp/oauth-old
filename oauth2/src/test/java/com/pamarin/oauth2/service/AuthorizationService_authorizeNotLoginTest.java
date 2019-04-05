@@ -6,10 +6,12 @@ package com.pamarin.oauth2.service;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.commons.provider.HostUrlProvider;
+import com.pamarin.commons.security.hashing.Hashing;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -31,11 +33,15 @@ public class AuthorizationService_authorizeNotLoginTest {
 
     @Mock
     private AuthorizationRequestVerification requestVerification;
+    
+    @Mock
+    private Hashing hashing;
 
     @Before
     public void initMocks() {
         MockitoAnnotations.initMocks(this);
         when(hostUrlProvider.provide()).thenReturn("");
+        when(hashing.hash(any(byte[].class))).thenReturn("AAAAA");
     }
 
     @Test
@@ -51,7 +57,7 @@ public class AuthorizationService_authorizeNotLoginTest {
                 .build();
 
         String output = authorizationService.authorize(input);
-        String expected = "/login?" + input.buildQuerystring();
+        String expected = "/login?" + input.buildQuerystring() + "&signature=AAAAA";
         assertThat(output).isEqualTo(expected);
     }
 }
