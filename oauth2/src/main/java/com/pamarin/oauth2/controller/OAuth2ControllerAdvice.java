@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pamarin.commons.validator.ValidUri;
 import com.pamarin.commons.view.ModelAndViewBuilder;
@@ -76,22 +75,14 @@ public class OAuth2ControllerAdvice {
     }
 
     private boolean isRedirectError(HttpServletRequest httpReq) {
-        return isGetAuthorize(httpReq)
-                || isGetLogout(httpReq);
+        return isRedirectGet(httpReq, "/authorize")
+                || isRedirectGet(httpReq, "/logout");
     }
 
-    private boolean isGetAuthorize(HttpServletRequest httpReq) {
+    private boolean isRedirectGet(HttpServletRequest httpReq, String servletPath) {
         String redirectUri = httpReq.getParameter("redirect_uri");
         return "GET".equalsIgnoreCase(httpReq.getMethod())
-                && "/authorize".equals(httpReq.getServletPath())
-                && hasText(redirectUri)
-                && uriValidator.isValid(redirectUri);
-    }
-
-    private boolean isGetLogout(HttpServletRequest httpReq) {
-        String redirectUri = httpReq.getParameter("redirect_uri");
-        return "GET".equalsIgnoreCase(httpReq.getMethod())
-                && "/logout".equals(httpReq.getServletPath())
+                && servletPath.equals(httpReq.getServletPath())
                 && hasText(redirectUri)
                 && uriValidator.isValid(redirectUri);
     }
