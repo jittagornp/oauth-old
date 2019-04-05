@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.domain;
 
+import com.pamarin.commons.util.ObjectEquals;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,20 +41,10 @@ public class OAuth2Client extends AuditingEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OAuth2Client other = (OAuth2Client) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return ObjectEquals.of(this)
+                .equals(obj, (origin, other) -> {
+                    return Objects.equals(origin.getId(), other.getId());
+                });
     }
 
 }

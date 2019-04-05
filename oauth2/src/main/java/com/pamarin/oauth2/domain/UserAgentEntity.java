@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.domain;
 
+import com.pamarin.commons.util.ObjectEquals;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -103,20 +104,10 @@ public class UserAgentEntity implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final UserAgentEntity other = (UserAgentEntity) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return ObjectEquals.of(this)
+                .equals(obj, (origin, other) -> {
+                    return Objects.equals(origin.getId(), other.getId());
+                });
     }
 
 }

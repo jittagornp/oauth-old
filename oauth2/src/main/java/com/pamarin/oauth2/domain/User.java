@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.domain;
 
+import com.pamarin.commons.util.ObjectEquals;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @Entity
 @Table(name = User.TABLE_NAME)
 public class User extends AuditingEntity {
-    
+
     public static final String TABLE_NAME = "user";
 
     @Id
@@ -40,20 +41,10 @@ public class User extends AuditingEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final User other = (User) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return ObjectEquals.of(this)
+                .equals(obj, (origin, other) -> {
+                    return Objects.equals(origin.getId(), other.getId());
+                });
     }
 
 }

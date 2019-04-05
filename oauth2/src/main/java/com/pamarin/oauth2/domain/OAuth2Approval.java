@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.domain;
 
+import com.pamarin.commons.util.ObjectEquals;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -21,7 +22,7 @@ import lombok.Setter;
 @Entity
 @Table(name = OAuth2Approval.TABLE_NAME)
 public class OAuth2Approval extends AuditingEntity {
-    
+
     public static final String TABLE_NAME = "oauth2_approval";
 
     @Getter
@@ -54,23 +55,13 @@ public class OAuth2Approval extends AuditingEntity {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final PK other = (PK) obj;
-            if (!Objects.equals(this.clientId, other.clientId)) {
-                return false;
-            }
-            if (!Objects.equals(this.userId, other.userId)) {
-                return false;
-            }
-            return true;
+            return ObjectEquals.of(this)
+                    .equals(obj, (origin, other) -> {
+                        if (!Objects.equals(origin.getClientId(), other.getClientId())) {
+                            return false;
+                        }
+                        return Objects.equals(origin.getUserId(), other.getUserId());
+                    });
         }
 
     }
@@ -87,20 +78,10 @@ public class OAuth2Approval extends AuditingEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final OAuth2Approval other = (OAuth2Approval) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return ObjectEquals.of(this)
+                .equals(obj, (origin, other) -> {
+                    return Objects.equals(origin.getId(), other.getId());
+                });
     }
 
 }
