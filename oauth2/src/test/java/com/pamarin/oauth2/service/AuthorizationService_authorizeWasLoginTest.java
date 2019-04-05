@@ -135,26 +135,4 @@ public class AuthorizationService_authorizeWasLoginTest {
         String expected = "https://pamarin.com/callback?code=ABCD&state=XYZ";
         assertThat(output).isEqualTo(expected);
     }
-
-    @Test
-    public void shouldBeReturnToken_whenResponseTypeIsToken() {
-        when(accessTokenGenerator.generate(any(AuthorizationRequest.class)))
-                .thenReturn(AccessTokenResponse.builder()
-                        .accessToken("ABCDEF")
-                        .tokenType("bearer")
-                        .expiresIn(3600)
-                        .build());
-
-        AuthorizationRequest input = AuthorizationRequest.builder()
-                .clientId("1234")
-                .redirectUri("https://pamarin.com/callback")
-                .responseType("token")
-                .scope("read")
-                .state("XYZ")
-                .build();
-
-        String output = authorizationService.authorize(input);
-        String expected = "https://pamarin.com/callback#access_token=ABCDEF&state=XYZ&token_type=bearer&expires_in=3600";
-        assertThat(output).isEqualTo(expected);
-    }
 }

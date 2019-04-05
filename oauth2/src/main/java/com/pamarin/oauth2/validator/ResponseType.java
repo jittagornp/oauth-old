@@ -43,8 +43,7 @@ public @interface ResponseType {
                 return false;
             }
 
-            return "code".equals(type)
-                    || "token".equals(type);
+            return "code".equals(type);
         }
 
         public boolean isValid(String type) {

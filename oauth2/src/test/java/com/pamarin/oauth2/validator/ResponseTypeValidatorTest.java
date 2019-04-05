@@ -53,10 +53,10 @@ public class ResponseTypeValidatorTest {
     }
 
     @Test
-    public void shouldBeTrue_whenInputIsToken() {
+    public void shouldBeFalse_whenInputIsToken() {
         String input = "token";
         boolean output = validator.isValid(input);
-        boolean expected = true;
+        boolean expected = false;
         assertThat(output).isEqualTo(expected);
     }
 
