@@ -74,6 +74,7 @@ public class LoginCtrl_postLoginTest extends IntegrationTestBase {
                         .param("username", "test")
                         .param("password", "password")
         )
-                .andExpect(status().isFound());
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("http://localhost/authorize?response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
     }
 }

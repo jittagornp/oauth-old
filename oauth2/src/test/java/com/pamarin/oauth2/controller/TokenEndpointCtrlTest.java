@@ -15,6 +15,8 @@ import org.junit.runner.RunWith;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,6 +29,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -35,6 +40,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @RunWith(SpringRunner.class)
 @WebMvcTest(TokenEndpointCtrl.class)
 public class TokenEndpointCtrlTest extends IntegrationTestBase {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TokenEndpointCtrlTest.class);
 
     @Autowired
     private MockMvc mockMvc;
@@ -68,21 +75,21 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
 
     @Test
     public void shouldBeErrorInvalidRequest_whenExchangeByHttpGet() throws Exception {
-        this.mockMvc.perform(get("/token"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Not support http 'GET'\"}"));
+        this.mockMvc.perform(get("/token").servletPath("/token"))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":405,\"error_description\":\"Not support http 'GET'\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenNotSetMediaType() throws Exception {
-        this.mockMvc.perform(post("/token"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Not support media type 'null'\"}"));
+        this.mockMvc.perform(post("/token").servletPath("/token"))
+                .andExpect(status().isUnsupportedMediaType())
+                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":415,\"error_description\":\"Not support media type 'null'\"}"));
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenEmptyGrantTypeParameter() throws Exception {
-        this.mockMvc.perform(post("/token").contentType(MediaType.APPLICATION_FORM_URLENCODED))
+        this.mockMvc.perform(post("/token").servletPath("/token").contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("{\"error\":\"invalid_grant\",\"error_status\":400,\"error_description\":\"Require parameter 'grant_type=authorization_code or grant_type=refresh_token'\"}"));
     }
@@ -91,6 +98,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenEmptyAuthorizationHeader() throws Exception {
         this.mockMvc.perform(
                 post("/token?grant_type=authorization_code")
+                        .servletPath("/token")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         )
                 .andExpect(status().isBadRequest())
@@ -101,6 +109,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenEmptyCodeParameter() throws Exception {
         this.mockMvc.perform(
                 post("/token?grant_type=authorization_code")
+                        .servletPath("/token")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .with(httpBasic("test", "password"))
         )
@@ -112,6 +121,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenHasCodeButEmptyRedirectUriParameter() throws Exception {
         this.mockMvc.perform(
                 post("/token?grant_type=authorization_code&code=XXX")
+                        .servletPath("/token")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .with(httpBasic("test", "password"))
         )
@@ -123,6 +133,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenEmptyRefreshTokenParameter() throws Exception {
         this.mockMvc.perform(
                 post("/token?grant_type=refresh_token")
+                        .servletPath("/token")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .with(httpBasic("test", "password"))
         )
@@ -134,6 +145,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenHasRefreshTokenButEmptyRedirectUriParameter() throws Exception {
         this.mockMvc.perform(
                 post("/token?grant_type=refresh_token&refresh_token=XXX")
+                        .servletPath("/token")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .with(httpBasic("test", "password"))
         )
@@ -146,6 +158,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
         String code = generateAuthorizationCode();
         this.mockMvc.perform(
                 post("/token?grant_type=authorization_code&code=" + code + "&redirect_uri=http://localhost/callback")
+                        .servletPath("/token")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .with(httpBasic("test", "password"))
         )
@@ -156,6 +169,7 @@ public class TokenEndpointCtrlTest extends IntegrationTestBase {
     public void shouldBeOk_whenGrantTypeIsRefreshToken() throws Exception {
         this.mockMvc.perform(
                 post("/token?grant_type=refresh_token&refresh_token=XXX&redirect_uri=http://localhost/callback")
+                        .servletPath("/token")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .with(httpBasic("test", "password"))
         )

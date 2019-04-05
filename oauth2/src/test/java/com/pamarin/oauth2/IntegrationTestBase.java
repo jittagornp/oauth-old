@@ -53,7 +53,6 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
  */
 @ActiveProfiles("test")
-//@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 public class IntegrationTestBase {
 
     @MockBean

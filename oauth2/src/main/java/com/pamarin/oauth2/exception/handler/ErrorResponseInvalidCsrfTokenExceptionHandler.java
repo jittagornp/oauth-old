@@ -27,6 +27,7 @@ public class ErrorResponseInvalidCsrfTokenExceptionHandler extends ErrorResponse
         return ErrorResponse.builder()
                 .error("invalid_csrf_token")
                 .errorStatus(HttpStatus.FORBIDDEN.value())
+                .errorDescription(ex.getMessage())
                 .build();
     }
 

@@ -15,10 +15,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -33,19 +36,25 @@ public class AuthorizeEndpointCtrl_approvedTest extends IntegrationTestBase {
 
     @MockBean
     private AuthorizationService authorizationService;
-
+    
     @Test
     public void shouldBeErrorInvalidRequest_whenEmptyParameter() throws Exception {
-        this.mockMvc.perform(post("/authorize"))
+        this.mockMvc.perform(post("/authorize").servletPath("/authorize"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter 'answer=approved or answer=not_approve'\"}"));
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Require parameter &#39;answer=approved or answer=not_approve&#39;&quot;}");
+        });
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenInvalidAnswer() throws Exception {
-        this.mockMvc.perform(post("/authorize?response_type=code&client_id=123456&redirect_uri=http://localhost/callback"))
+        this.mockMvc.perform(post("/authorize?response_type=code&client_id=123456&redirect_uri=http://localhost/callback").servletPath("/authorize"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter 'answer=approved or answer=not_approve'\"}"));
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Require parameter &#39;answer=approved or answer=not_approve&#39;&quot;}");
+        });
     }
 
     @Test
@@ -53,7 +62,7 @@ public class AuthorizeEndpointCtrl_approvedTest extends IntegrationTestBase {
         String returnValue = "http://localhost/authorize?response_type=code&client_id=123456&redirect_uri=http%3A%2F%2Flocalhost/callback";
         when(authorizationService.approved(any(AuthorizationRequest.class)))
                 .thenReturn(returnValue);
-        this.mockMvc.perform(post("/authorize?response_type=code&client_id=123456&redirect_uri=http://localhost/callback&answer=approved"))
+        this.mockMvc.perform(post("/authorize?response_type=code&client_id=123456&redirect_uri=http://localhost/callback&answer=approved").servletPath("/authorize"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl(returnValue));
     }

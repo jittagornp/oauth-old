@@ -5,6 +5,7 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.commons.provider.HostUrlProvider;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -44,42 +46,60 @@ public class LoginCtrl_getLoginTest extends IntegrationTestBase {
     public void shouldBeErrorInvalidRequest_whenResponseTypeIsAAA() throws Exception {
         this.mockMvc.perform(get("/login?response_type=AAA"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter client_id (String)\"}"));
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Require parameter client_id (String)&quot;}");
+                });
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenClientIdIs000000AndRedirectUriIsEmpty() throws Exception {
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter redirect_uri (String)\"}"));
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Require parameter redirect_uri (String)&quot;}");
+                });
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenEmptyClientIdAndRedirectUriIsAAA() throws Exception {
         this.mockMvc.perform(get("/login?response_type=code&redirect_uri=AAA"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Require parameter client_id (String)\"}"));
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Require parameter client_id (String)&quot;}");
+                });
     }
 
     @Test
     public void shouldBeErrorUnsupportResponseType_whenInvalidRedirectUri() throws Exception {
         this.mockMvc.perform(get("/login?response_type=AAA&client_id=000000&redirect_uri=http://localhost/callback"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"unsupported_response_type\",\"error_status\":400}"));
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;unsupported_response_type&quot;,&quot;error_status&quot;:400}");
+                });
     }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenInvalidRedirectUri() throws Exception {
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=AAA"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_request\",\"error_status\":400,\"error_description\":\"Invalid format 'AAA'\"}"));
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Invalid format &#39;AAA&#39;&quot;}");
+                });
     }
 
     @Test
     public void shouldBeErrorInvalidScope_whenInvalidScope() throws Exception {
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=write"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("{\"error\":\"invalid_scope\",\"error_status\":400}"));
+                .andExpect((MvcResult mr) -> {
+                    String string = mr.getResponse().getContentAsString();
+                    assertThat(string).contains("{&quot;error&quot;:&quot;invalid_scope&quot;,&quot;error_status&quot;:400}");
+                });
     }
 
 //    @Test
