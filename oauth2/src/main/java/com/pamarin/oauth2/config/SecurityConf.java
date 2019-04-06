@@ -79,7 +79,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     @Bean
     public StringSignature newStringSignature() {
-        final Hashing hashing = new ShortHashing(newHashing(), 11);
+        final Hashing hashing = new ShortHashing(newHashing(), 19);
         return new StringSignatureAdapter() {
             @Override
             protected Hashing getHashing() {
