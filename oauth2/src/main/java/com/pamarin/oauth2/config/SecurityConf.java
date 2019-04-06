@@ -7,6 +7,9 @@ import com.pamarin.commons.security.DefaultHashBasedToken;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.commons.security.hashing.HmacSHA384Hashing;
+import com.pamarin.commons.security.hashing.ShortHashing;
+import com.pamarin.commons.security.hashing.StringSignature;
+import com.pamarin.commons.security.hashing.StringSignatureAdapter;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,7 +73,18 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public Hashing newHashing(){
+    public Hashing newHashing() {
         return new HmacSHA384Hashing(tokenSecretKey);
+    }
+
+    @Bean
+    public StringSignature newStringSignature() {
+        final Hashing hashing = new ShortHashing(newHashing(), 11);
+        return new StringSignatureAdapter() {
+            @Override
+            protected Hashing getHashing() {
+                return hashing;
+            }
+        };
     }
 }

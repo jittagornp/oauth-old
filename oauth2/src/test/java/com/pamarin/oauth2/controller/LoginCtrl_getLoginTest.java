@@ -3,14 +3,16 @@
  */
 package com.pamarin.oauth2.controller;
 
+import com.pamarin.commons.exception.InvalidSignatureException;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.commons.provider.HostUrlProvider;
-import com.pamarin.commons.security.hashing.Hashing;
+import com.pamarin.commons.security.hashing.StringSignature;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,9 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -40,7 +40,7 @@ public class LoginCtrl_getLoginTest extends IntegrationTestBase {
     private HostUrlProvider hostUrlProvider;
 
     @MockBean
-    private Hashing hashing;
+    private StringSignature stringSignature;
     
     @Before
     public void before() {
@@ -109,6 +109,7 @@ public class LoginCtrl_getLoginTest extends IntegrationTestBase {
     
     @Test
     public void shouldBeErrorInvalidRequest_whenSignatureIsNull() throws Exception {
+        doThrow(IllegalArgumentException.class).when(stringSignature).verify(any(String.class), any(String.class));        
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read"))
                 .andExpect(status().isBadRequest())
                 .andExpect((MvcResult mr) -> {
@@ -119,6 +120,7 @@ public class LoginCtrl_getLoginTest extends IntegrationTestBase {
     
     @Test
     public void shouldBeErrorInvalidSignature_whenSignatureIsAAAAA() throws Exception {
+        doThrow(new InvalidSignatureException("Invalid signature \"AAAAA\".")).when(stringSignature).verify(any(String.class), any(String.class));        
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read&signature=AAAAA"))
                 .andExpect(status().isForbidden())
                 .andExpect((MvcResult mr) -> {
@@ -129,7 +131,6 @@ public class LoginCtrl_getLoginTest extends IntegrationTestBase {
 
     @Test
     public void shouldBeOk_whenScopeIsRead() throws Exception {
-        when(hashing.matches(any(byte[].class), any(String.class))).thenReturn(true);
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read&signature=BBBBB"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("login"))

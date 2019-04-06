@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.controller;
 
-import com.pamarin.commons.exception.InvalidSignatureException;
 import com.pamarin.oauth2.converter.HttpServletRequest2AuthorizationRequestConverter;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
@@ -11,7 +10,6 @@ import com.pamarin.oauth2.model.LoginCredential;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.GetCsrfToken;
 import com.pamarin.commons.security.LoginSession;
-import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.oauth2.service.AuthorizationRequestVerification;
 import com.pamarin.commons.view.ModelAndViewBuilder;
 import java.io.IOException;
@@ -26,7 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.pamarin.oauth2.service.LoginService;
-import static org.springframework.util.StringUtils.hasText;
+import com.pamarin.commons.security.hashing.StringSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -53,7 +51,7 @@ public class LoginCtrl {
     private LoginSession loginSession;
 
     @Autowired
-    private Hashing hashing;
+    private StringSignature stringSignature;
 
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);
@@ -63,11 +61,10 @@ public class LoginCtrl {
     }
 
     private void verifySignature(String querystring, String signature) throws MissingServletRequestParameterException {
-        if (!hasText(signature)) {
+        try {
+            stringSignature.verify(querystring, signature);
+        } catch (IllegalArgumentException ex) {
             throw new MissingServletRequestParameterException("signature", "String");
-        }
-        if (!hashing.matches(querystring.getBytes(), signature)) {
-            throw new InvalidSignatureException("Invalid signature \"" + signature + "\".");
         }
     }
 

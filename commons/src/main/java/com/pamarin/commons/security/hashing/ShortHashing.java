@@ -16,8 +16,8 @@ public class ShortHashing extends AbstractHashing {
     public ShortHashing(Hashing hashing, int length) {
         this.hashing = hashing;
         this.length = length;
-        if (length < 32) {
-            throw new IllegalArgumentException("length must more than or equals 32.");
+        if (length < 8) {
+            throw new IllegalArgumentException("length must more than or equals 8.");
         }
     }
 

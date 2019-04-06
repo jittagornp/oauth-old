@@ -7,6 +7,7 @@ import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.hashing.Hashing;
+import com.pamarin.commons.security.hashing.StringSignature;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,13 +36,13 @@ public class AuthorizationService_authorizeNotLoginTest {
     private AuthorizationRequestVerification requestVerification;
     
     @Mock
-    private Hashing hashing;
+    private StringSignature stringSignature;
 
     @Before
     public void initMocks() {
         MockitoAnnotations.initMocks(this);
         when(hostUrlProvider.provide()).thenReturn("");
-        when(hashing.hash(any(byte[].class))).thenReturn("AAAAA");
+        when(stringSignature.sign(any(String.class))).thenReturn("AAAAA");
     }
 
     @Test
