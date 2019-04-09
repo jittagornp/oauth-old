@@ -33,7 +33,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         "/",
                         "/code",
                         "/authorize",
-                        "logout"
+                        "/logout"
                 )
                 .permitAll()
                 .anyRequest()
