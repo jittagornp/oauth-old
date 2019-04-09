@@ -21,6 +21,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/17
+ * 
+ * Implement follow https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md
  */
 public class CsrfInterceptor extends HandlerInterceptorAdapter {
 
