@@ -4,9 +4,7 @@
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.InvalidCsrfTokenException;
-import com.pamarin.commons.resolver.HttpRequestOriginResolver;
 import java.net.MalformedURLException;
-import java.net.URL;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +16,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/18
@@ -37,39 +34,20 @@ public class CsrfInterceptor_preHandleTest {
     private HttpServletResponse httpResp;
 
     private AuthenticityToken authenticityToken;
-    
-    private HttpRequestOriginResolver httpRequestOriginResolver;
-
+ 
     @Before
     public void before() throws MalformedURLException {
-        interceptor = new CsrfInterceptor();
+        interceptor = new CsrfInterceptor("https://pamarin.com", 44);
         httpReq = mock(HttpServletRequest.class);
         httpResp = mock(HttpServletResponse.class);
         authenticityToken = mock(AuthenticityToken.class);
-        
-        httpRequestOriginResolver = mock(HttpRequestOriginResolver.class);
-        when(httpRequestOriginResolver.resolve(httpReq)).thenReturn(new URL("https://pamarin.com"));
 
         HttpSession httpSession = mock(HttpSession.class);
         when(httpReq.getSession()).thenReturn(httpSession);
         
-        ReflectionTestUtils.setField(
-                interceptor,
-                "hostUrl",
-                "https://pamarin.com"
-        );
-
-        ReflectionTestUtils.setField(
-                interceptor,
-                "authenticityToken",
-                authenticityToken
-        );
+        when(httpReq.getHeader("Origin")).thenReturn("https://pamarin.com");
         
-        ReflectionTestUtils.setField(
-                interceptor,
-                "httpRequestOriginResolver",
-                httpRequestOriginResolver
-        );
+        interceptor.setAuthenticityToken(authenticityToken);
     }
 
     @Test

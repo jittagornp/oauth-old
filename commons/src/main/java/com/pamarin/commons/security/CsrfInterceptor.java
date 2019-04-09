@@ -5,25 +5,15 @@ package com.pamarin.commons.security;
 
 import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.commons.exception.InvalidCsrfTokenException;
-import com.pamarin.commons.exception.InvalidURLException;
-import com.pamarin.commons.resolver.HttpRequestOriginResolver;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import static org.springframework.util.StringUtils.hasText;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -40,17 +30,20 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
     private static final String CSRF_ATTRIBUTE_VALUE = "csrfToken";
     private static final String CSRF_HEADER_KEY = "X-CSRF-Token";
 
-    @NotBlank
-    @Value("${server.hostUrl}")
-    private String hostUrl;
-
-    @Autowired
+    private final String hostUrl;
     private AuthenticityToken authenticityToken;
-
-    @Autowired
-    private HttpRequestOriginResolver httpRequestOriginResolver;
-
+    private final HttpRequestSameOriginVerifier sameOriginVerifier;
     private List<String> ignorePaths;
+
+    public CsrfInterceptor(String hostUrl, int tokenSize) {
+        this.hostUrl = hostUrl;
+        this.sameOriginVerifier = new DefaultHttpRequestSameOriginVerifier(hostUrl);
+        this.authenticityToken = new DefaultAuthenticityToken(tokenSize);
+    }
+
+    public void setAuthenticityToken(AuthenticityToken authenticityToken) {
+        this.authenticityToken = authenticityToken;
+    }
 
     public void setIgnorePaths(String... ignorePaths) {
         this.ignorePaths = Arrays.asList(ignorePaths);
@@ -79,7 +72,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         }
 
         //1. Verify Same Origin
-        verifySameOrigin(httpReq);
+        sameOriginVerifier.verify(httpReq);
 
         //2. Check Double Submit Cookie 
         String csrfToken = getCsrfToken(httpReq);
@@ -87,44 +80,12 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         doubleSubmitCookie(csrfToken, csrfCookie);
 
         //3. Verify CSRF token in Session
-        synchronizerCSRFTokens(csrfToken, httpReq);
+        synchronizerSession(csrfToken, httpReq);
 
         return true;
     }
 
-    private URL getRequestOrign(HttpServletRequest httpReq) {
-        try {
-            return httpRequestOriginResolver.resolve(httpReq);
-        } catch (InvalidURLException ex) {
-            throw new InvalidCsrfTokenException("Invalid same origin.");
-        }
-    }
-
-    private URL getHostURL() {
-        try {
-            return new URL(hostUrl);
-        } catch (MalformedURLException ex) {
-            throw new InvalidURLException("Invalid hostUrl format.");
-        }
-    }
-
-    private void verifySameOrigin(HttpServletRequest httpReq) {
-        URL origin = getRequestOrign(httpReq);
-        URL host = getHostURL();
-        if (!Objects.equals(origin.getProtocol(), host.getProtocol())) {
-            throw new InvalidCsrfTokenException("Invalid same origin, protocol.");
-        }
-
-        if (!Objects.equals(origin.getHost(), host.getHost())) {
-            throw new InvalidCsrfTokenException("Invalid same origin, host.");
-        }
-
-        if (!Objects.equals(origin.getPort(), host.getPort())) {
-            throw new InvalidCsrfTokenException("Invalid same origin, port.");
-        }
-    }
-
-    private void synchronizerCSRFTokens(String csrfToken, HttpServletRequest httpReq) {
+    private void synchronizerSession(String csrfToken, HttpServletRequest httpReq) {
         String token = authenticityToken.decode(csrfToken);
         if (!hasText(token)) {
             throw new InvalidCsrfTokenException("Can't decode csrf token");

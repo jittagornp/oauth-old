@@ -14,7 +14,6 @@ import org.junit.rules.ExpectedException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,7 +34,7 @@ public class CsrfInterceptor_postHandleTest {
 
     @Before
     public void before() {
-        interceptor = new CsrfInterceptor();
+        interceptor = new CsrfInterceptor("https://pamarin.com", 44);
         httpReq = mock(HttpServletRequest.class);
         httpResp = mock(HttpServletResponse.class);
         authenticityToken = mock(AuthenticityToken.class);
@@ -43,17 +42,7 @@ public class CsrfInterceptor_postHandleTest {
         HttpSession httpSession = mock(HttpSession.class);
         when(httpReq.getSession()).thenReturn(httpSession);
 
-        ReflectionTestUtils.setField(
-                interceptor,
-                "authenticityToken",
-                authenticityToken
-        );
-
-        ReflectionTestUtils.setField(
-                interceptor,
-                "hostUrl",
-                "http://localhost"
-        );
+        interceptor.setAuthenticityToken(authenticityToken);
     }
 
     private HandlerMethod getHandlerMethod(String methodName) throws NoSuchMethodException {

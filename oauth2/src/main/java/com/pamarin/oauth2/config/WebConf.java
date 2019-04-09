@@ -78,7 +78,7 @@ public class WebConf extends WebMvcConfigurerAdapter {
 
     @Bean
     public CsrfInterceptor newCsrfInterceptor() {
-        CsrfInterceptor interceptor = new CsrfInterceptor();
+        CsrfInterceptor interceptor = new CsrfInterceptor(hostUrl, 44);
         interceptor.setIgnorePaths(
                 "/",
                 "/token",
@@ -96,11 +96,6 @@ public class WebConf extends WebMvcConfigurerAdapter {
     @Bean
     public UserAgentTokenIdResolver newUserAgentTokenIdResolver() {
         return new DefaultUserAgentTokenIdResolver(USER_AGENT_COOKIE_NAME);
-    }
-
-    @Bean
-    public AuthenticityToken newAuthenticityToken() {
-        return new DefaultAuthenticityToken(44);
     }
 
     @Bean
