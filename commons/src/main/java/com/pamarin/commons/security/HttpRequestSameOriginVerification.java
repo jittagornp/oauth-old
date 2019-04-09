@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author jitta
  */
-public interface HttpRequestSameOriginVerifier {
+public interface HttpRequestSameOriginVerification {
 
     void verify(HttpServletRequest httpReq);
 

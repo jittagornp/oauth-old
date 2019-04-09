@@ -37,12 +37,12 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
     private final String hostUrl;
     private AuthenticityToken authenticityToken;
     private final HttpCookieResolver cookieResolver;
-    private final HttpRequestSameOriginVerifier sameOriginVerifier;
+    private final HttpRequestSameOriginVerification sameOriginVerification;
     private List<String> ignorePaths;
 
     public CsrfInterceptor(String hostUrl, int tokenSize) {
         this.hostUrl = hostUrl;
-        this.sameOriginVerifier = new DefaultHttpRequestSameOriginVerifier(hostUrl);
+        this.sameOriginVerification = new DefaultHttpRequestSameOriginVerification(hostUrl);
         this.authenticityToken = new DefaultAuthenticityToken(tokenSize);
         this.cookieResolver = new DefaultHttpCookieResolver(CSRF_PARAM_VALUE);
     }
@@ -78,7 +78,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         }
 
         //1. Verify Same Origin
-        sameOriginVerifier.verify(httpReq);
+        sameOriginVerification.verify(httpReq);
 
         //2. Check Double Submit Cookie 
         String csrfToken = getCsrfToken(httpReq);

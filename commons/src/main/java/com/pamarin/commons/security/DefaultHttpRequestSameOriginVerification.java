@@ -16,13 +16,13 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author jitta
  */
-public class DefaultHttpRequestSameOriginVerifier implements HttpRequestSameOriginVerifier {
+public class DefaultHttpRequestSameOriginVerification implements HttpRequestSameOriginVerification {
 
     private final URL origin;
 
     private final HttpRequestOriginResolver httpRequestOriginResolver;
 
-    public DefaultHttpRequestSameOriginVerifier(String originUrl) {
+    public DefaultHttpRequestSameOriginVerification(String originUrl) {
         try {
             this.origin = new URL(originUrl);
         } catch (MalformedURLException ex) {
