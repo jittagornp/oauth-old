@@ -80,12 +80,12 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         doubleSubmitCookie(csrfToken, csrfCookie);
 
         //3. Verify CSRF token in Session
-        synchronizerSession(csrfToken, httpReq);
+        synchronizeSession(csrfToken, httpReq);
 
         return true;
     }
 
-    private void synchronizerSession(String csrfToken, HttpServletRequest httpReq) {
+    private void synchronizeSession(String csrfToken, HttpServletRequest httpReq) {
         String token = authenticityToken.decode(csrfToken);
         if (!hasText(token)) {
             throw new InvalidCsrfTokenException("Can't decode csrf token");

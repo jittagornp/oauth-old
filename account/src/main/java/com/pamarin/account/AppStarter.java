@@ -15,7 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.pamarin")
 public class AppStarter {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         SpringApplication.run(AppStarter.class, args);
     }
 

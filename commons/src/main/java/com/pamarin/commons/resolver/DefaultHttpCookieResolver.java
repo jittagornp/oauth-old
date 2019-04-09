@@ -32,7 +32,7 @@ public class DefaultHttpCookieResolver implements HttpCookieResolver {
 
         return Stream.of(cookies)
                 .filter(cookie -> cookie != null && cookieName.equalsIgnoreCase(cookie.getName()))
-                .map(cookie -> cookie.getValue())
+                .map(Cookie::getValue)
                 .findFirst()
                 .orElse(null);
     }

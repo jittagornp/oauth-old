@@ -16,6 +16,14 @@ import lombok.Setter;
 @Builder
 public class UserAgent {
 
+    private static final String UNKNOWN_KEY = "UNKNOWN";
+
+    private static final String UNKNOWN_NAME = "Unknown";
+
+    private static final String OTHER_KEY = "OTHER";
+    
+    private static final String OTHER_NAME = "Other";
+
     private String deviceTypeKey; //COMPUTER, MOBILE, TABLET, WEARABLE
     private String deviceTypeName; //Computer
 
@@ -47,23 +55,23 @@ public class UserAgent {
 
     public static UserAgent unknown() {
         return builder()
-                .deviceTypeKey("UNKNOWN")
-                .deviceTypeName("Unknown")
-                .browserTypeKey("UNKNOWN")
+                .deviceTypeKey(UNKNOWN_KEY)
+                .deviceTypeName(UNKNOWN_NAME)
+                .browserTypeKey(UNKNOWN_KEY)
                 .browserTypeName("unknown")
-                .browserKey("UNKNOWN")
-                .browserName("Unknown")
-                .browserGroupKey("UNKNOWN")
-                .browserGroupName("Unknown")
-                .browserRenderingEngine("OTHER")
-                .browserManufacturerKey("OTHER")
-                .browserManufacturerName("Other")
-                .osManufacturerKey("OTHER")
-                .osManufacturerName("Other")
-                .osGroupKey("UNKNOWN")
-                .osGroupName("Unknown")
-                .osKey("UNKNOWN")
-                .osName("Unknown")
+                .browserKey(UNKNOWN_KEY)
+                .browserName(UNKNOWN_NAME)
+                .browserGroupKey(UNKNOWN_KEY)
+                .browserGroupName(UNKNOWN_NAME)
+                .browserRenderingEngine(OTHER_KEY)
+                .browserManufacturerKey(OTHER_KEY)
+                .browserManufacturerName(OTHER_NAME)
+                .osManufacturerKey(OTHER_KEY)
+                .osManufacturerName(OTHER_NAME)
+                .osGroupKey(UNKNOWN_KEY)
+                .osGroupName(UNKNOWN_NAME)
+                .osKey(UNKNOWN_KEY)
+                .osName(UNKNOWN_NAME)
                 .agentVersion(null)
                 .agentMajorVersion(null)
                 .agentMinorVersion(null)
