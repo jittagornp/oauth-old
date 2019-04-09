@@ -31,6 +31,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -65,6 +66,9 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
 
     private final HttpAuthorizeBearerParser httpAuthorizeBearerParser;
 
+    @Value("${oauth2.session-filter.disabled}")
+    private Boolean disabled;
+
     @Autowired
     public OAuth2SessionFilter(
             HostUrlProvider hostUrlProvider,
@@ -78,6 +82,18 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         this.oauth2AccessTokenResolver = oauth2AccessTokenResolver;
         this.oauth2RefreshTokenResolver = oauth2RefreshTokenResolver;
         this.httpAuthorizeBearerParser = httpAuthorizeBearerParser;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        if (disabled == null) {
+            return false;
+        }
+        return disabled;
     }
 
     @Override
