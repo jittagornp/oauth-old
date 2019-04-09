@@ -7,7 +7,6 @@ import com.pamarin.commons.util.HttpAuthorizeBearerParser;
 import com.pamarin.oauth2.DatabaseSessionRepoImpl;
 import com.pamarin.oauth2.security.SessionCookieSerializer;
 import com.pamarin.oauth2.service.AccessTokenVerification;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,14 +31,8 @@ public class SessionConf {
     @Value("${server.hostUrl}")
     private String hostUrl;
 
-    @Autowired
-    private HttpAuthorizeBearerParser httpAuthorizeBearerParser;
-
-    @Autowired
-    private AccessTokenVerification accessTokenVerification;
-
     @Bean
-    public CookieSerializer newCookieSerializer() {
+    public CookieSerializer newCookieSerializer(HttpAuthorizeBearerParser httpAuthorizeBearerParser, AccessTokenVerification accessTokenVerification) {
         SessionCookieSerializer cookieSerializer = new SessionCookieSerializer(
                 "user-session",
                 secretKey,

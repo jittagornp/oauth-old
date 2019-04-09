@@ -5,7 +5,6 @@ package com.pamarin.oauth2.config;
 
 import com.pamarin.oauth2.RedisSessionRepositoryImpl;
 import com.pamarin.oauth2.RevokeTokenServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,11 +32,8 @@ public class RedisConf extends SpringHttpSessionConfiguration {
     @Value("${spring.session.redis.flush-mode}")
     private String flushMode;
 
-    @Autowired
-    private DatabaseSessionRepo databaseSessionRepo;
-    
     @Bean
-    public SessionRepository sessionRepository(RedisConnectionFactory factory) {
+    public SessionRepository sessionRepository(RedisConnectionFactory factory, DatabaseSessionRepo databaseSessionRepo) {
         RedisSessionRepositoryImpl sessionRepository = new RedisSessionRepositoryImpl(factory);
         sessionRepository.setRedisKeyNamespace(namespace);
         sessionRepository.setDefaultMaxInactiveInterval(sessionTimeout);

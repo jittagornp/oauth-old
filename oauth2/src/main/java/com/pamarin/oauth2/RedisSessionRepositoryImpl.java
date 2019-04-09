@@ -8,8 +8,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisOperations;
@@ -25,7 +23,7 @@ import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 /**
  * @author Jitta
  */
-public class RedisSessionRepositoryImpl implements FindByIndexNameSessionRepository<RedisSession>, MessageListener {
+public class RedisSessionRepositoryImpl implements FindByIndexNameSessionRepository<RedisSession> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSessionRepositoryImpl.class);
 
@@ -136,11 +134,6 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
             redisSession.setMaxInactiveIntervalInSeconds(this.defaultMaxInactiveInterval);
         }
         return redisSession;
-    }
-
-    @Override
-    public void onMessage(Message message, byte[] pattern) {
-
     }
 
     public void setRedisKeyNamespace(String namespace) {
