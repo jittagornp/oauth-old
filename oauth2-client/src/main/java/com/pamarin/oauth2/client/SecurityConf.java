@@ -31,7 +31,9 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         "/assets/**",
                         "/favicon.ico",
                         "/",
-                        "/code"
+                        "/code",
+                        "/authorize",
+                        "logout"
                 )
                 .permitAll()
                 .anyRequest()
