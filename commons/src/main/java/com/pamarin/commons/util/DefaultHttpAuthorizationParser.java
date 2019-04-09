@@ -7,7 +7,6 @@ import com.pamarin.commons.exception.InvalidHttpAuthorizationException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
-import static org.springframework.util.StringUtils.hasText;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03
@@ -23,7 +22,7 @@ public class DefaultHttpAuthorizationParser implements HttpAuthorizationParser {
 
         Pattern pattern = Pattern.compile("^" + type + "\\s(.*?)$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(authorization);
-        while (matcher.find()) {
+        if (matcher.find()) {
             return matcher.group(1);
         }
 

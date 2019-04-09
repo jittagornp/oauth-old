@@ -5,6 +5,8 @@ package com.pamarin.commons.security;
 
 import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.commons.exception.InvalidCsrfTokenException;
+import com.pamarin.commons.resolver.DefaultHttpCookieResolver;
+import com.pamarin.commons.resolver.HttpCookieResolver;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
 
     private final String hostUrl;
     private AuthenticityToken authenticityToken;
+    private final HttpCookieResolver cookieResolver;
     private final HttpRequestSameOriginVerifier sameOriginVerifier;
     private List<String> ignorePaths;
 
@@ -41,6 +44,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         this.hostUrl = hostUrl;
         this.sameOriginVerifier = new DefaultHttpRequestSameOriginVerifier(hostUrl);
         this.authenticityToken = new DefaultAuthenticityToken(tokenSize);
+        this.cookieResolver = new DefaultHttpCookieResolver(CSRF_PARAM_VALUE);
     }
 
     public void setAuthenticityToken(AuthenticityToken authenticityToken) {
@@ -78,7 +82,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
 
         //2. Check Double Submit Cookie 
         String csrfToken = getCsrfToken(httpReq);
-        String csrfCookie = getCsrfCookie(httpReq);
+        String csrfCookie = cookieResolver.resolve(httpReq);
         doubleSubmitCookie(csrfToken, csrfCookie);
 
         //3. Verify CSRF token in Session
@@ -117,18 +121,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         }
         return csrfToken;
     }
-
-    private String getCsrfCookie(HttpServletRequest httpReq) {
-        if (httpReq.getCookies() == null) {
-            return null;
-        }
-        return Arrays.stream(httpReq.getCookies())
-                .filter(c -> CSRF_PARAM_VALUE.equals(c.getName()))
-                .findFirst()
-                .map(c -> c.getValue())
-                .orElse(null);
-    }
-
+    
     private boolean isHandlerMethod(Object handler) {
         return handler instanceof HandlerMethod;
     }
