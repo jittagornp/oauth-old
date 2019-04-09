@@ -135,6 +135,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                 String errorStatus = httpReq.getParameter("error_status");
                 String errorDescription = httpReq.getParameter("error_description");
                 if (hasText(error) && hasText(errorStatus)) {
+                    LOG.debug("authorization server return error => {} : {}", error, errorStatus);
                     if (hasText(state)) {
                         verifyAuthorizationState(state, httpReq);
                     }
@@ -173,6 +174,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
     }
 
     private void verifyAuthorizationState(String state, HttpServletRequest httpReq) {
+        LOG.debug("verify authorization state => {}", state);
         HttpSession session = httpReq.getSession(false);
         if (session != null) {
             String sessionState = (String) session.getAttribute(OAUTH2_AUTHORIZATION_STATE);
