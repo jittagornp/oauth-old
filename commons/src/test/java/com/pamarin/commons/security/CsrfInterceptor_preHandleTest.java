@@ -4,6 +4,9 @@
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.InvalidCsrfTokenException;
+import com.pamarin.commons.resolver.HttpRequestOriginResolver;
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,21 +37,38 @@ public class CsrfInterceptor_preHandleTest {
     private HttpServletResponse httpResp;
 
     private AuthenticityToken authenticityToken;
+    
+    private HttpRequestOriginResolver httpRequestOriginResolver;
 
     @Before
-    public void before() {
+    public void before() throws MalformedURLException {
         interceptor = new CsrfInterceptor();
         httpReq = mock(HttpServletRequest.class);
         httpResp = mock(HttpServletResponse.class);
         authenticityToken = mock(AuthenticityToken.class);
+        
+        httpRequestOriginResolver = mock(HttpRequestOriginResolver.class);
+        when(httpRequestOriginResolver.resolve(httpReq)).thenReturn(new URL("https://pamarin.com"));
 
         HttpSession httpSession = mock(HttpSession.class);
         when(httpReq.getSession()).thenReturn(httpSession);
+        
+        ReflectionTestUtils.setField(
+                interceptor,
+                "hostUrl",
+                "https://pamarin.com"
+        );
 
         ReflectionTestUtils.setField(
                 interceptor,
                 "authenticityToken",
                 authenticityToken
+        );
+        
+        ReflectionTestUtils.setField(
+                interceptor,
+                "httpRequestOriginResolver",
+                httpRequestOriginResolver
         );
     }
 

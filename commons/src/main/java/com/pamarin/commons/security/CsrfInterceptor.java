@@ -5,12 +5,18 @@ package com.pamarin.commons.security;
 
 import com.pamarin.commons.util.CookieSpecBuilder;
 import com.pamarin.commons.exception.InvalidCsrfTokenException;
+import com.pamarin.commons.exception.InvalidURLException;
+import com.pamarin.commons.resolver.HttpRequestOriginResolver;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +47,9 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private AuthenticityToken authenticityToken;
 
+    @Autowired
+    private HttpRequestOriginResolver httpRequestOriginResolver;
+
     private List<String> ignorePaths;
 
     public void setIgnorePaths(String... ignorePaths) {
@@ -69,13 +78,50 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
 
+        //1. Verify Same Origin
+        verifySameOrigin(httpReq);
+
+        //2. Check Double Submit Cookie 
         String csrfToken = getCsrfToken(httpReq);
         String csrfCookie = getCsrfCookie(httpReq);
-
         doubleSubmitCookie(csrfToken, csrfCookie);
+
+        //3. Verify CSRF token in Session
         synchronizerCSRFTokens(csrfToken, httpReq);
 
         return true;
+    }
+
+    private URL getRequestOrign(HttpServletRequest httpReq) {
+        try {
+            return httpRequestOriginResolver.resolve(httpReq);
+        } catch (InvalidURLException ex) {
+            throw new InvalidCsrfTokenException("Invalid same origin.");
+        }
+    }
+
+    private URL getHostURL() {
+        try {
+            return new URL(hostUrl);
+        } catch (MalformedURLException ex) {
+            throw new InvalidURLException("Invalid hostUrl format.");
+        }
+    }
+
+    private void verifySameOrigin(HttpServletRequest httpReq) {
+        URL origin = getRequestOrign(httpReq);
+        URL host = getHostURL();
+        if (!Objects.equals(origin.getProtocol(), host.getProtocol())) {
+            throw new InvalidCsrfTokenException("Invalid same origin, protocol.");
+        }
+
+        if (!Objects.equals(origin.getHost(), host.getHost())) {
+            throw new InvalidCsrfTokenException("Invalid same origin, host.");
+        }
+
+        if (!Objects.equals(origin.getPort(), host.getPort())) {
+            throw new InvalidCsrfTokenException("Invalid same origin, port.");
+        }
     }
 
     private void synchronizerCSRFTokens(String csrfToken, HttpServletRequest httpReq) {
