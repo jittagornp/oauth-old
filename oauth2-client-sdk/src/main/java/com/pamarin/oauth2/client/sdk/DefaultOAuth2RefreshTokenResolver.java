@@ -22,9 +22,11 @@ public class DefaultOAuth2RefreshTokenResolver implements OAuth2RefreshTokenReso
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
-        String token = httpReq.getParameter(REFRESH_TOKEN);
-        if (hasText(token)) {
-            return token;
+        if ("POST".equalsIgnoreCase(httpReq.getMethod())) {
+            String token = httpReq.getParameter(REFRESH_TOKEN);
+            if (hasText(token)) {
+                return token;
+            }
         }
 
         String tokenAttr = (String) httpReq.getAttribute(REFRESH_TOKEN);

@@ -67,10 +67,22 @@ public class OAuth2AccessTokenResolverTest {
     }
 
     @Test
-    public void shouldBeAAA_whenRequestParameterIsAAA() {
+    public void shouldBeNull_whenRequestParameterIsAAA() {
         String token = "AAA";
         when(httpServletRequest.getParameter(TOKEN_NAME))
                 .thenReturn(token);
+        String output = resolver.resolve(httpServletRequest);
+        String expected = null;
+        assertThat(output).isEqualTo(expected);
+    }
+    
+    @Test
+    public void shouldBeAAA_whenRequestMethodIsPostAndParameterIsAAA() {
+        String token = "AAA";
+        when(httpServletRequest.getParameter(TOKEN_NAME))
+                .thenReturn(token);
+        when(httpServletRequest.getMethod())
+                .thenReturn("POST");
         String output = resolver.resolve(httpServletRequest);
         String expected = token;
         assertThat(output).isEqualTo(expected);
