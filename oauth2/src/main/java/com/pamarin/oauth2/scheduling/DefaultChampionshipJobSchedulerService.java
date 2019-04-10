@@ -30,7 +30,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private static final long CHAMPOIN_EXPIRE_SECONDS = 30;
 
-    private static final long RUN_EVERY_SECOUNDS = 20;
+    private static final long RUN_EVERY_MILLISECS = 20000;
 
     private final Long FIXED_ID = 1L;
 
@@ -57,7 +57,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
     }
 
     @Override
-    @Scheduled(fixedDelay = RUN_EVERY_SECOUNDS)
+    @Scheduled(fixedDelay = RUN_EVERY_MILLISECS)
     public void run() {
         LOG.debug("Championship job runner : {} ...", System.currentTimeMillis());
         OAuth2JobScheduler champion = findChampion();
