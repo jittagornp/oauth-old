@@ -30,7 +30,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private static final long CHAMPOIN_EXPIRE_SECONDS = 30;
 
-    private static final long RUN_EVERY_MILLISECS = 20000;
+    private static final long RUN_EVERY_MILLISECS = 20 * 1000; //20 seconds
 
     private final Long FIXED_ID = 1L;
 
