@@ -20,7 +20,7 @@ public class SchedulingConf  implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(1);
+        taskScheduler.setPoolSize(10);
         taskScheduler.initialize();
         taskRegistrar.setTaskScheduler(taskScheduler);
     }
