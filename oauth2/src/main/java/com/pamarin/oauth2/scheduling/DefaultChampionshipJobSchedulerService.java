@@ -74,7 +74,6 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
         if (wasExpired(champion.getUpdatedDate())) {
             LOG.debug("\"{}\" was expired.", champion.getJobId());
-            deleteChampion(champion.getJobId());
             toBeChampion();
         }
     }
@@ -85,10 +84,6 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
         }
         return updatedDate.plusSeconds(CHAMPOIN_EXPIRE_SECONDS)
                 .isBefore(LocalDateTime.now());
-    }
-
-    private void deleteChampion(String jobId) {
-        jobSchedulerRepository.deleteByJobId(jobId);
     }
 
     private void toBeChampion() {
