@@ -32,6 +32,8 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private static final long RUN_EVERY_SECOUNDS = 20;
 
+    private final Long FIXED_ID = 1L;
+
     private final String jobId;
 
     private final OAuth2JobSchedulerRepository jobSchedulerRepository;
@@ -65,14 +67,14 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
             return;
         }
 
-        if (Objects.equals(champion.getId(), jobId)) {
+        if (Objects.equals(champion.getJobId(), jobId)) {
             toBeChampion();
             return;
         }
 
         if (wasExpired(champion.getUpdatedDate())) {
-            LOG.debug("\"{}\" was expired.", champion.getId());
-            deleteChampion(champion.getId());
+            LOG.debug("\"{}\" was expired.", champion.getJobId());
+            deleteChampion(champion.getJobId());
             toBeChampion();
         }
     }
@@ -86,13 +88,14 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
     }
 
     private void deleteChampion(String jobId) {
-        jobSchedulerRepository.delete(jobId);
+        jobSchedulerRepository.deleteByJobId(jobId);
     }
 
     private void toBeChampion() {
         LOG.debug("\"{}\" to be champion.", jobId);
         jobSchedulerRepository.save(OAuth2JobScheduler.builder()
-                .id(jobId)
+                .id(FIXED_ID)
+                .jobId(jobId)
                 .updatedDate(LocalDateTime.now())
                 .build());
     }
@@ -103,7 +106,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
         if (notFound(champion)) {
             return false;
         }
-        if (!Objects.equals(champion.getId(), jobId)) {
+        if (!Objects.equals(champion.getJobId(), jobId)) {
             return false;
         }
         return !wasExpired(champion.getUpdatedDate());

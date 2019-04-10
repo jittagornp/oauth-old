@@ -33,7 +33,10 @@ public class OAuth2JobScheduler implements Serializable {
     public static final String TABLE_NAME = "oauth2_job_scheduler";
 
     @Id
-    private String id;
+    private Long id;
+    
+    @Column(name = "job_id")
+    private String jobId;
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
