@@ -31,6 +31,7 @@ import com.pamarin.oauth2.repository.OAuth2ApprovalScopeRepo;
 import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientRepo;
 import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
+import com.pamarin.oauth2.repository.OAuth2JobSchedulerRepository;
 import java.util.Arrays;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.repository.OAuth2ScopeRepo;
@@ -60,6 +61,9 @@ public class IntegrationTestBase {
 
     @MockBean
     protected UserSessionRepo userSessionRepo;
+    
+    @MockBean
+    protected OAuth2JobSchedulerRepository jobSchedulerRepository;
 
     @MockBean
     protected UserAgentRepo userAgentRepo;
