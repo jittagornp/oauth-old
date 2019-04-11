@@ -71,6 +71,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
         } else if (wasExpired(champion)) {
             LOG.debug("\"{}\" was expired.", champion.getJobId());
             deleteChampion();
+            toBeChampion();
         }
     }
 
