@@ -93,6 +93,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private OAuth2JobScheduler findChampion() {
         try {
+            LOG.debug("{}", SELECT_CHAMPION_SQL);
             return jdbcTemplate.queryForObject(SELECT_CHAMPION_SQL, (rs, i) -> {
                 return singletonList(OAuth2JobScheduler.builder()
                         .id(rs.getLong("id"))
@@ -107,11 +108,13 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private void continueToChampion(OAuth2JobScheduler champion) {
         LOG.debug("\"{}\" continue to champion.", champion.getJobId());
+        LOG.debug("{}", UPDATE_CHAMPION_SQL);
         jdbcTemplate.update(UPDATE_CHAMPION_SQL, convert2Date(LocalDateTime.now()));
     }
 
     private void toBeChampion() {
         LOG.debug("\"{}\" to be champion.", jobId);
+        LOG.debug("{}", INSERT_CHAMPION_SQL);
         jdbcTemplate.update(INSERT_CHAMPION_SQL,
                 FIXED_ID,
                 jobId,
@@ -121,6 +124,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private void deleteChampion() {
         LOG.debug("Delete champion");
+        LOG.debug("{}", DELETE_CHAMPION_SQL);
         jdbcTemplate.update(DELETE_CHAMPION_SQL);
     }
 
