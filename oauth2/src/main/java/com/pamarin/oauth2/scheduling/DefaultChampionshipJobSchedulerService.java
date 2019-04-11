@@ -71,7 +71,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
             deleteChampion();
             toBeChampion();
         }else{
-            LOG.debug("\"{}\" is challenger, don't have to do anything.");
+            LOG.debug("\"{}\" is challenger, don't have to do anything.", jobId);
         }
     }
 
