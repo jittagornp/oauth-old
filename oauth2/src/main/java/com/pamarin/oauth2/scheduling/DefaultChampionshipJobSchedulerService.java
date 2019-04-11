@@ -7,6 +7,8 @@ import com.pamarin.commons.generator.UUIDGenerator;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
 import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
 import com.pamarin.oauth2.domain.OAuth2JobScheduler;
+import static com.pamarin.oauth2.domain.OAuth2JobScheduler.TABLE_NAME;
+import static java.lang.String.format;
 import java.time.LocalDateTime;
 import static java.util.Collections.singletonList;
 import java.util.Objects;
@@ -34,17 +36,13 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private static final long RUN_EVERY_MILLISECS = 20 * 1000; //20 seconds
 
-    private static final String SELECT_CHAMPION_SQL = "select * from ${table}"
-            .replace("${table}", OAuth2JobScheduler.TABLE_NAME);
+    private static final String SELECT_CHAMPION_SQL = format("select * from %s", TABLE_NAME);
 
-    private static final String INSERT_CHAMPION_SQL = "insert into ${table} (id, job_id, updated_date) values (?, ?, ?)"
-            .replace("${table}", OAuth2JobScheduler.TABLE_NAME);
+    private static final String INSERT_CHAMPION_SQL = format("insert into %s (id, job_id, updated_date) values (?, ?, ?)", TABLE_NAME);
 
-    private static final String UPDATE_CHAMPION_SQL = "update ${table} set updated_date = ?"
-            .replace("${table}", OAuth2JobScheduler.TABLE_NAME);
+    private static final String UPDATE_CHAMPION_SQL = format("update %s set updated_date = ?", TABLE_NAME);
 
-    private static final String DELETE_CHAMPION_SQL = "delete from ${table}"
-            .replace("${table}", OAuth2JobScheduler.TABLE_NAME);
+    private static final String DELETE_CHAMPION_SQL = format("delete from %s", TABLE_NAME);
 
     private final Long FIXED_ID = 1L;
 
