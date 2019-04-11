@@ -46,15 +46,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.session.SessionRepository;
 import com.pamarin.oauth2.repository.UserAgentRepo;
 import com.pamarin.oauth2.service.RevokeTokenService;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import javax.sql.DataSource;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
  */
 @ActiveProfiles("test")
 public class IntegrationTestBase {
+    
+    @MockBean 
+    private DataSource dataSource; 
 
     @MockBean
     protected UserRepo userRepo;
