@@ -32,9 +32,9 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultChampionshipJobSchedulerService.class);
 
-    private static final long CHAMPOIN_EXPIRE_SECONDS = 30;
+    private static final long RUN_EVERY_SECONDS = 60;
 
-    private static final long RUN_EVERY_MILLISECS = 20 * 1000; //20 seconds
+    private static final long CHAMPOIN_EXPIRE_SECONDS = RUN_EVERY_SECONDS + 10;
 
     private static final String SELECT_CHAMPION_SQL = format("select * from %s", TABLE_NAME);
 
@@ -57,7 +57,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
     }
 
     @Override
-    @Scheduled(fixedDelay = RUN_EVERY_MILLISECS)
+    @Scheduled(fixedDelay = RUN_EVERY_SECONDS * 1000)
     public void run() {
         LOG.debug("Championship job runner : \"{}\" ...", jobId);
         OAuth2JobScheduler champion = findChampion();
