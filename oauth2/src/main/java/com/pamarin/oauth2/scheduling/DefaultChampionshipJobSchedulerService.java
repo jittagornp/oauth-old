@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -23,7 +22,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  * @author jitta
  */
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional
 public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSchedulerService, JobRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultChampionshipJobSchedulerService.class);
@@ -59,23 +58,21 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
     @Override
     @Scheduled(fixedDelay = RUN_EVERY_MILLISECS)
     public void run() {
-        LOG.debug("Championship job runner : {} ...", System.currentTimeMillis());
+        LOG.debug("Championship job runner : \"{}\" ...", jobId);
         OAuth2JobScheduler champion = findChampion();
         if (notFound(champion)) {
             LOG.debug("Not found champion.");
             toBeChampion();
-            return;
-        }
-
-        if (Objects.equals(champion.getJobId(), jobId)) {
-            toBeChampion();
-            return;
-        }
-
-        if (wasExpired(champion.getUpdatedDate())) {
+        } else if (thisIsChampion(champion)) {
+            continueToChampion(champion);
+        } else if (wasExpired(champion.getUpdatedDate())) {
             LOG.debug("\"{}\" was expired.", champion.getJobId());
-            toBeChampion();
+            deleteChampion();
         }
+    }
+
+    private boolean thisIsChampion(OAuth2JobScheduler champion) {
+        return Objects.equals(jobId, champion.getJobId());
     }
 
     private boolean wasExpired(LocalDateTime updatedDate) {
@@ -84,6 +81,11 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
         }
         return updatedDate.plusSeconds(CHAMPOIN_EXPIRE_SECONDS)
                 .isBefore(LocalDateTime.now());
+    }
+
+    private void continueToChampion(OAuth2JobScheduler champion) {
+        LOG.debug("\"{}\" continue to champion.", champion.getJobId());
+        champion.setUpdatedDate(LocalDateTime.now());
     }
 
     private void toBeChampion() {
@@ -95,13 +97,18 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
                 .build());
     }
 
+    private void deleteChampion() {
+        LOG.debug("Delete champion");
+        jobSchedulerRepository.deleteAll();
+    }
+
     @Override
     public boolean isChampion() {
         OAuth2JobScheduler champion = findChampion();
         if (notFound(champion)) {
             return false;
         }
-        if (!Objects.equals(champion.getJobId(), jobId)) {
+        if (!thisIsChampion(champion)) {
             return false;
         }
         return !wasExpired(champion.getUpdatedDate());
