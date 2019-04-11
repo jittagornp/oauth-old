@@ -4,18 +4,21 @@
 package com.pamarin.oauth2.scheduling;
 
 import com.pamarin.commons.generator.UUIDGenerator;
+import static com.pamarin.commons.util.DateConverterUtils.convert2Date;
+import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
 import com.pamarin.oauth2.domain.OAuth2JobScheduler;
-import com.pamarin.oauth2.repository.OAuth2JobSchedulerRepository;
 import java.time.LocalDateTime;
-import java.util.List;
+import static java.util.Collections.singletonList;
 import java.util.Objects;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  *
@@ -31,28 +34,28 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private static final long RUN_EVERY_MILLISECS = 20 * 1000; //20 seconds
 
+    private static final String SELECT_CHAMPION_SQL = "select * from ${table}"
+            .replace("${table}", OAuth2JobScheduler.TABLE_NAME);
+
+    private static final String INSERT_CHAMPION_SQL = "insert into ${table} (id, job_id, updated_date) values (?, ?, ?)"
+            .replace("${table}", OAuth2JobScheduler.TABLE_NAME);
+
+    private static final String UPDATE_CHAMPION_SQL = "update ${table} set updated_date = ?"
+            .replace("${table}", OAuth2JobScheduler.TABLE_NAME);
+
+    private static final String DELETE_CHAMPION_SQL = "delete from ${table}"
+            .replace("${table}", OAuth2JobScheduler.TABLE_NAME);
+
     private final Long FIXED_ID = 1L;
 
     private final String jobId;
 
-    private final OAuth2JobSchedulerRepository jobSchedulerRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public DefaultChampionshipJobSchedulerService(OAuth2JobSchedulerRepository jobSchedulerRepository, UUIDGenerator uuidGenerator) {
-        this.jobSchedulerRepository = jobSchedulerRepository;
+    public DefaultChampionshipJobSchedulerService(DataSource dataSource, UUIDGenerator uuidGenerator) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.jobId = uuidGenerator.generate();
-    }
-
-    private OAuth2JobScheduler findChampion() {
-        List<OAuth2JobScheduler> schedulers = jobSchedulerRepository.findAll();
-        if (isEmpty(schedulers)) {
-            return null;
-        }
-        return schedulers.get(0);
-    }
-
-    private boolean notFound(OAuth2JobScheduler champion) {
-        return champion == null;
     }
 
     @Override
@@ -65,17 +68,22 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
             toBeChampion();
         } else if (thisIsChampion(champion)) {
             continueToChampion(champion);
-        } else if (wasExpired(champion.getUpdatedDate())) {
+        } else if (wasExpired(champion)) {
             LOG.debug("\"{}\" was expired.", champion.getJobId());
             deleteChampion();
         }
+    }
+
+    private boolean notFound(OAuth2JobScheduler champion) {
+        return champion == null;
     }
 
     private boolean thisIsChampion(OAuth2JobScheduler champion) {
         return Objects.equals(jobId, champion.getJobId());
     }
 
-    private boolean wasExpired(LocalDateTime updatedDate) {
+    private boolean wasExpired(OAuth2JobScheduler champion) {
+        LocalDateTime updatedDate = champion.getUpdatedDate();
         if (updatedDate == null) {
             return true;
         }
@@ -83,23 +91,37 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
                 .isBefore(LocalDateTime.now());
     }
 
+    private OAuth2JobScheduler findChampion() {
+        try {
+            return jdbcTemplate.queryForObject(SELECT_CHAMPION_SQL, (rs, i) -> {
+                return singletonList(OAuth2JobScheduler.builder()
+                        .id(rs.getLong("id"))
+                        .jobId(rs.getString("job_id"))
+                        .updatedDate(convert2LocalDateTime(rs.getTimestamp("updated_date")))
+                        .build());
+            }).get(0);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
+    }
+
     private void continueToChampion(OAuth2JobScheduler champion) {
         LOG.debug("\"{}\" continue to champion.", champion.getJobId());
-        champion.setUpdatedDate(LocalDateTime.now());
+        jdbcTemplate.update(UPDATE_CHAMPION_SQL, convert2Date(LocalDateTime.now()));
     }
 
     private void toBeChampion() {
         LOG.debug("\"{}\" to be champion.", jobId);
-        jobSchedulerRepository.save(OAuth2JobScheduler.builder()
-                .id(FIXED_ID)
-                .jobId(jobId)
-                .updatedDate(LocalDateTime.now())
-                .build());
+        jdbcTemplate.update(INSERT_CHAMPION_SQL,
+                FIXED_ID,
+                jobId,
+                convert2Date(LocalDateTime.now())
+        );
     }
 
     private void deleteChampion() {
         LOG.debug("Delete champion");
-        jobSchedulerRepository.deleteAll();
+        jdbcTemplate.update(DELETE_CHAMPION_SQL);
     }
 
     @Override
@@ -111,6 +133,6 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
         if (!thisIsChampion(champion)) {
             return false;
         }
-        return !wasExpired(champion.getUpdatedDate());
+        return !wasExpired(champion);
     }
 }

@@ -34,7 +34,7 @@ public class OAuth2JobScheduler implements Serializable {
 
     @Id
     private Long id;
-    
+
     @Column(name = "job_id")
     private String jobId;
 
