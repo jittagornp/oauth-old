@@ -70,6 +70,8 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
             LOG.debug("\"{}\" was expired.", champion.getJobId());
             deleteChampion();
             toBeChampion();
+        }else{
+            LOG.debug("\"{}\" is challenger, don't have to do anything.");
         }
     }
 
