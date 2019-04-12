@@ -30,25 +30,30 @@ public class ApprovalServiceImpl implements ApprovalService {
 
     @Override
     public boolean wasApprovedByUserIdAndClientId(String userId, String clientId) {
-        OAuth2Approval approval = approveRepository.findOne(new OAuth2Approval.PK(userId, clientId));
-        return approval != null;
+        return approveRepository.findOne(OAuth2Approval.PK.builder()
+                .userId(userId)
+                .clientId(clientId)
+                .build()
+        ) != null;
     }
 
     private void saveScope(OAuth2Approval approval, List<String> scopes) {
-        approvalScopeRepository.save(scopes.stream().map(s -> {
-            OAuth2ApprovalScope scope = new OAuth2ApprovalScope();
-            scope.setApproval(approval);
-            scope.setClientId(approval.getId().getClientId());
-            scope.setUserId(approval.getId().getUserId());
-            scope.setScope(s);
-            return scope;
-        }).collect(Collectors.toList()));
+        approvalScopeRepository.save(scopes.stream().map(s -> OAuth2ApprovalScope.builder()
+                .approval(approval)
+                .clientId(approval.getId().getClientId())
+                .userId(approval.getId().getUserId())
+                .scope(s)
+                .build()).collect(Collectors.toList()));
     }
 
     private OAuth2Approval newOAuth2Approval(String userId, String clientId) {
-        OAuth2Approval approval = new OAuth2Approval();
-        approval.setId(new OAuth2Approval.PK(userId, clientId));
-        return approval;
+        return OAuth2Approval.builder()
+                .id(OAuth2Approval.PK.builder()
+                        .userId(userId)
+                        .clientId(clientId)
+                        .build()
+                )
+                .build();
     }
 
     @Override

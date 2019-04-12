@@ -39,7 +39,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private LoginHistoryService loginHistoryService;
-    
+
     @Override
     public void login(String username, String password) {
         if (username == null || password == null) {
@@ -61,7 +61,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String id) {
         if (id == null) {
             throw new UsernameNotFoundException("Require id.");
         }

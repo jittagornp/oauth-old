@@ -9,13 +9,13 @@ import com.pamarin.oauth2.domain.OAuth2Token;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt;  
  * create : 2017/12/03
- * @param <TOKEN>
+ * @param <T>
  */
-public interface OAuth2TokenRepository <TOKEN extends OAuth2Token> {
+public interface OAuth2TokenRepository <T extends OAuth2Token> {
 
-    TOKEN save(TOKEN token);
+    T save(T token);
     
-    TOKEN findByTokenId(String tokenId);
+    T findByTokenId(String tokenId);
     
     void deleteByTokenId(String tokenId);
 }

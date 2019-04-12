@@ -8,7 +8,6 @@ import com.pamarin.oauth2.exception.RequireApprovalException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.model.AuthorizationResponse;
 import com.pamarin.commons.provider.HostUrlProvider;
-import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.commons.util.QuerystringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

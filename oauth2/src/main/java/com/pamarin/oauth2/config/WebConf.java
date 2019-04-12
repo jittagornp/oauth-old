@@ -3,9 +3,7 @@
  */
 package com.pamarin.oauth2.config;
 
-import com.pamarin.commons.security.AuthenticityToken;
 import com.pamarin.commons.security.CsrfInterceptor;
-import com.pamarin.commons.security.DefaultAuthenticityToken;
 import com.pamarin.oauth2.interceptor.UserAgentTokenInterceptor;
 import com.pamarin.oauth2.resolver.DefaultUserAgentTokenIdResolver;
 import java.util.concurrent.TimeUnit;

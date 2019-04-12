@@ -49,15 +49,17 @@ public class LoginHistoryServiceImpl implements LoginHistoryService {
     @Override
     public void createHistory() {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
-        LoginHistory history = new LoginHistory();
         String id = idGenerator.generate();
-        history.setId(id);
-        history.setIpAddress(httpClientIPAddressResolver.resolve(httpReq));
-        history.setLoginDate(LocalDateTime.now());
-        history.setAgentId(userAgentTokenIdResolver.resolve(httpReq));
-        history.setSessionId(loginSession.getSessionId());
-        history.setUserId(loginSession.getUserDetails().getUsername());
-        loginHistoryRepository.save(history);
+        loginHistoryRepository.save(
+                LoginHistory.builder()
+                        .id(id)
+                        .ipAddress(httpClientIPAddressResolver.resolve(httpReq))
+                        .loginDate(LocalDateTime.now())
+                        .agentId(userAgentTokenIdResolver.resolve(httpReq))
+                        .sessionId(loginSession.getSessionId())
+                        .userId(loginSession.getUserDetails().getUsername())
+                        .build()
+        );
 
         httpReq.getSession().setAttribute(LOGIN_HISTORY_ATTR, id);
     }

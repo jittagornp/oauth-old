@@ -63,9 +63,9 @@ public class DatabaseSessionRepositoryImpl implements DatabaseSessionRepository 
 
     @Autowired
     private UserAgentResolver userAgentResolver;
-    
+
     @Autowired
-    private IdGenerator idGenerator; 
+    private IdGenerator idGenerator;
 
     public DatabaseSessionRepositoryImpl(Integer sessionTimeout, Integer synchronizeTimeout) {
         this.sessionTimeout = sessionTimeout;
@@ -75,15 +75,12 @@ public class DatabaseSessionRepositoryImpl implements DatabaseSessionRepository 
     @Override
     public void synchronize(Session session) {
         long currentTime = System.currentTimeMillis();
-        Long lastAcccessedTime = (Long) session.getAttribute(LAST_ACCESSED_TIME_ATTR);
-        if (lastAcccessedTime == null) {
-            updateSession(session, false);
-            session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
-        } else if (currentTime - lastAcccessedTime > synchronizeTimeout) {
+        Long lastAcccessedTime = session.getAttribute(LAST_ACCESSED_TIME_ATTR);
+        if (lastAcccessedTime == null || (currentTime - lastAcccessedTime > synchronizeTimeout)) {
             updateSession(session, false);
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
         } else {
-            Object firstTimeWithLogin = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
+            Long firstTimeWithLogin = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
             if (firstTimeWithLogin == null) {
                 boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
                 if (alreadyLogin) {

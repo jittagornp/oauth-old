@@ -13,8 +13,6 @@ import com.pamarin.oauth2.model.RefreshAccessTokenRequest;
 import com.pamarin.oauth2.service.AccessTokenGenerator;
 import com.pamarin.oauth2.service.ClientVerification;
 import com.pamarin.commons.security.LoginSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,8 +36,6 @@ import com.pamarin.oauth2.repository.OAuth2AccessTokenRepository;
 @Service
 @Transactional
 class AccessTokenGeneratorImpl implements AccessTokenGenerator {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AccessTokenGeneratorImpl.class);
 
     @Autowired
     private LoginSession loginSession;
@@ -105,7 +101,6 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
             OAuth2AuthorizationCode authCode = authorizationCodeVerification.verify(req.getCode());
             return buildAccessTokenResponse(authCode);
         } catch (InvalidTokenException ex) {
-            LOG.warn(null, ex);
             throw new UnauthorizedClientException(ex);
         }
     }

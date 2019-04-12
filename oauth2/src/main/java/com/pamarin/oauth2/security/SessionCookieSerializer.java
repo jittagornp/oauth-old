@@ -30,7 +30,7 @@ import static org.springframework.util.StringUtils.hasText;
  */
 public class SessionCookieSerializer implements CookieSerializer {
 
-    private static final String RESOLVED = SessionCookieSerializer.class.getName() + "OAUTH2_RESOLVED_SESSION";
+    private static final String RESOLVED = SessionCookieSerializer.class.getName() + ".OAUTH2_RESOLVED_SESSION";
 
     private static final String ANONYMOUS = "anonymous";
 
@@ -56,7 +56,7 @@ public class SessionCookieSerializer implements CookieSerializer {
         this.httpAuthorizeBearerParser = httpAuthorizeBearerParser;
         this.accessTokenVerification = accessTokenVerification;
         this.httpCookieResolver = new DefaultHttpCookieResolver(cookieName);
-        this.aesEncryption = new DefaultBase64AESEncryption(DefaultAESEncryption.withKeyLength16());;
+        this.aesEncryption = new DefaultBase64AESEncryption(DefaultAESEncryption.withKeyLength16());
     }
 
     @Override

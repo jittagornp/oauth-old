@@ -49,7 +49,7 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
         }
 
         @Override
-        public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        public UserDetails loadUserByUsername(String id) {
             OAuth2RefreshToken refreshToken = refreshTokenRepo.findByTokenId(id);
             if (refreshToken == null) {
                 throw new UsernameNotFoundException("Not found refresh token");

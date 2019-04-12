@@ -1,7 +1,6 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-
 package com.pamarin.oauth2.client;
 
 import org.springframework.boot.SpringApplication;
@@ -16,7 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.pamarin")
 public class AppStarter {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         SpringApplication.run(AppStarter.class, args);
     }
 

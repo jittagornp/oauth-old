@@ -49,7 +49,7 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
         }
 
         @Override
-        public UserDetails loadUserByUsername(String tokenId) throws UsernameNotFoundException {
+        public UserDetails loadUserByUsername(String tokenId) {
             OAuth2AccessToken token = accessTokenRepo.findByTokenId(tokenId);
             if (token == null) {
                 throw new UsernameNotFoundException("Not found access token");

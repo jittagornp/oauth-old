@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.controller;
 
-import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.service.ClientVerification;
 import com.pamarin.oauth2.service.LogoutService;
 import java.io.IOException;

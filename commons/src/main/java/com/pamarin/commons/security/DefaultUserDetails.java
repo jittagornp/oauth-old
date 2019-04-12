@@ -81,9 +81,7 @@ public class DefaultUserDetails implements UserDetails {
     @Override
     public boolean equals(Object obj) {
         return ObjectEquals.of(this)
-                .equals(obj, (orgin, other) -> {
-                    return Objects.equals(orgin.getUsername(), other.getUsername());
-                });
+                .equals(obj, (orgin, other) -> Objects.equals(orgin.getUsername(), other.getUsername()));
     }
 
 }

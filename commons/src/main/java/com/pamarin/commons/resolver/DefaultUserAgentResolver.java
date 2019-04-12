@@ -31,7 +31,7 @@ public class DefaultUserAgentResolver implements UserAgentResolver {
         }
 
         UserAgent userAgent = UserAgent.builder().build();
-        $(parseUserAgentString(header)).ifPresent(agent -> {
+        of(parseUserAgentString(header)).ifPresent(agent -> {
             copyBrowser(agent.getBrowser(), userAgent);
             copyOperatingSystem(agent.getOperatingSystem(), userAgent);
             copyVerion(agent.getBrowserVersion(), userAgent);
@@ -39,12 +39,12 @@ public class DefaultUserAgentResolver implements UserAgentResolver {
         return userAgent;
     }
 
-    private <T> Optional<T> $(T value) {
+    private <T> Optional<T> of(T value) {
         return Optional.ofNullable(value);
     }
 
     private void copyBrowser(Browser browser, UserAgent userAgent) {
-        $(browser).ifPresent(bws -> {
+        of(browser).ifPresent(bws -> {
             userAgent.setBrowserKey(bws.name());
             userAgent.setBrowserName(bws.getName());
             copyRenderingEngine(bws.getRenderingEngine(), userAgent);
@@ -55,34 +55,34 @@ public class DefaultUserAgentResolver implements UserAgentResolver {
     }
 
     private void copyRenderingEngine(RenderingEngine renderingEngine, UserAgent userAgent) {
-        $(renderingEngine).ifPresent(engine -> {
-            userAgent.setBrowserRenderingEngine(engine.name());
-        });
+        of(renderingEngine).ifPresent(engine
+                -> userAgent.setBrowserRenderingEngine(engine.name())
+        );
     }
 
     private void copyBrowerManufacturer(Manufacturer manufacturer, UserAgent userAgent) {
-        $(manufacturer).ifPresent(man -> {
+        of(manufacturer).ifPresent(man -> {
             userAgent.setBrowserManufacturerKey(man.name());
             userAgent.setBrowserManufacturerName(man.getName());
         });
     }
 
     private void copyBrowserGroup(Browser browser, UserAgent userAgent) {
-        $(browser).ifPresent(group -> {
+        of(browser).ifPresent(group -> {
             userAgent.setBrowserGroupKey(group.name());
             userAgent.setBrowserGroupName(group.getName());
         });
     }
 
     private void copyBrowserType(BrowserType browserType, UserAgent userAgent) {
-        $(browserType).ifPresent(type -> {
+        of(browserType).ifPresent(type -> {
             userAgent.setBrowserTypeKey(type.name());
             userAgent.setBrowserTypeName(type.getName());
         });
     }
 
     private void copyOperatingSystem(OperatingSystem operatingSystem, UserAgent userAgent) {
-        $(operatingSystem).ifPresent(os -> {
+        of(operatingSystem).ifPresent(os -> {
             userAgent.setOsKey(os.name());
             userAgent.setOsName(os.getName());
             copyDeviceType(os.getDeviceType(), userAgent);
@@ -92,28 +92,28 @@ public class DefaultUserAgentResolver implements UserAgentResolver {
     }
 
     private void copyDeviceType(DeviceType deviceType, UserAgent userAgent) {
-        $(deviceType).ifPresent(type -> {
+        of(deviceType).ifPresent(type -> {
             userAgent.setDeviceTypeKey(type.name());
             userAgent.setDeviceTypeName(type.getName());
         });
     }
 
     private void copyOsManufacturer(Manufacturer osManufacturer, UserAgent userAgent) {
-        $(osManufacturer).ifPresent(manufacturer -> {
+        of(osManufacturer).ifPresent(manufacturer -> {
             userAgent.setOsManufacturerKey(manufacturer.name());
             userAgent.setOsManufacturerName(manufacturer.getName());
         });
     }
 
     private void copyOsGroup(OperatingSystem osGroup, UserAgent userAgent) {
-        $(osGroup).ifPresent(group -> {
+        of(osGroup).ifPresent(group -> {
             userAgent.setOsGroupKey(group.name());
             userAgent.setOsGroupName(group.getName());
         });
     }
 
     private void copyVerion(Version version, UserAgent userAgent) {
-        $(version).ifPresent(vs -> {
+        of(version).ifPresent(vs -> {
             userAgent.setAgentVersion(vs.getVersion());
             userAgent.setAgentMajorVersion(vs.getMajorVersion());
             userAgent.setAgentMinorVersion(vs.getMinorVersion());

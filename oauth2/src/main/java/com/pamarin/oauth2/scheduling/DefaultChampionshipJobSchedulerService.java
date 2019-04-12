@@ -44,7 +44,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
 
     private static final String DELETE_CHAMPION_SQL = format("delete from %s", TABLE_NAME);
 
-    private final Long FIXED_ID = 1L;
+    private static final Long FIXED_ID = 1L;
 
     private final String jobId;
 
@@ -70,7 +70,7 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
             LOG.debug("\"{}\" was expired.", champion.getJobId());
             deleteChampion();
             toBeChampion();
-        }else{
+        } else {
             LOG.debug("\"{}\" is challenger, don't have to do anything.", jobId);
         }
     }
@@ -95,13 +95,13 @@ public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSc
     private OAuth2JobScheduler findChampion() {
         try {
             LOG.debug("{}", SELECT_CHAMPION_SQL);
-            return jdbcTemplate.queryForObject(SELECT_CHAMPION_SQL, (rs, i) -> {
-                return singletonList(OAuth2JobScheduler.builder()
-                        .id(rs.getLong("id"))
-                        .jobId(rs.getString("job_id"))
-                        .updatedDate(convert2LocalDateTime(rs.getTimestamp("updated_date")))
-                        .build());
-            }).get(0);
+            return jdbcTemplate.queryForObject(SELECT_CHAMPION_SQL, (rs, i)
+                    -> singletonList(OAuth2JobScheduler.builder()
+                            .id(rs.getLong("id"))
+                            .jobId(rs.getString("job_id"))
+                            .updatedDate(convert2LocalDateTime(rs.getTimestamp("updated_date")))
+                            .build())
+            ).get(0);
         } catch (EmptyResultDataAccessException ex) {
             return null;
         }

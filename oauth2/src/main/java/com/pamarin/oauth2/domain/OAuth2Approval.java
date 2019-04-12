@@ -11,7 +11,10 @@ import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -19,6 +22,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = OAuth2Approval.TABLE_NAME)
 public class OAuth2Approval extends AuditingEntity {
@@ -27,6 +33,9 @@ public class OAuth2Approval extends AuditingEntity {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Embeddable
     public static class PK implements Serializable {
 
@@ -35,15 +44,6 @@ public class OAuth2Approval extends AuditingEntity {
 
         @Column(name = "client_id")
         private String clientId;
-
-        public PK() {
-
-        }
-
-        public PK(String userId, String clientId) {
-            this.userId = userId;
-            this.clientId = clientId;
-        }
 
         @Override
         public int hashCode() {

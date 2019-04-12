@@ -3,7 +3,10 @@
  */
 package com.pamarin.oauth2.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -13,6 +16,9 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginCredential {
 
     @NotBlank

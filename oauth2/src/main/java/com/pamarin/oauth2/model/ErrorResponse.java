@@ -6,8 +6,10 @@ package com.pamarin.oauth2.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pamarin.commons.util.QuerystringBuilder;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
@@ -18,6 +20,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ErrorResponse {
 
     private String error;
@@ -36,17 +40,6 @@ public class ErrorResponse {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String state;
-
-    public ErrorResponse() {
-    }
-
-    public ErrorResponse(String error, Integer errorStatus, String errorDescription, String errorUri, String state) {
-        this.error = error;
-        this.errorStatus = errorStatus;
-        this.errorDescription = errorDescription;
-        this.errorUri = errorUri;
-        this.state = state;
-    }
 
     public String getError() {
         return error;

@@ -3,6 +3,7 @@
  */
 package com.pamarin.commons.util;
 
+import com.pamarin.commons.exception.InvalidPrivateConstructorException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import static java.lang.reflect.Modifier.isPrivate;
@@ -24,7 +25,7 @@ public class ClassUtils {
                 constructor.newInstance();
                 return true;
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                throw new RuntimeException(ex);
+                throw new InvalidPrivateConstructorException(ex);
             }
         }
         return false;

@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.exception.handler;
 
-import com.pamarin.commons.exception.InvalidCsrfTokenException;
 import com.pamarin.commons.exception.InvalidSameOriginException;
 import com.pamarin.oauth2.model.ErrorResponse;
 import javax.servlet.http.HttpServletRequest;

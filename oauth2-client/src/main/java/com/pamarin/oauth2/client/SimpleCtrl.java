@@ -32,7 +32,7 @@ public class SimpleCtrl {
 
     @Autowired
     private HostUrlProvider hostUrlProvider;
-    
+
     @Autowired
     private OAuth2ClientOperations oauth2ClientOperations;
 
@@ -44,8 +44,8 @@ public class SimpleCtrl {
                 .replace("{scope}", "user:public_profile")
                 .replace("{state}", "xyz");
     }
-    
-    private String getLogoutUrl() throws UnsupportedEncodingException{
+
+    private String getLogoutUrl() throws UnsupportedEncodingException {
         return "{oauth2_host}/logout?client_id={client_id}&redirect_uri={redirect_uri}"
                 .replace("{oauth2_host}", oauth2ClientOperations.getAuthorizationServerHostUrl())
                 .replace("{client_id}", oauth2ClientOperations.getClientId())
@@ -61,12 +61,12 @@ public class SimpleCtrl {
     }
 
     @GetMapping("/authorize")
-    public void authorize(HttpServletResponse response) throws UnsupportedEncodingException, IOException {
+    public void authorize(HttpServletResponse response) throws IOException {
         response.sendRedirect(getAuthorizeUrl());
     }
 
     @GetMapping("/code")
-    public ModelAndView getToken(@RequestParam("code") String code) throws UnsupportedEncodingException, JsonProcessingException {
+    public ModelAndView getToken(@RequestParam("code") String code) throws JsonProcessingException {
 
         OAuth2AccessToken accessToken = oauth2ClientOperations.getAccessTokenByAuthorizationCode(code);
         OAuth2Session session = oauth2ClientOperations.getSession(accessToken.getAccessToken());
@@ -82,7 +82,7 @@ public class SimpleCtrl {
     }
 
     @GetMapping("/logout")
-    public void logout(HttpServletResponse response) throws Exception{
+    public void logout(HttpServletResponse response) throws IOException {
         response.sendRedirect(getLogoutUrl());
     }
 }

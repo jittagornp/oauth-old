@@ -3,6 +3,7 @@
  */
 package com.pamarin.commons.util;
 
+import com.pamarin.commons.exception.InvalidPrivateConstructorException;
 import static com.pamarin.commons.util.ClassUtils.isPrivateConstructor;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +41,7 @@ public class ClassUtils_isPrivateConstructorTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = InvalidPrivateConstructorException.class)
     public void shouldBeThrowRuntimeException() {
         isPrivateConstructor(PrivateConstructorWithArguments.class);
     }

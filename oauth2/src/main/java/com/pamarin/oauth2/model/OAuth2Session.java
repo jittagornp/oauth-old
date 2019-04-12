@@ -8,8 +8,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -18,6 +20,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OAuth2Session implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,6 +39,8 @@ public class OAuth2Session implements Serializable {
     @Getter
     @Setter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class User implements Serializable {
 
         private String id;
@@ -55,6 +61,8 @@ public class OAuth2Session implements Serializable {
     @Getter
     @Setter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Client implements Serializable {
 
         private String id;

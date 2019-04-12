@@ -3,10 +3,10 @@
  */
 package com.pamarin.oauth2.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -16,8 +16,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OAuth2AuthorizationCode implements OAuth2Token {
-    
+
     private String id;
 
     private String tokenId;

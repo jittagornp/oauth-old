@@ -12,7 +12,6 @@ import com.pamarin.commons.util.HttpAuthorizeBearerParser;
 import com.pamarin.commons.util.QuerystringBuilder;
 import static com.pamarin.oauth2.client.sdk.OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -116,35 +115,47 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         }
     }
 
-    private void doFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException {
+    private void doFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String accessToken = getAccessTokenHeader(httpReq.getHeader("Authorization"));
         if (hasText(accessToken)) {
-            if (!getSession(accessToken, httpReq, httpResp)) {
-                throw new AuthenticationException("Please login");
-            }
+            getSessionByAuthorizationHeader(accessToken, httpReq);
         } else {
             String code = httpReq.getParameter("code");
             String state = httpReq.getParameter("state");
             if (hasText(code) && hasText(state)) {
-                verifyAuthorizationState(state, httpReq);
-                if (getAccessTokenByAuthorizationCode(code, httpReq, httpResp)) {
-                    throw new RequireRedirectException("Get accessToken from authorizationCode success.");
-                }
+                getAccessTokenByAuthorizationCode(code, state, httpReq, httpResp);
             } else {
                 String error = httpReq.getParameter("error");
                 String errorStatus = httpReq.getParameter("error_status");
-                String errorDescription = httpReq.getParameter("error_description");
                 if (hasText(error) && hasText(errorStatus)) {
-                    LOG.debug("authorization server return error => {} : {}", error, errorStatus);
-                    if (hasText(state)) {
-                        verifyAuthorizationState(state, httpReq);
-                    }
-                    throw new OAuth2ErrorException(error, Integer.valueOf(errorStatus), errorDescription);
+                    redirectError(error, errorStatus, state, httpReq);
                 } else {
                     getSession(httpReq, httpResp);
                 }
             }
         }
+    }
+
+    private void getSessionByAuthorizationHeader(String accessToken, HttpServletRequest httpReq) {
+        if (!getSession(accessToken, httpReq)) {
+            throw new AuthenticationException("Please login");
+        }
+    }
+
+    private void getAccessTokenByAuthorizationCode(String code, String state, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        verifyAuthorizationState(state, httpReq);
+        if (getAccessTokenByAuthorizationCode(code, httpReq, httpResp)) {
+            throw new RequireRedirectException("Get accessToken from authorizationCode success.");
+        }
+    }
+
+    private void redirectError(String error, String errorStatus, String state, HttpServletRequest httpReq) {
+        String errorDescription = httpReq.getParameter("error_description");
+        LOG.warn("authorization server return error => {} : {}", error, errorStatus);
+        if (hasText(state)) {
+            verifyAuthorizationState(state, httpReq);
+        }
+        throw new OAuth2ErrorException(error, Integer.valueOf(errorStatus), errorDescription);
     }
 
     private String randomState() {
@@ -153,7 +164,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         return Base64Utils.encode(bytes);
     }
 
-    private String getAuthorizationUrl(HttpServletRequest httpReq) throws UnsupportedEncodingException {
+    private String getAuthorizationUrl(HttpServletRequest httpReq) {
         String state = randomState();
         httpReq.getSession().setAttribute(OAUTH2_AUTHORIZATION_STATE, state);
         return "{server}/authorize?".replace("{server}", oauth2ClientOperations.getAuthorizationServerHostUrl())
@@ -209,15 +220,15 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
 
     private void getSession(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String accessToken = oauth2AccessTokenResolver.resolve(httpReq);
-        if (!getSession(accessToken, httpReq, httpResp)) {
+        if (!getSession(accessToken, httpReq)) {
             accessToken = refreshToken(httpReq, httpResp);
-            if (!getSession(accessToken, httpReq, httpResp)) {
+            if (!getSession(accessToken, httpReq)) {
                 throw new AuthorizationException("Please authorize.");
             }
         }
     }
 
-    private boolean getSession(String accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private boolean getSession(String accessToken, HttpServletRequest httpReq) {
         if (!hasText(accessToken)) {
             clearSecurityContext(httpReq);
             return false;

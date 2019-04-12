@@ -7,8 +7,10 @@ import com.pamarin.commons.util.QuerystringBuilder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import static org.springframework.util.StringUtils.hasText;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthorizationRequest implements ClientDetails {
 
     private String responseType;
@@ -52,8 +56,8 @@ public class AuthorizationRequest implements ClientDetails {
                 || hasText(scope)
                 || hasText(state);
     }
-    
-    public void requireParameters() throws MissingServletRequestParameterException{
+
+    public void requireParameters() throws MissingServletRequestParameterException {
         if (!hasText(responseType)) {
             throw new MissingServletRequestParameterException("response_type", "String");
         }

@@ -41,7 +41,7 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     @Override
     public void revokeBySessionIds(List<String> sessionIds) {
         if (!isEmpty(sessionIds)) {
-            sessionIds.forEach(sessionId -> revokeBySessionId(sessionId));
+            sessionIds.forEach(this::revokeBySessionId);
         }
     }
 

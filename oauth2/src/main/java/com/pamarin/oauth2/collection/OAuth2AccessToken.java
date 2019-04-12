@@ -7,8 +7,10 @@ import com.pamarin.commons.util.ObjectEquals;
 import com.pamarin.oauth2.domain.OAuth2Token;
 import java.util.Objects;
 import javax.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,6 +22,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = OAuth2AccessToken.COLLECTION_NAME)
 public class OAuth2AccessToken implements OAuth2Token {
 
@@ -52,21 +56,6 @@ public class OAuth2AccessToken implements OAuth2Token {
 
     @Field("session_id")
     private String sessionId;
-
-    public OAuth2AccessToken() {
-    }
-
-    public OAuth2AccessToken(String id, String tokenId, long issuedAt, long expiresAt, String userId, String clientId, int expireMinutes, String secretKey, String sessionId) {
-        this.id = id;
-        this.tokenId = tokenId;
-        this.issuedAt = issuedAt;
-        this.expiresAt = expiresAt;
-        this.userId = userId;
-        this.clientId = clientId;
-        this.expireMinutes = expireMinutes;
-        this.secretKey = secretKey;
-        this.sessionId = sessionId;
-    }
 
     @Override
     public int hashCode() {

@@ -11,7 +11,10 @@ import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -19,6 +22,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = OAuth2ClientScope.TABLE_NAME)
 public class OAuth2ClientScope extends AuditingEntity {
@@ -27,6 +33,9 @@ public class OAuth2ClientScope extends AuditingEntity {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Embeddable
     public static class PK implements Serializable {
 
@@ -34,15 +43,6 @@ public class OAuth2ClientScope extends AuditingEntity {
         private String clientId;
 
         private String scope;
-
-        public PK() {
-
-        }
-
-        public PK(String clientId, String scope) {
-            this.clientId = clientId;
-            this.scope = scope;
-        }
 
         @Override
         public int hashCode() {

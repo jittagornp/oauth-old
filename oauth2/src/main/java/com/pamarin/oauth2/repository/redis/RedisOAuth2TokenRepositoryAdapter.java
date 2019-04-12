@@ -16,9 +16,9 @@ import com.pamarin.oauth2.repository.OAuth2TokenRepositoryAdapter;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03
- * @param <TOKEN>
+ * @param <T>
  */
-public abstract class RedisOAuth2TokenRepositoryAdapter<TOKEN extends OAuth2Token> extends OAuth2TokenRepositoryAdapter<TOKEN> {
+public abstract class RedisOAuth2TokenRepositoryAdapter<T extends OAuth2Token> extends OAuth2TokenRepositoryAdapter<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisOAuth2TokenRepositoryAdapter.class);
 
@@ -35,7 +35,7 @@ public abstract class RedisOAuth2TokenRepositoryAdapter<TOKEN extends OAuth2Toke
     }
 
     @Override
-    public TOKEN doSave(TOKEN token) {
+    public T doSave(T token) {
         try {
             String key = makeKey(token.getTokenId());
             String value = objectMapper.writeValueAsString(token);
@@ -48,7 +48,7 @@ public abstract class RedisOAuth2TokenRepositoryAdapter<TOKEN extends OAuth2Toke
     }
 
     @Override
-    public TOKEN findByTokenId(String tokenId) {
+    public T findByTokenId(String tokenId) {
         try {
             String key = makeKey(tokenId);
             String value = redisTemplate.opsForValue().get(key);

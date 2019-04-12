@@ -7,8 +7,10 @@ import com.pamarin.commons.util.ObjectEquals;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,6 +23,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = UserSession.COLLECTION_NAME)
 public class UserSession implements Serializable {
 
@@ -50,20 +54,6 @@ public class UserSession implements Serializable {
 
     @Field("ip_address")
     private String ipAddress;
-
-    public UserSession() {
-    }
-
-    public UserSession(String id, String sessionId, Long creationTime, Integer maxInactiveInterval, Long lastAccessedTime, String userId, String agentId, String ipAddress) {
-        this.id = id;
-        this.sessionId = sessionId;
-        this.creationTime = creationTime;
-        this.maxInactiveInterval = maxInactiveInterval;
-        this.lastAccessedTime = lastAccessedTime;
-        this.userId = userId;
-        this.agentId = agentId;
-        this.ipAddress = ipAddress;
-    }
 
     @Override
     public int hashCode() {
