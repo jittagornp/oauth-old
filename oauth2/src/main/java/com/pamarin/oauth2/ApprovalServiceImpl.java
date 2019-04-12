@@ -9,11 +9,11 @@ import com.pamarin.oauth2.model.ClientDetails;
 import com.pamarin.oauth2.service.ApprovalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
-import com.pamarin.oauth2.repository.OAuth2ApprovalScopeRepo;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
+import com.pamarin.oauth2.repository.OAuth2ApprovalRepository;
+import com.pamarin.oauth2.repository.OAuth2ApprovalScopeRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -23,19 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApprovalServiceImpl implements ApprovalService {
 
     @Autowired
-    private OAuth2ApprovalRepo approveRepo;
+    private OAuth2ApprovalRepository approveRepository;
 
     @Autowired
-    private OAuth2ApprovalScopeRepo approvalScopeRepo;
+    private OAuth2ApprovalScopeRepository approvalScopeRepository;
 
     @Override
     public boolean wasApprovedByUserIdAndClientId(String userId, String clientId) {
-        OAuth2Approval approval = approveRepo.findOne(new OAuth2Approval.PK(userId, clientId));
+        OAuth2Approval approval = approveRepository.findOne(new OAuth2Approval.PK(userId, clientId));
         return approval != null;
     }
 
     private void saveScope(OAuth2Approval approval, List<String> scopes) {
-        approvalScopeRepo.save(scopes.stream().map(s -> {
+        approvalScopeRepository.save(scopes.stream().map(s -> {
             OAuth2ApprovalScope scope = new OAuth2ApprovalScope();
             scope.setApproval(approval);
             scope.setClientId(approval.getId().getClientId());
@@ -53,7 +53,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
     @Override
     public void approvedClientByUserId(ClientDetails details, String userId) {
-        saveScope(approveRepo.save(newOAuth2Approval(
+        saveScope(approveRepository.save(newOAuth2Approval(
                 userId,
                 details.getClientId()
         )), details.getScopes());
@@ -61,7 +61,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
     @Override
     public List<String> findScopeByUserIdAndClientId(String userId, String clientId) {
-        return approvalScopeRepo.findScopeByUserIdAndClientId(userId, clientId);
+        return approvalScopeRepository.findScopeByUserIdAndClientId(userId, clientId);
     }
 
 }

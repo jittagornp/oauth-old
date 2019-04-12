@@ -9,9 +9,6 @@ import com.pamarin.oauth2.domain.OAuth2Client;
 import com.pamarin.oauth2.exception.OAuth2ClientNotFoundException;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
-import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
-import com.pamarin.oauth2.repository.OAuth2ClientRepo;
-import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
@@ -24,6 +21,9 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import com.pamarin.oauth2.repository.OAuth2ApprovalRepository;
+import com.pamarin.oauth2.repository.OAuth2ClientRepository;
+import com.pamarin.oauth2.repository.OAuth2ClientScopeRepository;
 
 /**
  *
@@ -39,13 +39,13 @@ public class OAuth2SessionBuilderService_buildTest {
     private OAuth2SessionBuilderServiceImpl builderService;
 
     @MockBean
-    private OAuth2ApprovalRepo approvalRepo;
+    private OAuth2ApprovalRepository approvalRepository;
 
     @MockBean
-    private OAuth2ClientScopeRepo clientScopeRepo;
+    private OAuth2ClientScopeRepository clientScopeRepository;
 
     @MockBean
-    private OAuth2ClientRepo clientRepo;
+    private OAuth2ClientRepository clientRepository;
 
     @Before
     public void before() {
@@ -68,7 +68,7 @@ public class OAuth2SessionBuilderService_buildTest {
 
         OAuth2AccessToken accessToken = stubAccessToken();
 
-        when(approvalRepo.findOne(new OAuth2Approval.PK(
+        when(approvalRepository.findOne(new OAuth2Approval.PK(
                 accessToken.getUserId(),
                 accessToken.getClientId()
         ))).thenReturn(null);
@@ -85,12 +85,12 @@ public class OAuth2SessionBuilderService_buildTest {
 
         OAuth2AccessToken accessToken = stubAccessToken();
 
-        when(approvalRepo.findOne(new OAuth2Approval.PK(
+        when(approvalRepository.findOne(new OAuth2Approval.PK(
                 accessToken.getUserId(),
                 accessToken.getClientId()
         ))).thenReturn(new OAuth2Approval());
 
-        when(clientRepo.findOne(accessToken.getClientId())).thenReturn(null);
+        when(clientRepository.findOne(accessToken.getClientId())).thenReturn(null);
 
         exception.expect(OAuth2ClientNotFoundException.class);
         exception.expectMessage("Not found client id " + accessToken.getClientId());
@@ -104,12 +104,12 @@ public class OAuth2SessionBuilderService_buildTest {
 
         OAuth2AccessToken accessToken = stubAccessToken();
 
-        when(approvalRepo.findOne(new OAuth2Approval.PK(
+        when(approvalRepository.findOne(new OAuth2Approval.PK(
                 accessToken.getUserId(),
                 accessToken.getClientId()
         ))).thenReturn(new OAuth2Approval());
 
-        when(clientRepo.findOne(accessToken.getClientId()))
+        when(clientRepository.findOne(accessToken.getClientId()))
                 .thenReturn(new OAuth2Client());
 
         OAuth2Session output = builderService.build(accessToken);

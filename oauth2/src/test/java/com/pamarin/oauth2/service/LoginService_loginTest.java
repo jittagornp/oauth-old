@@ -3,11 +3,9 @@
  */
 package com.pamarin.oauth2.service;
 
-import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 import com.pamarin.oauth2.LoginServiceImpl;
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
-import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.commons.security.PasswordEncryption;
 import org.junit.Before;
@@ -19,6 +17,8 @@ import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import com.pamarin.oauth2.repository.DatabaseSessionRepository;
+import com.pamarin.oauth2.repository.UserRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/18
@@ -32,7 +32,7 @@ public class LoginService_loginTest {
     private LoginServiceImpl loginService;
 
     @Mock
-    private UserRepo userRepo;
+    private UserRepository userRepository;
 
     @Mock
     private PasswordEncryption passwordEncryption;
@@ -41,7 +41,7 @@ public class LoginService_loginTest {
     private LoginSession loginSession;
 
     @Mock
-    private DatabaseSessionRepo databaseSessionSynchronizerService;
+    private DatabaseSessionRepository databaseSessionSynchronizerService;
 
     @Mock
     private RevokeSessionService revokeSessionService;
@@ -52,9 +52,9 @@ public class LoginService_loginTest {
     @Before
     public void before() {
         MockitoAnnotations.initMocks(this);
-        when(userRepo.findByUsername("test"))
+        when(userRepository.findByUsername("test"))
                 .thenReturn(null);
-        when(userRepo.findByUsername("root"))
+        when(userRepository.findByUsername("root"))
                 .thenReturn(new User());
     }
 

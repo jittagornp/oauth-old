@@ -7,7 +7,6 @@ import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.collection.LoginHistory;
-import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepo;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import com.pamarin.oauth2.service.LoginHistoryService;
 import java.time.LocalDateTime;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.util.StringUtils.hasText;
 import com.pamarin.commons.generator.IdGenerator;
+import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepository;
 
 /**
  *
@@ -41,7 +41,7 @@ public class LoginHistoryServiceImpl implements LoginHistoryService {
     private UserAgentTokenIdResolver userAgentTokenIdResolver;
 
     @Autowired
-    private LoginHistoryRepo loginHistoryRepo;
+    private LoginHistoryRepository loginHistoryRepository;
 
     @Autowired
     private IdGenerator idGenerator;
@@ -57,7 +57,7 @@ public class LoginHistoryServiceImpl implements LoginHistoryService {
         history.setAgentId(userAgentTokenIdResolver.resolve(httpReq));
         history.setSessionId(loginSession.getSessionId());
         history.setUserId(loginSession.getUserDetails().getUsername());
-        loginHistoryRepo.save(history);
+        loginHistoryRepository.save(history);
 
         httpReq.getSession().setAttribute(LOGIN_HISTORY_ATTR, id);
     }
@@ -67,10 +67,10 @@ public class LoginHistoryServiceImpl implements LoginHistoryService {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String id = (String) httpReq.getSession().getAttribute(LOGIN_HISTORY_ATTR);
         if (hasText(id)) {
-            LoginHistory history = loginHistoryRepo.findOne(id);
+            LoginHistory history = loginHistoryRepository.findOne(id);
             if (history != null) {
                 history.setLogoutDate(LocalDateTime.now());
-                loginHistoryRepo.save(history);
+                loginHistoryRepository.save(history);
             }
         }
     }

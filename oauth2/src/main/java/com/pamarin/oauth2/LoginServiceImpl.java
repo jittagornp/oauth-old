@@ -5,7 +5,6 @@ package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.domain.User;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
-import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.LoginSession;
 import com.pamarin.commons.security.PasswordEncryption;
@@ -17,6 +16,7 @@ import com.pamarin.oauth2.service.LoginService;
 import com.pamarin.oauth2.service.RevokeSessionService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.pamarin.oauth2.repository.UserRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; createSession : 2017/11/12
@@ -26,7 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 public class LoginServiceImpl implements LoginService {
 
     @Autowired
-    private UserRepo userRepo;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncryption passwordEncryption;
@@ -46,7 +46,7 @@ public class LoginServiceImpl implements LoginService {
             throw new InvalidUsernamePasswordException("Require username and password.");
         }
 
-        User user = userRepo.findByUsername(username);
+        User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new InvalidUsernamePasswordException("User not found.");
         }
@@ -66,7 +66,7 @@ public class LoginServiceImpl implements LoginService {
             throw new UsernameNotFoundException("Require id.");
         }
 
-        User user = userRepo.findOne(id);
+        User user = userRepository.findOne(id);
         if (user == null) {
             throw new UsernameNotFoundException("User not found.");
         }

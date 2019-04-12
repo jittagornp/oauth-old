@@ -7,7 +7,6 @@ import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
-import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import com.pamarin.oauth2.repository.OAuth2AccessTokenRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 public class AccessTokenVerificationImpl implements AccessTokenVerification {
 
     @Autowired
-    private OAuth2AccessTokenRepo accessTokenRepo;
+    private OAuth2AccessTokenRepository accessTokenRepository;
 
     @Autowired
     private HashBasedToken hashBasedToken;
@@ -31,7 +31,7 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
     @Override
     public OAuth2AccessToken verify(String accessToken) {
         OAuth2AccessToken output = OAuth2AccessToken.builder().build();
-        if (!hashBasedToken.matches(accessToken, new UserDetailsServiceImpl(accessTokenRepo, output))) {
+        if (!hashBasedToken.matches(accessToken, new UserDetailsServiceImpl(accessTokenRepository, output))) {
             throw new InvalidTokenException("Invalid access token.");
         }
         return output;
@@ -39,11 +39,11 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
 
     public static class UserDetailsServiceImpl implements UserDetailsService {
 
-        private final OAuth2AccessTokenRepo accessTokenRepo;
+        private final OAuth2AccessTokenRepository accessTokenRepo;
 
         private final OAuth2AccessToken output;
 
-        public UserDetailsServiceImpl(OAuth2AccessTokenRepo accessTokenRepo, OAuth2AccessToken output) {
+        public UserDetailsServiceImpl(OAuth2AccessTokenRepository accessTokenRepo, OAuth2AccessToken output) {
             this.accessTokenRepo = accessTokenRepo;
             this.output = output;
         }

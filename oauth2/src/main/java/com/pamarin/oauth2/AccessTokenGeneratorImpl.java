@@ -25,12 +25,12 @@ import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 import com.pamarin.oauth2.domain.OAuth2Token;
 import com.pamarin.oauth2.exception.InvalidTokenException;
-import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import com.pamarin.oauth2.service.AuthorizationCodeVerification;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
 import com.pamarin.oauth2.service.RevokeTokenService;
 import java.util.Date;
+import com.pamarin.oauth2.repository.OAuth2AccessTokenRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -51,7 +51,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     private ClientVerification clientVerification;
 
     @Autowired
-    private OAuth2AccessTokenRepo accessTokenRepo;
+    private OAuth2AccessTokenRepository accessTokenRepository;
 
     @Autowired
     private RefreshTokenGenerator refreshTokenGenerator;
@@ -66,7 +66,7 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     private RevokeTokenService revokeTokenService;
 
     private AccessTokenResponse buildAccessTokenResponse(OAuth2Token instance) {
-        OAuth2AccessToken accessToken = accessTokenRepo.save(OAuth2AccessToken.builder()
+        OAuth2AccessToken accessToken = accessTokenRepository.save(OAuth2AccessToken.builder()
                 .userId(instance.getUserId())
                 .clientId(instance.getClientId())
                 .sessionId(instance.getSessionId())

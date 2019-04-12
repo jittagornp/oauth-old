@@ -3,11 +3,11 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.repository.OAuth2ClientRepo;
 import com.pamarin.oauth2.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.pamarin.oauth2.repository.OAuth2ClientRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -17,11 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ClientServiceImpl implements ClientService {
 
     @Autowired
-    private OAuth2ClientRepo clientRepo;
+    private OAuth2ClientRepository clientRepository;
 
     @Override
     public String findClientSecretByClientId(String clientId) {
-        return clientRepo.findSecretById(clientId);
+        return clientRepository.findSecretById(clientId);
     }
 
 }

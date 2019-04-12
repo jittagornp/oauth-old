@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.repository.UserSessionRepo;
 import com.pamarin.oauth2.service.RevokeSessionService;
 import com.pamarin.oauth2.service.RevokeTokenService;
 import java.util.List;
@@ -12,6 +11,7 @@ import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
+import com.pamarin.oauth2.repository.UserSessionRepository;
 
 /**
  *
@@ -21,7 +21,7 @@ import static org.springframework.util.StringUtils.hasText;
 public class RevokeSessionServiceImpl implements RevokeSessionService {
 
     @Autowired
-    private UserSessionRepo userSessionRepo;
+    private UserSessionRepository userSessionRepository;
 
     @Autowired
     private SessionRepository sessionRepository;
@@ -33,7 +33,7 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     public void revokeBySessionId(String sessionId) {
         if (hasText(sessionId)) {
             sessionRepository.delete(sessionId);
-            userSessionRepo.deleteBySessionId(sessionId);
+            userSessionRepository.deleteBySessionId(sessionId);
             revokeTokenService.revokeBySessionId(sessionId);
         }
     }
@@ -48,21 +48,21 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     @Override
     public void revokeAllOnSameUserAgentBySessionId(String sessionId) {
         if (hasText(sessionId)) {
-            revokeBySessionIds(userSessionRepo.findAllSessionIdsOnSameUserAgentBySessionId(sessionId));
+            revokeBySessionIds(userSessionRepository.findAllSessionIdsOnSameUserAgentBySessionId(sessionId));
         }
     }
 
     @Override
     public void revokeByUserId(String userId) {
         if (hasText(userId)) {
-            revokeBySessionIds(userSessionRepo.findAllSessionIdsByUserId(userId));
+            revokeBySessionIds(userSessionRepository.findAllSessionIdsByUserId(userId));
         }
     }
 
     @Override
     public void revokeOthersOnSameUserAgentBySessionId(String sessionId) {
         if (hasText(sessionId)) {
-            revokeBySessionIds(userSessionRepo.findOtherSessionIdsOnSameUserAgentBySessionId(sessionId));
+            revokeBySessionIds(userSessionRepository.findOtherSessionIdsOnSameUserAgentBySessionId(sessionId));
         }
     }
 

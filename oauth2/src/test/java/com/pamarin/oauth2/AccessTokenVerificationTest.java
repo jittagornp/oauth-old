@@ -9,7 +9,6 @@ import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.commons.security.hashing.SHA384Hashing;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.InvalidTokenException;
-import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
@@ -21,6 +20,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
+import com.pamarin.oauth2.repository.OAuth2AccessTokenRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/04
@@ -34,7 +34,7 @@ public class AccessTokenVerificationTest {
     private AccessTokenVerificationImpl verification;
 
     @Mock
-    private OAuth2AccessTokenRepo accessTokenRepo;
+    private OAuth2AccessTokenRepository accessTokenRepository;
 
     private HashBasedToken hashBasedToken;
 
@@ -48,9 +48,9 @@ public class AccessTokenVerificationTest {
                 hashBasedToken
         );
 
-        when(accessTokenRepo.findByTokenId("123456"))
+        when(accessTokenRepository.findByTokenId("123456"))
                 .thenReturn(null);
-        when(accessTokenRepo.findByTokenId("999999"))
+        when(accessTokenRepository.findByTokenId("999999"))
                 .thenReturn(OAuth2AccessToken.builder()
                         .tokenId("999999")
                         .secretKey("999999")

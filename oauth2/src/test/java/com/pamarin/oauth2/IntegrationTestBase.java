@@ -5,8 +5,6 @@ package com.pamarin.oauth2;
 
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
-import com.pamarin.oauth2.repository.OAuth2AllowDomainRepo;
-import com.pamarin.oauth2.repository.UserRepo;
 import com.pamarin.commons.security.CsrfInterceptor;
 import com.pamarin.commons.security.UserDetailsStub;
 import com.pamarin.commons.security.LoginSession;
@@ -14,10 +12,8 @@ import com.pamarin.oauth2.cache.OAuth2SessionCacheStore;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.domain.User;
-import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepo;
-import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepo;
-import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2RefreshTokenRepo;
-import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepository;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2RefreshTokenRepository;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,16 +22,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
-import com.pamarin.oauth2.repository.OAuth2ApprovalScopeRepo;
-import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepo;
-import com.pamarin.oauth2.repository.OAuth2ClientRepo;
-import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
 import com.pamarin.oauth2.repository.OAuth2JobSchedulerRepository;
 import java.util.Arrays;
-import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
-import com.pamarin.oauth2.repository.OAuth2ScopeRepo;
-import com.pamarin.oauth2.repository.UserSessionRepo;
 import com.pamarin.oauth2.service.AuthorizeViewModelService;
 import com.pamarin.oauth2.service.AuthorizeViewModelService.Model;
 import com.pamarin.oauth2.service.AuthorizeViewModelService.Scope;
@@ -44,9 +32,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.session.SessionRepository;
-import com.pamarin.oauth2.repository.UserAgentRepo;
 import com.pamarin.oauth2.service.RevokeTokenService;
 import javax.sql.DataSource;
+import com.pamarin.oauth2.repository.OAuth2AccessTokenRepository;
+import com.pamarin.oauth2.repository.OAuth2AllowDomainRepository;
+import com.pamarin.oauth2.repository.OAuth2ApprovalRepository;
+import com.pamarin.oauth2.repository.OAuth2ApprovalScopeRepository;
+import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepository;
+import com.pamarin.oauth2.repository.OAuth2ClientRepository;
+import com.pamarin.oauth2.repository.OAuth2ClientScopeRepository;
+import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
+import com.pamarin.oauth2.repository.OAuth2ScopeRepository;
+import com.pamarin.oauth2.repository.UserAgentRepository;
+import com.pamarin.oauth2.repository.UserRepository;
+import com.pamarin.oauth2.repository.UserSessionRepository;
+import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -58,16 +58,16 @@ public class IntegrationTestBase {
     private DataSource dataSource; 
 
     @MockBean
-    protected UserRepo userRepo;
+    protected UserRepository userRepository;
 
     @MockBean
-    protected UserSessionRepo userSessionRepo;
+    protected UserSessionRepository userSessionRepository;
     
     @MockBean
     protected OAuth2JobSchedulerRepository jobSchedulerRepository;
 
     @MockBean
-    protected UserAgentRepo userAgentRepo;
+    protected UserAgentRepository userAgentRepository;
 
     @MockBean
     protected CsrfInterceptor csrfVerificationInterceptor;
@@ -76,34 +76,34 @@ public class IntegrationTestBase {
     protected LoginSession loginSession;
 
     @MockBean
-    protected OAuth2ApprovalRepo approvalRepo;
+    protected OAuth2ApprovalRepository approvalRepository;
 
     @MockBean
-    protected OAuth2ApprovalScopeRepo approvalScopeRepo;
+    protected OAuth2ApprovalScopeRepository approvalScopeRepository;
 
     @MockBean
-    protected OAuth2ClientRepo clientRepo;
+    protected OAuth2ClientRepository clientRepository;
 
     @MockBean
-    protected OAuth2AllowDomainRepo allowDomainRepo;
+    protected OAuth2AllowDomainRepository allowDomainRepository;
 
     @MockBean
-    protected OAuth2ClientScopeRepo clientScopeRepo;
+    protected OAuth2ClientScopeRepository clientScopeRepository;
 
     @MockBean
-    protected OAuth2ScopeRepo scopeRepo;
+    protected OAuth2ScopeRepository scopeRepository;
 
     @MockBean
     protected AuthorizeViewModelService authorizeViewModelService;
 
     @MockBean
-    protected OAuth2AuthorizationCodeRepo authorizationCodeRepo;
+    protected OAuth2AuthorizationCodeRepository authorizationCodeRepository;
 
     @MockBean
-    protected OAuth2AccessTokenRepo accessTokenRepo;
+    protected OAuth2AccessTokenRepository accessTokenRepository;
 
     @MockBean
-    protected OAuth2RefreshTokenRepo refreshTokenRepo;
+    protected OAuth2RefreshTokenRepository refreshTokenRepository;
 
     @MockBean
     protected OAuth2SessionCacheStore sessionCacheStore;
@@ -115,13 +115,13 @@ public class IntegrationTestBase {
     protected SessionRepository sessionRepository;
 
     @MockBean
-    protected LoginHistoryRepo loginHistoryRepo;
+    protected LoginHistoryRepository loginHistoryRepository;
 
     @MockBean
-    protected MongodbOAuth2AccessTokenRepo mongodbOAuth2AccessTokenRepo;
+    protected MongodbOAuth2AccessTokenRepository mongodbOAuth2AccessTokenRepository;
 
     @MockBean
-    protected MongodbOAuth2RefreshTokenRepo mongodbOAuth2RefreshTokenRepo;
+    protected MongodbOAuth2RefreshTokenRepository mongodbOAuth2RefreshTokenRepository;
     
     @MockBean
     protected RevokeTokenService revokeTokenService;
@@ -135,21 +135,21 @@ public class IntegrationTestBase {
     }
 
     @Before
-    public void mockUserRepo() {
+    public void mockUserRepository() {
         UserDetails userDetails = UserDetailsStub.get();
         User user = new User();
         user.setId(userDetails.getUsername());
         user.setUsername(userDetails.getUsername());
         user.setPassword(userDetails.getPassword());
-        when(userRepo.findOne(any(String.class)))
+        when(userRepository.findOne(any(String.class)))
                 .thenReturn(user);
     }
 
     @Before
-    public void mockRefreshTokenRepo() {
+    public void mockRefreshTokenRepository() {
         OAuth2RefreshToken refreshToken = stubRefreshToken();
-        when(refreshTokenRepo.save(any(OAuth2RefreshToken.class))).thenReturn(refreshToken);
-        when(refreshTokenRepo.findByTokenId(any(String.class))).thenReturn(refreshToken);
+        when(refreshTokenRepository.save(any(OAuth2RefreshToken.class))).thenReturn(refreshToken);
+        when(refreshTokenRepository.findByTokenId(any(String.class))).thenReturn(refreshToken);
     }
 
     @Before
@@ -167,20 +167,20 @@ public class IntegrationTestBase {
     }
 
     @Before
-    public void mockClientRepo() {
-        when(clientRepo.findSecretById(any(String.class)))
+    public void mockClientRepository() {
+        when(clientRepository.findSecretById(any(String.class)))
                 .thenReturn("password");
     }
 
     @Before
-    public void mockAllowDomainRepo() {
-        when(allowDomainRepo.findDomainNameByClientId(any(String.class)))
+    public void mockAllowDomainRepository() {
+        when(allowDomainRepository.findDomainNameByClientId(any(String.class)))
                 .thenReturn(Arrays.asList("http://localhost"));
     }
 
     @Before
-    public void mockClientScopeRepo() {
-        when(clientScopeRepo.findScopeByClientId(any(String.class)))
+    public void mockClientScopeRepository() {
+        when(clientScopeRepository.findScopeByClientId(any(String.class)))
                 .thenReturn(Arrays.asList("read"));
     }
 
@@ -195,10 +195,10 @@ public class IntegrationTestBase {
     }
 
     @Before
-    public void mockOAuth2AccessTokenRepo() {
+    public void mockOAuth2AccessTokenRepository() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expires = now.plusMinutes(30);
-        when(accessTokenRepo.save(any(OAuth2AccessToken.class)))
+        when(accessTokenRepository.save(any(OAuth2AccessToken.class)))
                 .thenReturn(OAuth2AccessToken.builder()
                         .tokenId("abcdefghijklmnopqrstuvwxyz")
                         .userId(UUID.randomUUID().toString())
@@ -209,10 +209,10 @@ public class IntegrationTestBase {
     }
 
     @Before
-    public void mockOAuth2AuthorizationCodeRepo() {
+    public void mockOAuth2AuthorizationCodeRepository() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expires = now.plusMinutes(30);
-        when(authorizationCodeRepo.save(any(OAuth2AuthorizationCode.class)))
+        when(authorizationCodeRepository.save(any(OAuth2AuthorizationCode.class)))
                 .thenReturn(OAuth2AuthorizationCode.builder()
                         .tokenId("00000000-0000-0000-0000-000000000000")
                         .userId(UUID.randomUUID().toString())

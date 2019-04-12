@@ -8,12 +8,12 @@ import com.pamarin.commons.security.HashBasedToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.exception.InvalidTokenException;
-import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepo;
 import com.pamarin.oauth2.service.AuthorizationCodeVerification;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -22,20 +22,20 @@ import org.springframework.stereotype.Service;
 public class AuthorizationCodeVerificationImpl implements AuthorizationCodeVerification {
 
     @Autowired
-    private OAuth2AuthorizationCodeRepo authorizationCodeRepo;
+    private OAuth2AuthorizationCodeRepository authorizationCodeRepository;
 
     @Autowired
     private HashBasedToken hashBasedToken;
 
     private UserDetailsService userDetailsService(OAuth2AuthorizationCode output) {
         return tokenId -> {
-            OAuth2AuthorizationCode code = authorizationCodeRepo.findByTokenId(tokenId);
+            OAuth2AuthorizationCode code = authorizationCodeRepository.findByTokenId(tokenId);
             if (code == null) {
                 throw new UsernameNotFoundException("Not found authorization code.");
             }
 
             //revoke code
-            authorizationCodeRepo.deleteByTokenId(tokenId);
+            authorizationCodeRepository.deleteByTokenId(tokenId);
 
             String[] ignoreProperties = new String[]{"secretKey"};
             BeanUtils.copyProperties(code, output, ignoreProperties);

@@ -3,38 +3,38 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
-import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
-import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
 
 /**
  *
  * @author jitta
  */
-public class OAuth2RefreshTokenRepoImpl implements OAuth2RefreshTokenRepo {
+public class OAuth2RefreshTokenRepoImpl implements OAuth2RefreshTokenRepository {
 
     @Autowired
-    private RedisOAuth2RefreshTokenRepo redisOAuth2RefreshTokenRepo;
+    private RedisOAuth2RefreshTokenRepository redisOAuth2RefreshTokenRepository;
 
     @Autowired
-    private MongodbOAuth2RefreshTokenRepo mongodbOAuth2RefreshTokenRepo;
+    private MongodbOAuth2RefreshTokenRepository mongodbOAuth2RefreshTokenRepository;
 
     @Override
     public OAuth2RefreshToken save(OAuth2RefreshToken token) {
-        return mongodbOAuth2RefreshTokenRepo.save(redisOAuth2RefreshTokenRepo.save(token));
+        return mongodbOAuth2RefreshTokenRepository.save(redisOAuth2RefreshTokenRepository.save(token));
     }
 
     @Override
     public OAuth2RefreshToken findByTokenId(String tokenId) {
-        return redisOAuth2RefreshTokenRepo.findByTokenId(tokenId);
+        return redisOAuth2RefreshTokenRepository.findByTokenId(tokenId);
     }
 
     @Override
     public void deleteByTokenId(String tokenId) {
-        redisOAuth2RefreshTokenRepo.deleteByTokenId(tokenId);
-        mongodbOAuth2RefreshTokenRepo.deleteByTokenId(tokenId);
+        redisOAuth2RefreshTokenRepository.deleteByTokenId(tokenId);
+        mongodbOAuth2RefreshTokenRepository.deleteByTokenId(tokenId);
     }
 
 }

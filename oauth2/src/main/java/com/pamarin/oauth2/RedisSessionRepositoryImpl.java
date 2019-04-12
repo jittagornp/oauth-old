@@ -18,7 +18,7 @@ import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.MapSession;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.util.Assert;
-import com.pamarin.oauth2.repository.DatabaseSessionRepo;
+import com.pamarin.oauth2.repository.DatabaseSessionRepository;
 
 /**
  * @author Jitta
@@ -27,7 +27,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSessionRepositoryImpl.class);
 
-    private DatabaseSessionRepo databaseSessionRepository;
+    private DatabaseSessionRepository databaseSessionRepository;
 
     private static final String SESSION_KEY_PREFIX = "user-session:";
 
@@ -41,7 +41,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
 
     private String keyPrefix = SESSION_KEY_PREFIX;
 
-    private final RedisOperations<Object, Object> sessionRedisOperations;
+    private final RedisOperations<Object, Object> redisOperations;
 
     private Integer defaultMaxInactiveInterval;
 
@@ -51,9 +51,9 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
         this(createDefaultTemplate(redisConnectionFactory));
     }
 
-    public RedisSessionRepositoryImpl(RedisOperations<Object, Object> sessionRedisOperations) {
-        Assert.notNull(sessionRedisOperations, "sessionRedisOperations cannot be null");
-        this.sessionRedisOperations = sessionRedisOperations;
+    public RedisSessionRepositoryImpl(RedisOperations<Object, Object> redisOperations) {
+        Assert.notNull(redisOperations, "redisOperations cannot be null");
+        this.redisOperations = redisOperations;
     }
 
     public void setDefaultMaxInactiveInterval(int defaultMaxInactiveInterval) {
@@ -123,7 +123,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
     public void delete(String sessionId) {
         LOG.debug("delete({})...", sessionId);
         String key = getSessionKey(sessionId);
-        this.sessionRedisOperations.delete(key);
+        this.redisOperations.delete(key);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
 
     private BoundHashOperations<Object, Object, Object> getSessionBoundHashOperations(String sessionId) {
         String key = getSessionKey(sessionId);
-        return this.sessionRedisOperations.boundHashOps(key);
+        return this.redisOperations.boundHashOps(key);
     }
 
     static String getSessionAttrNameKey(String attributeName) {
@@ -279,7 +279,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
         }
     }
 
-    public void setDatabaseSessionRepository(DatabaseSessionRepo databaseSessionRepository) {
+    public void setDatabaseSessionRepository(DatabaseSessionRepository databaseSessionRepository) {
         this.databaseSessionRepository = databaseSessionRepository;
     }
 

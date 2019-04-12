@@ -5,7 +5,6 @@ package com.pamarin.oauth2.service;
 
 import com.pamarin.oauth2.LoginServiceImpl;
 import com.pamarin.oauth2.domain.User;
-import com.pamarin.oauth2.repository.UserRepo;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,6 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.pamarin.oauth2.repository.UserRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/04
@@ -30,14 +30,14 @@ public class LoginService_loadUserByUsernameTest {
     private LoginServiceImpl loginService;
 
     @Mock
-    private UserRepo userRepo;
+    private UserRepository userRepository;
 
     @Before
     public void before() {
         MockitoAnnotations.initMocks(this);
-        when(userRepo.findOne("1111"))
+        when(userRepository.findOne("1111"))
                 .thenReturn(null);
-        when(userRepo.findOne("2222"))
+        when(userRepository.findOne("2222"))
                 .thenReturn(new User());
     }
 

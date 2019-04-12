@@ -9,14 +9,14 @@ import com.pamarin.oauth2.domain.OAuth2Client;
 import com.pamarin.oauth2.exception.OAuth2ClientNotFoundException;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
-import com.pamarin.oauth2.repository.OAuth2ApprovalRepo;
-import com.pamarin.oauth2.repository.OAuth2ClientRepo;
-import com.pamarin.oauth2.repository.OAuth2ClientScopeRepo;
 import com.pamarin.oauth2.service.OAuth2SessionBuilderService;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.pamarin.oauth2.repository.OAuth2ApprovalRepository;
+import com.pamarin.oauth2.repository.OAuth2ClientRepository;
+import com.pamarin.oauth2.repository.OAuth2ClientScopeRepository;
 
 /**
  *
@@ -27,22 +27,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class OAuth2SessionBuilderServiceImpl implements OAuth2SessionBuilderService {
 
     @Autowired
-    private OAuth2ClientScopeRepo clientScopeRepo;
+    private OAuth2ClientScopeRepository clientScopeRepository;
 
     @Autowired
-    private OAuth2ClientRepo clientRepo;
+    private OAuth2ClientRepository clientRepository;
 
     @Autowired
-    private OAuth2ApprovalRepo approvalRepo;
+    private OAuth2ApprovalRepository approvalRepository;
 
     @Override
     public OAuth2Session build(OAuth2AccessToken accessToken) {
-        OAuth2Approval approval = approvalRepo.findOne(new OAuth2Approval.PK(accessToken.getUserId(), accessToken.getClientId()));
+        OAuth2Approval approval = approvalRepository.findOne(new OAuth2Approval.PK(accessToken.getUserId(), accessToken.getClientId()));
         if (approval == null) {
             throw new UnauthorizedClientException("Unauthorized client " + accessToken.getClientId() + " for user " + accessToken.getUserId() + ".");
         }
 
-        OAuth2Client client = clientRepo.findOne(accessToken.getClientId());
+        OAuth2Client client = clientRepository.findOne(accessToken.getClientId());
         if (client == null) {
             throw new OAuth2ClientNotFoundException("Not found client id " + accessToken.getClientId());
         }
@@ -61,7 +61,7 @@ public class OAuth2SessionBuilderServiceImpl implements OAuth2SessionBuilderServ
                 .client(OAuth2Session.Client.builder()
                         .id(client.getId())
                         .name(client.getName())
-                        .scopes(clientScopeRepo.findScopeByClientId(client.getId()))
+                        .scopes(clientScopeRepository.findScopeByClientId(client.getId()))
                         .build()
                 )
                 .build();

@@ -7,7 +7,6 @@ import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
-import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
 import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,6 +20,7 @@ import static org.mockito.Mockito.when;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
+import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
 
 /**
  *
@@ -33,7 +33,7 @@ public class RefreshTokenVerificationTest {
 
     private RefreshTokenVerificationImpl.UserDetailsServiceImpl userDetailsServiceImpl;
 
-    private OAuth2RefreshTokenRepo refreshTokenRepo;
+    private OAuth2RefreshTokenRepository refreshTokenRepository;
 
     private OAuth2RefreshToken output;
 
@@ -43,16 +43,16 @@ public class RefreshTokenVerificationTest {
 
     @Before
     public void before() {
-        refreshTokenRepo = mock(OAuth2RefreshTokenRepo.class);
+        refreshTokenRepository = mock(OAuth2RefreshTokenRepository.class);
         output = OAuth2RefreshToken.builder().build();
-        userDetailsServiceImpl = new RefreshTokenVerificationImpl.UserDetailsServiceImpl(refreshTokenRepo, output);
+        userDetailsServiceImpl = new RefreshTokenVerificationImpl.UserDetailsServiceImpl(refreshTokenRepository, output);
         hashBasedToken = mock(HashBasedToken.class);
 
         refreshTokenVerification = new RefreshTokenVerificationImpl();
         ReflectionTestUtils.setField(
                 refreshTokenVerification,
-                "refreshTokenRepo",
-                refreshTokenRepo
+                "refreshTokenRepository",
+                refreshTokenRepository
         );
 
         ReflectionTestUtils.setField(
@@ -68,7 +68,7 @@ public class RefreshTokenVerificationTest {
         exception.expect(UsernameNotFoundException.class);
         exception.expectMessage("Not found refresh token");
 
-        when(refreshTokenRepo.findByTokenId(any(String.class))).thenReturn(null);
+        when(refreshTokenRepository.findByTokenId(any(String.class))).thenReturn(null);
 
         String input = "test";
         userDetailsServiceImpl.loadUserByUsername(input);
@@ -79,7 +79,7 @@ public class RefreshTokenVerificationTest {
         OAuth2RefreshToken refreshToken = OAuth2RefreshToken.builder().build();
         refreshToken.setUserId("jittagornp");
         refreshToken.setSecretKey("xyz");
-        when(refreshTokenRepo.findByTokenId(any(String.class))).thenReturn(refreshToken);
+        when(refreshTokenRepository.findByTokenId(any(String.class))).thenReturn(refreshToken);
 
         String input = "test";
         userDetailsServiceImpl.loadUserByUsername(input);

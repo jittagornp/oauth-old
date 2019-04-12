@@ -7,7 +7,6 @@ import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
-import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepo;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/05
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
 
     @Autowired
-    private OAuth2RefreshTokenRepo refreshTokenRepo;
+    private OAuth2RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
     private HashBasedToken hashBasedToken;
@@ -31,7 +31,7 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
     @Override
     public OAuth2RefreshToken verify(String token) {
         OAuth2RefreshToken output = OAuth2RefreshToken.builder().build();
-        if (!hashBasedToken.matches(token, new UserDetailsServiceImpl(refreshTokenRepo, output))) {
+        if (!hashBasedToken.matches(token, new UserDetailsServiceImpl(refreshTokenRepository, output))) {
             throw new UnauthorizedClientException("Invalid refresh token");
         }
         return output;
@@ -39,11 +39,11 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
 
     public static class UserDetailsServiceImpl implements UserDetailsService {
 
-        private final OAuth2RefreshTokenRepo refreshTokenRepo;
+        private final OAuth2RefreshTokenRepository refreshTokenRepo;
 
         private final OAuth2RefreshToken output;
 
-        public UserDetailsServiceImpl(OAuth2RefreshTokenRepo refreshTokenRepo, OAuth2RefreshToken output) {
+        public UserDetailsServiceImpl(OAuth2RefreshTokenRepository refreshTokenRepo, OAuth2RefreshToken output) {
             this.refreshTokenRepo = refreshTokenRepo;
             this.output = output;
         }

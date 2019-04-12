@@ -4,15 +4,15 @@
 package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
-import com.pamarin.oauth2.DatabaseSessionRepoImpl;
+import com.pamarin.oauth2.DatabaseSessionRepositoryImpl;
 import com.pamarin.oauth2.security.SessionCookieSerializer;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.web.http.CookieSerializer;
-import com.pamarin.oauth2.repository.DatabaseSessionRepo;
 import javax.validation.constraints.NotNull;
+import com.pamarin.oauth2.repository.DatabaseSessionRepository;
 
 /**
  *
@@ -46,8 +46,8 @@ public class SessionConf {
     }
 
     @Bean
-    public DatabaseSessionRepo newDatabaseSessionRepo() {
-        return new DatabaseSessionRepoImpl(sessionTimeout, 1000 * 30);
+    public DatabaseSessionRepository newDatabaseSessionRepository() {
+        return new DatabaseSessionRepositoryImpl(sessionTimeout, 1000 * 30);
     }
 
 }

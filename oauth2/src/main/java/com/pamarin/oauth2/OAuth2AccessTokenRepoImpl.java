@@ -3,38 +3,38 @@
  */
 package com.pamarin.oauth2;
 
-import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepo;
-import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepo;
+import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepository;
+import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepository;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
-import com.pamarin.oauth2.repository.OAuth2AccessTokenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.pamarin.oauth2.repository.OAuth2AccessTokenRepository;
 
 /**
  *
  * @author jitta
  */
-public class OAuth2AccessTokenRepoImpl implements OAuth2AccessTokenRepo {
+public class OAuth2AccessTokenRepoImpl implements OAuth2AccessTokenRepository {
 
     @Autowired
-    private RedisOAuth2AccessTokenRepo redisOAuth2AccessTokenRepo;
+    private RedisOAuth2AccessTokenRepository redisOAuth2AccessTokenRepository;
 
     @Autowired
-    private MongodbOAuth2AccessTokenRepo mongodbOAuth2AccessTokenRepo;
+    private MongodbOAuth2AccessTokenRepository mongodbOAuth2AccessTokenRepository;
 
     @Override
     public OAuth2AccessToken save(OAuth2AccessToken token) {
-        return redisOAuth2AccessTokenRepo.save(mongodbOAuth2AccessTokenRepo.save(token));
+        return redisOAuth2AccessTokenRepository.save(mongodbOAuth2AccessTokenRepository.save(token));
     }
 
     @Override
     public OAuth2AccessToken findByTokenId(String tokenId) {
-        return redisOAuth2AccessTokenRepo.findByTokenId(tokenId);
+        return redisOAuth2AccessTokenRepository.findByTokenId(tokenId);
     }
 
     @Override
     public void deleteByTokenId(String tokenId) {
-        redisOAuth2AccessTokenRepo.deleteByTokenId(tokenId);
-        mongodbOAuth2AccessTokenRepo.deleteByTokenId(tokenId);
+        redisOAuth2AccessTokenRepository.deleteByTokenId(tokenId);
+        mongodbOAuth2AccessTokenRepository.deleteByTokenId(tokenId);
     }
 
 }

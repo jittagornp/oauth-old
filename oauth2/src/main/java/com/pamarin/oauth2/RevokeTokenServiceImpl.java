@@ -5,8 +5,8 @@ package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
-import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepo;
-import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepo;
+import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepository;
+import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
 import com.pamarin.oauth2.service.RevokeTokenService;
 import static java.util.Collections.emptyList;
 import java.util.List;
@@ -23,25 +23,25 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class RevokeTokenServiceImpl implements RevokeTokenService {
 
     @Autowired
-    private RedisOAuth2AccessTokenRepo redisOAuth2AccessTokenRepo;
+    private RedisOAuth2AccessTokenRepository redisOAuth2AccessTokenRepository;
 
     @Autowired
-    private RedisOAuth2RefreshTokenRepo redisOAuth2RefreshTokenRepo;
+    private RedisOAuth2RefreshTokenRepository redisOAuth2RefreshTokenRepository;
 
     @Autowired
-    private MongoOperations mongoOps;
+    private MongoOperations mongoOperations;
 
     private Query makeAttributeQuery(String attributeName, Object attributeValue) {
         return Query.query(Criteria.where(attributeName).is(attributeValue));
     }
 
     private void revokeRedisToken(String tokenId) {
-        redisOAuth2AccessTokenRepo.deleteByTokenId(tokenId);
-        redisOAuth2RefreshTokenRepo.deleteByTokenId(tokenId);
+        redisOAuth2AccessTokenRepository.deleteByTokenId(tokenId);
+        redisOAuth2RefreshTokenRepository.deleteByTokenId(tokenId);
     }
 
     private List<OAuth2AccessToken> findAccessTokens(Query query) {
-        List<OAuth2AccessToken> accessTokens = mongoOps.find(query, OAuth2AccessToken.class);
+        List<OAuth2AccessToken> accessTokens = mongoOperations.find(query, OAuth2AccessToken.class);
         if (isEmpty(accessTokens)) {
             return emptyList();
         }
@@ -52,8 +52,8 @@ public class RevokeTokenServiceImpl implements RevokeTokenService {
         Query query = makeAttributeQuery(attributeName, attributeValue);
         findAccessTokens(query)
                 .forEach(accessToken -> revokeRedisToken(accessToken.getTokenId()));
-        mongoOps.remove(query, OAuth2AccessToken.class);
-        mongoOps.remove(query, OAuth2RefreshToken.class);
+        mongoOperations.remove(query, OAuth2AccessToken.class);
+        mongoOperations.remove(query, OAuth2RefreshToken.class);
     }
 
     @Override

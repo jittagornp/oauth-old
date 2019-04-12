@@ -12,9 +12,9 @@ import com.pamarin.commons.security.LoginSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
-import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepo;
 import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
 import java.util.Date;
+import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepository;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -26,15 +26,14 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
     private LoginSession loginSession;
 
     @Autowired
-    private OAuth2AuthorizationCodeRepo auth2AuthorizationCodeRepo;
+    private OAuth2AuthorizationCodeRepository authorizationCodeRepository;
 
     @Autowired
     private HashBasedToken hashBasedToken;
 
     @Override
     public AuthorizationResponse generate(AuthorizationRequest req) {
-
-        OAuth2AuthorizationCode code = auth2AuthorizationCodeRepo.save(OAuth2AuthorizationCode.builder()
+        OAuth2AuthorizationCode code = authorizationCodeRepository.save(OAuth2AuthorizationCode.builder()
                 .userId(loginSession.getUserDetails().getUsername())
                 .clientId(req.getClientId())
                 .sessionId(loginSession.getSessionId())
