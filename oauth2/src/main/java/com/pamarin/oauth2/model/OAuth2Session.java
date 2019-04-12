@@ -42,6 +42,8 @@ public class OAuth2Session implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class User implements Serializable {
+        
+        private static final long serialVersionUID = 1L;
 
         private String id;
 
@@ -64,6 +66,8 @@ public class OAuth2Session implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Client implements Serializable {
+        
+        private static final long serialVersionUID = 1L;
 
         private String id;
 
@@ -89,9 +93,7 @@ public class OAuth2Session implements Serializable {
     @Override
     public boolean equals(Object obj) {
         return ObjectEquals.of(this)
-                .equals(obj, (origin, other) -> {
-                    return Objects.equals(origin.getId(), other.getId());
-                });
+                .equals(obj, (origin, other) -> Objects.equals(origin.getId(), other.getId()));
     }
 
 }
