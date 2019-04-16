@@ -3,11 +3,14 @@
  */
 package com.pamarin.oauth2.cache;
 
+import java.io.Serializable;
+
 /**
  *
  * @author jitta
+ * @param <T>
  */
-public interface CacheStore<T> {
+public interface CacheStore<T extends Serializable> {
 
     int getExpiresMinutes();
 

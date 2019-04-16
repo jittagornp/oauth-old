@@ -57,7 +57,7 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
     }
 
     private List<String> map(List<UserSession> userSessions) {
-        return userSessions.stream().map(us -> us.getSessionId()).collect(Collectors.toList());
+        return userSessions.stream().map(UserSession::getSessionId).collect(Collectors.toList());
     }
 
     @Override

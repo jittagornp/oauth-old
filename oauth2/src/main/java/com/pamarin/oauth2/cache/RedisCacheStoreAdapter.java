@@ -3,10 +3,10 @@
  */
 package com.pamarin.oauth2.cache;
 
-import com.pamarin.oauth2.cache.CacheStore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author jitta
  * @param <T>
  */
-public abstract class RedisCacheStoreAdapter<T> implements CacheStore<T> {
+public abstract class RedisCacheStoreAdapter<T extends Serializable> implements CacheStore<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisCacheStoreAdapter.class);
 

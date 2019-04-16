@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.pamarin.commons.generator.IdGenerator;
+import org.springframework.beans.BeanUtils;
 
 /**
  *
@@ -69,14 +70,15 @@ public abstract class OAuth2TokenRepositoryAdapter<T extends OAuth2Token> implem
     @Override
     public T save(T token) {
         try {
-            T clone = (T) token.clone();
+            T clone = getTokenClass().newInstance();
+            BeanUtils.copyProperties(token, clone);
             setIdIfNotPresent(clone);
             setTokenIdIfNotPresent(clone);
             setExpirationTimeIfNotPresent(clone);
             setSecretKeyIfNotPresent(clone);
             return doSave(clone);
-        } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException("Can't clone token", ex);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            throw new RuntimeException("Can't save token", ex);
         }
     }
 }

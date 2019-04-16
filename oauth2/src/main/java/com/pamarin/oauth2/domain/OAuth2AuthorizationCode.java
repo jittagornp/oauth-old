@@ -3,6 +3,8 @@
  */
 package com.pamarin.oauth2.domain;
 
+import com.pamarin.commons.util.ObjectEquals;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,7 +41,16 @@ public class OAuth2AuthorizationCode implements OAuth2Token {
     private String sessionId;
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + Objects.hashCode(this.id);
+        return hash;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return ObjectEquals.of(this)
+                .equals(obj, (origin, other) -> Objects.equals(origin.getId(), other.getId()));
+    }
+
 }

@@ -42,7 +42,7 @@ public class OAuth2Session implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class User implements Serializable {
-        
+
         private static final long serialVersionUID = 1L;
 
         private String id;
@@ -58,6 +58,19 @@ public class OAuth2Session implements Serializable {
             return authorities;
         }
 
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 47 * hash + Objects.hashCode(this.id);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return ObjectEquals.of(this)
+                    .equals(obj, (origin, other) -> Objects.equals(origin.getId(), other.getId()));
+        }
+
     }
 
     @Getter
@@ -66,7 +79,7 @@ public class OAuth2Session implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Client implements Serializable {
-        
+
         private static final long serialVersionUID = 1L;
 
         private String id;
@@ -81,6 +94,20 @@ public class OAuth2Session implements Serializable {
             }
             return scopes;
         }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 17 * hash + Objects.hashCode(this.id);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return ObjectEquals.of(this)
+                    .equals(obj, (origin, other) -> Objects.equals(origin.getId(), other.getId()));
+        }
+
     }
 
     @Override

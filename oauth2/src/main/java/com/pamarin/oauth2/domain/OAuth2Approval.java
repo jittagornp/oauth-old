@@ -79,9 +79,7 @@ public class OAuth2Approval extends AuditingEntity {
     @Override
     public boolean equals(Object obj) {
         return ObjectEquals.of(this)
-                .equals(obj, (origin, other) -> {
-                    return Objects.equals(origin.getId(), other.getId());
-                });
+                .equals(obj, (origin, other) -> Objects.equals(origin.getId(), other.getId()));
     }
 
 }

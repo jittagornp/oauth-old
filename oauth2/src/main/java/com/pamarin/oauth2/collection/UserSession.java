@@ -65,9 +65,9 @@ public class UserSession implements Serializable {
     @Override
     public boolean equals(Object obj) {
         return ObjectEquals.of(this)
-                .equals(obj, (origin, other) -> {
-                    return Objects.equals(origin.getId(), other.getId())
-                            || Objects.equals(origin.getSessionId(), other.getSessionId());
-                });
+                .equals(obj, (origin, other)
+                        -> Objects.equals(origin.getId(), other.getId())
+                || Objects.equals(origin.getSessionId(), other.getSessionId())
+                );
     }
 }

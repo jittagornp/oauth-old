@@ -67,15 +67,9 @@ public class OAuth2AccessToken implements OAuth2Token {
     @Override
     public boolean equals(Object obj) {
         return ObjectEquals.of(this)
-                .equals(obj, (origin, other) -> {
-                    return Objects.equals(origin.getId(), other.getId())
-                            || Objects.equals(origin.getTokenId(), other.getTokenId());
-                });
+                .equals(obj, (origin, other)
+                        -> Objects.equals(origin.getId(), other.getId())
+                || Objects.equals(origin.getTokenId(), other.getTokenId())
+                );
     }
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
 }

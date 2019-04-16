@@ -5,7 +5,7 @@ package com.pamarin.oauth2.exception.handler;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ public class DefaultErrorResponseExceptionHandlerResolver implements ErrorRespon
     public DefaultErrorResponseExceptionHandlerResolver(List<ErrorResponseExceptionHandler> handlers, ErrorResponseRootExceptionHandler rootExceptionHandler) {
         this.registry = handlers.stream()
                 .filter(handler -> handler.getTypeClass() != Exception.class)
-                .collect(Collectors.toMap(handler -> handler.getTypeClass(), handler -> handler));
+                .collect(toMap(ErrorResponseExceptionHandler::getTypeClass, handler -> handler));
         this.rootExceptionHandler = rootExceptionHandler;
     }
 

@@ -4,7 +4,6 @@
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.AESEncryptionException;
-import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
@@ -47,7 +46,7 @@ public class DefaultAESEncryption implements AESEncryption {
         return StringUtils.rightPad(secretKey, keyLength);
     }
 
-    private SecretKeySpec makeSecretKeySpec(String secretKey) throws UnsupportedEncodingException {
+    private SecretKeySpec makeSecretKeySpec(String secretKey) {
         return new SecretKeySpec(getFixedKey(secretKey).getBytes(), ALGORITHM);
     }
 
@@ -57,7 +56,7 @@ public class DefaultAESEncryption implements AESEncryption {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, makeSecretKeySpec(secretKey));
             return cipher.doFinal(data);
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             throw new AESEncryptionException(ex);
         }
     }
@@ -68,7 +67,7 @@ public class DefaultAESEncryption implements AESEncryption {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, makeSecretKeySpec(secretKey));
             return cipher.doFinal(data);
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             throw new AESEncryptionException(ex);
         }
     }
