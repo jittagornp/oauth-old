@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.exception.handler;
 
-import com.pamarin.commons.generator.UUIDGenerator;
+import com.pamarin.commons.generator.ErrorCodeGenerator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -20,11 +20,11 @@ public class ErrorResponseRootExceptionHandler extends ErrorResponseExceptionHan
 
     private static final Logger LOG = LoggerFactory.getLogger(ErrorResponseRootExceptionHandler.class);
 
-    private final UUIDGenerator uuidGenerator;
+    private final ErrorCodeGenerator errorCodeGenerator;
 
     @Autowired
-    public ErrorResponseRootExceptionHandler(UUIDGenerator uuidGenerator) {
-        this.uuidGenerator = uuidGenerator;
+    public ErrorResponseRootExceptionHandler(ErrorCodeGenerator errorCodeGenerator) {
+        this.errorCodeGenerator = errorCodeGenerator;
     }
 
     @Override
@@ -34,17 +34,10 @@ public class ErrorResponseRootExceptionHandler extends ErrorResponseExceptionHan
 
     @Override
     protected ErrorResponse buildError(Exception ex, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        String code = random();
+        String code = errorCodeGenerator.generate();
         LOG.error("error code => {}", code);
         ErrorResponse err = ErrorResponse.serverError();
         err.setErrorCode(code);
         return err;
-    }
-
-    private String random() {
-        return uuidGenerator.generate()
-                .replace("-", "")
-                .toUpperCase()
-                .substring(0, 8);
     }
 }

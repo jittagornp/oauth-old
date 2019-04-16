@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.controller;
 
+import com.pamarin.commons.generator.ErrorCodeGenerator;
 import com.pamarin.commons.generator.UUIDGenerator;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.exception.InvalidClientIdException;
@@ -42,13 +43,13 @@ public class AuthorizeEndpointController_authorizeTest extends IntegrationTestBa
 
     @MockBean
     private AuthorizationService authorizationService;
-    
+
     @MockBean
-    private UUIDGenerator uuidGenerator;
-    
+    private ErrorCodeGenerator errorCodeGenerator;
+
     @Before
-    public void before(){
-        when(uuidGenerator.generate()).thenReturn("00000000-0000-0000-0000-000000000000");
+    public void before() {
+        when(errorCodeGenerator.generate()).thenReturn("00000000");
     }
 
     @Test
