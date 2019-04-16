@@ -8,9 +8,9 @@ import com.pamarin.oauth2.domain.OAuth2Token;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.pamarin.commons.generator.IdGenerator;
+import com.pamarin.commons.util.Base64Utils;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -62,7 +62,7 @@ public abstract class OAuth2TokenRepositoryAdapter<T extends OAuth2Token> implem
         if (clone.getSecretKey() == null) {
             byte[] bytes = new byte[SECRET_KEY_SIZE];
             secureRandom.nextBytes(bytes);
-            String secret = Base64.getEncoder().encodeToString(bytes);
+            String secret = Base64Utils.encode(bytes);
             clone.setSecretKey(secret);
         }
     }

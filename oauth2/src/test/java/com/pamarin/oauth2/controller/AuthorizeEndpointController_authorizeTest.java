@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.controller;
 
+import com.pamarin.commons.generator.UUIDGenerator;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.exception.InvalidClientIdException;
 import com.pamarin.oauth2.exception.InvalidRedirectUriException;
@@ -12,6 +13,7 @@ import com.pamarin.oauth2.exception.RequireApprovalException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.oauth2.service.AuthorizationService;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.Matchers.any;
@@ -40,6 +42,14 @@ public class AuthorizeEndpointController_authorizeTest extends IntegrationTestBa
 
     @MockBean
     private AuthorizationService authorizationService;
+    
+    @MockBean
+    private UUIDGenerator uuidGenerator;
+    
+    @Before
+    public void before(){
+        when(uuidGenerator.generate()).thenReturn("00000000-0000-0000-0000-000000000000");
+    }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenEmptyParameter() throws Exception {
@@ -124,7 +134,7 @@ public class AuthorizeEndpointController_authorizeTest extends IntegrationTestBa
                 .thenThrow(Exception.class);
         this.mockMvc.perform(get("/authorize?response_type=code&client_id=123456&redirect_uri=http://localhost/callback").servletPath("/authorize"))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost/callback?error=server_error&error_status=500"));
+                .andExpect(redirectedUrl("http://localhost/callback?error=server_error&error_status=500&error_code=00000000"));
     }
 
     @Test

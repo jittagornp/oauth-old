@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2.model;
+package com.pamarin.oauth2.exception.handler;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,6 +40,10 @@ public class ErrorResponse {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String state;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonProperty("error_code")
+    private String errorCode;
 
     public String getError() {
         return error;
@@ -229,6 +233,7 @@ public class ErrorResponse {
                 .addParameter("error", error)
                 .addParameter("error_status", errorStatus == null ? null : ("" + errorStatus))
                 .addParameter("error_description", errorDescription)
+                .addParameter("error_code", errorCode)
                 .addParameter("error_uri", errorUri)
                 .addParameter("state", state)
                 .build();

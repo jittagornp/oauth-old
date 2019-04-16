@@ -4,7 +4,6 @@
 package com.pamarin.oauth2.exception.handler;
 
 import com.pamarin.oauth2.exception.InvalidClientIdException;
-import com.pamarin.oauth2.model.ErrorResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;

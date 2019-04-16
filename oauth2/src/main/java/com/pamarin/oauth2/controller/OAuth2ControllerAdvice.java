@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pamarin.commons.validator.ValidUri;
 import com.pamarin.commons.view.ModelAndViewBuilder;
 import com.pamarin.oauth2.exception.handler.ErrorResponseExceptionHandlerResolver;
-import com.pamarin.oauth2.model.ErrorResponse;
+import com.pamarin.oauth2.exception.handler.ErrorResponse;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
