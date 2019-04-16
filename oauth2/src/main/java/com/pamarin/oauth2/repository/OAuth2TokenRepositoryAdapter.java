@@ -15,9 +15,9 @@ import com.pamarin.commons.generator.IdGenerator;
 /**
  *
  * @author jitta
- * @param <TOKEN>
+ * @param <T>
  */
-public abstract class OAuth2TokenRepositoryAdapter<TOKEN extends OAuth2Token> implements OAuth2TokenRepository<TOKEN> {
+public abstract class OAuth2TokenRepositoryAdapter<T extends OAuth2Token> implements OAuth2TokenRepository<T> {
 
     private static final int SECRET_KEY_SIZE = 7;
 
@@ -29,25 +29,25 @@ public abstract class OAuth2TokenRepositoryAdapter<TOKEN extends OAuth2Token> im
     @Autowired
     private UUIDGenerator uuidGenerator;
 
-    protected abstract Class<TOKEN> getTokenClass();
+    protected abstract Class<T> getTokenClass();
 
     protected abstract int getExpiresMinutes();
 
-    protected abstract TOKEN doSave(TOKEN token);
+    protected abstract T doSave(T token);
 
-    private void setIdIfNotPresent(TOKEN clone) {
+    private void setIdIfNotPresent(T clone) {
         if (clone.getId() == null) {
             clone.setId(idGenerator.generate());
         }
     }
 
-    private void setTokenIdIfNotPresent(TOKEN clone) {
+    private void setTokenIdIfNotPresent(T clone) {
         if (clone.getTokenId() == null) {
             clone.setTokenId(uuidGenerator.generate());
         }
     }
 
-    private void setExpirationTimeIfNotPresent(TOKEN clone) {
+    private void setExpirationTimeIfNotPresent(T clone) {
         clone.setExpireMinutes(getExpiresMinutes());
         if (clone.getIssuedAt() < 1) {
             LocalDateTime now = LocalDateTime.now();
@@ -57,7 +57,7 @@ public abstract class OAuth2TokenRepositoryAdapter<TOKEN extends OAuth2Token> im
         }
     }
 
-    private void setSecretKeyIfNotPresent(TOKEN clone) {
+    private void setSecretKeyIfNotPresent(T clone) {
         if (clone.getSecretKey() == null) {
             byte[] bytes = new byte[SECRET_KEY_SIZE];
             secureRandom.nextBytes(bytes);
@@ -67,9 +67,9 @@ public abstract class OAuth2TokenRepositoryAdapter<TOKEN extends OAuth2Token> im
     }
 
     @Override
-    public TOKEN save(TOKEN token) {
+    public T save(T token) {
         try {
-            TOKEN clone = (TOKEN) token.clone();
+            T clone = (T) token.clone();
             setIdIfNotPresent(clone);
             setTokenIdIfNotPresent(clone);
             setExpirationTimeIfNotPresent(clone);

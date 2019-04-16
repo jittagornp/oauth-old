@@ -66,5 +66,4 @@ public abstract class RedisOAuth2TokenRepositoryAdapter<T extends OAuth2Token> e
     public void deleteByTokenId(String tokenId) {
         redisTemplate.delete(makeKey(tokenId));
     }
-
 }

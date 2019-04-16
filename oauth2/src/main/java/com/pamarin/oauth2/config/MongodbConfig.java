@@ -24,7 +24,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @Profile("!test") //inactive for test profile
 @EnableMongoRepositories(basePackages = "com.pamarin.oauth2.repository.mongodb")
-public class MongodbConf {
+public class MongodbConfig {
 
     @Bean
     public MappingMongoConverter mappingMongoConverter(MongoDbFactory factory, MongoMappingContext context, BeanFactory beanFactory) {

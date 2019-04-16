@@ -21,7 +21,7 @@ import com.pamarin.oauth2.repository.DatabaseSessionRepository;
  */
 @Configuration
 @Profile("!test") //inactive for test profile
-public class RedisConf extends SpringHttpSessionConfiguration {
+public class RedisConfig extends SpringHttpSessionConfiguration {
 
     @Value("${spring.session.timeout}")
     private Integer sessionTimeout;

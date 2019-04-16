@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2.repository.redis;
+package com.pamarin.oauth2.cache;
 
 import com.pamarin.oauth2.cache.CacheStore;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -13,7 +13,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/03
  */
 @Configuration
-public class JacksonConf implements Jackson2ObjectMapperBuilderCustomizer {
+public class JacksonConfig implements Jackson2ObjectMapperBuilderCustomizer {
 
     @Autowired
     private JacksonJava8DateTimeConf jacksonJava8DateTimeConf;

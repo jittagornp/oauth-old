@@ -26,7 +26,7 @@ import com.pamarin.oauth2.repository.UserSessionRepository;
  */
 @Configuration
 @Profile("!test") //inactive for test profile
-public class RepositoryConf {
+public class RepositoryConfig {
 
     @Value("${spring.session.access-token.timeout}")
     private Integer accessTokenTimeout;

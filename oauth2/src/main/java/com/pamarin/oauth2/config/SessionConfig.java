@@ -19,7 +19,7 @@ import com.pamarin.oauth2.repository.DatabaseSessionRepository;
  * @author jitta
  */
 @Configuration
-public class SessionConf {
+public class SessionConfig {
 
     @NotNull
     @Value("${spring.session.timeout}")

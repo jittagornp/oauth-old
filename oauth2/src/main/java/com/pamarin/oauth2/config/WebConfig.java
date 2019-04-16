@@ -29,7 +29,7 @@ import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
  */
 @Configuration
 @EnableWebMvc
-public class WebConf extends WebMvcConfigurerAdapter {
+public class WebConfig extends WebMvcConfigurerAdapter {
 
     private static final String USER_AGENT_COOKIE_NAME = "user-agent";
 
