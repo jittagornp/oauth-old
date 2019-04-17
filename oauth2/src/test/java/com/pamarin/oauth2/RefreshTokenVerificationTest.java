@@ -48,18 +48,7 @@ public class RefreshTokenVerificationTest {
         userDetailsServiceImpl = new RefreshTokenVerificationImpl.UserDetailsServiceImpl(refreshTokenRepository, output);
         hashBasedToken = mock(HashBasedToken.class);
 
-        refreshTokenVerification = new RefreshTokenVerificationImpl();
-        ReflectionTestUtils.setField(
-                refreshTokenVerification,
-                "refreshTokenRepository",
-                refreshTokenRepository
-        );
-
-        ReflectionTestUtils.setField(
-                refreshTokenVerification,
-                "hashBasedToken",
-                hashBasedToken
-        );
+        refreshTokenVerification = new RefreshTokenVerificationImpl(refreshTokenRepository, hashBasedToken);
     }
 
     @Test

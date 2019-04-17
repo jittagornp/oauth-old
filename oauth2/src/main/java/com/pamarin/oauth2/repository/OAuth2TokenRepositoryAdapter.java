@@ -4,7 +4,7 @@
 package com.pamarin.oauth2.repository;
 
 import com.pamarin.commons.generator.UUIDGenerator;
-import com.pamarin.oauth2.domain.OAuth2Token;
+import com.pamarin.oauth2.model.OAuth2Token;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

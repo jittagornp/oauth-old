@@ -4,7 +4,7 @@
 package com.pamarin.oauth2.collection;
 
 import com.pamarin.commons.util.ObjectEquals;
-import com.pamarin.oauth2.domain.OAuth2Token;
+import com.pamarin.oauth2.model.OAuth2Token;
 import java.util.Objects;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;

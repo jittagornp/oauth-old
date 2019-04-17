@@ -4,7 +4,7 @@
 package com.pamarin.oauth2.repository.mongodb;
 
 import com.mongodb.WriteResult;
-import com.pamarin.oauth2.domain.OAuth2Token;
+import com.pamarin.oauth2.model.OAuth2Token;
 import com.pamarin.oauth2.repository.OAuth2TokenRepositoryAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -4,7 +4,7 @@
 
 package com.pamarin.oauth2.repository;
 
-import com.pamarin.oauth2.domain.OAuth2Token;
+import com.pamarin.oauth2.model.OAuth2Token;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt;  

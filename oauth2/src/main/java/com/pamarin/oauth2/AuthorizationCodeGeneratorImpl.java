@@ -33,24 +33,29 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
 
     @Override
     public AuthorizationResponse generate(AuthorizationRequest req) {
-        OAuth2AuthorizationCode code = authorizationCodeRepository.save(OAuth2AuthorizationCode.builder()
+        OAuth2AuthorizationCode code = generateAuthorizationCode(req);
+        return AuthorizationResponse.builder()
+                .code(hashToken(code))
+                .state(req.getState())
+                .build();
+    }
+
+    private OAuth2AuthorizationCode generateAuthorizationCode(AuthorizationRequest req) {
+        return authorizationCodeRepository.save(OAuth2AuthorizationCode.builder()
                 .userId(loginSession.getUserDetails().getUsername())
                 .clientId(req.getClientId())
                 .sessionId(loginSession.getSessionId())
                 .build()
         );
+    }
 
-        String token = hashBasedToken.hash(
+    private String hashToken(OAuth2AuthorizationCode code) {
+        return hashBasedToken.hash(
                 DefaultUserDetails.builder()
                         .username(code.getTokenId())
                         .password(code.getSecretKey())
                         .build(),
                 convert2LocalDateTime(new Date(code.getExpiresAt()))
         );
-
-        return AuthorizationResponse.builder()
-                .code(token)
-                .state(req.getState())
-                .build();
     }
 }

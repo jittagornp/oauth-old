@@ -22,16 +22,20 @@ import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
 @Service
 public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
 
-    @Autowired
-    private OAuth2RefreshTokenRepository refreshTokenRepository;
+    private final OAuth2RefreshTokenRepository repository;
+
+    private final HashBasedToken hashBasedToken;
 
     @Autowired
-    private HashBasedToken hashBasedToken;
+    public RefreshTokenVerificationImpl(OAuth2RefreshTokenRepository repository, HashBasedToken hashBasedToken) {
+        this.repository = repository;
+        this.hashBasedToken = hashBasedToken;
+    }
 
     @Override
     public OAuth2RefreshToken verify(String token) {
         OAuth2RefreshToken output = OAuth2RefreshToken.builder().build();
-        if (!hashBasedToken.matches(token, new UserDetailsServiceImpl(refreshTokenRepository, output))) {
+        if (!hashBasedToken.matches(token, new UserDetailsServiceImpl(repository, output))) {
             throw new UnauthorizedClientException("Invalid refresh token");
         }
         return output;

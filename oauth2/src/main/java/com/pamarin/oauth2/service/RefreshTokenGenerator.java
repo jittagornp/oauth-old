@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.service;
 
-import com.pamarin.oauth2.domain.OAuth2Token;
+import com.pamarin.oauth2.model.OAuth2Token;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/12/05

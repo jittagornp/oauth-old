@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.domain;
 
+import com.pamarin.oauth2.model.OAuth2Token;
 import com.pamarin.commons.util.ObjectEquals;
 import java.util.Objects;
 import lombok.AllArgsConstructor;

@@ -22,16 +22,20 @@ import com.pamarin.oauth2.repository.OAuth2AccessTokenRepository;
 @Service
 public class AccessTokenVerificationImpl implements AccessTokenVerification {
 
-    @Autowired
-    private OAuth2AccessTokenRepository accessTokenRepository;
+    private final OAuth2AccessTokenRepository repository;
+
+    private final HashBasedToken hashBasedToken;
 
     @Autowired
-    private HashBasedToken hashBasedToken;
+    public AccessTokenVerificationImpl(OAuth2AccessTokenRepository repository, HashBasedToken hashBasedToken) {
+        this.repository = repository;
+        this.hashBasedToken = hashBasedToken;
+    }
 
     @Override
     public OAuth2AccessToken verify(String accessToken) {
         OAuth2AccessToken output = OAuth2AccessToken.builder().build();
-        if (!hashBasedToken.matches(accessToken, new UserDetailsServiceImpl(accessTokenRepository, output))) {
+        if (!hashBasedToken.matches(accessToken, new UserDetailsServiceImpl(repository, output))) {
             throw new InvalidTokenException("Invalid access token.");
         }
         return output;
@@ -39,18 +43,18 @@ public class AccessTokenVerificationImpl implements AccessTokenVerification {
 
     public static class UserDetailsServiceImpl implements UserDetailsService {
 
-        private final OAuth2AccessTokenRepository accessTokenRepo;
+        private final OAuth2AccessTokenRepository repository;
 
         private final OAuth2AccessToken output;
 
-        public UserDetailsServiceImpl(OAuth2AccessTokenRepository accessTokenRepo, OAuth2AccessToken output) {
-            this.accessTokenRepo = accessTokenRepo;
+        public UserDetailsServiceImpl(OAuth2AccessTokenRepository repository, OAuth2AccessToken output) {
+            this.repository = repository;
             this.output = output;
         }
 
         @Override
         public UserDetails loadUserByUsername(String tokenId) {
-            OAuth2AccessToken token = accessTokenRepo.findByTokenId(tokenId);
+            OAuth2AccessToken token = repository.findByTokenId(tokenId);
             if (token == null) {
                 throw new UsernameNotFoundException("Not found access token");
             }

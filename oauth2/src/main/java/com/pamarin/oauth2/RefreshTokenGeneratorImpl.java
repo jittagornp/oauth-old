@@ -7,7 +7,7 @@ import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.security.HashBasedToken;
 import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
-import com.pamarin.oauth2.domain.OAuth2Token;
+import com.pamarin.oauth2.model.OAuth2Token;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +22,18 @@ import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
 @Transactional
 public class RefreshTokenGeneratorImpl implements RefreshTokenGenerator {
 
-    @Autowired
-    private OAuth2RefreshTokenRepository refreshTokenRepository;
+    private final OAuth2RefreshTokenRepository repository;
+
+    private final HashBasedToken hashBasedToken;
 
     @Autowired
-    private HashBasedToken hashBasedToken;
+    public RefreshTokenGeneratorImpl(OAuth2RefreshTokenRepository repository, HashBasedToken hashBasedToken) {
+        this.repository = repository;
+        this.hashBasedToken = hashBasedToken;
+    }
 
     private OAuth2RefreshToken generateRefreshToken(OAuth2Token token) {
-        return refreshTokenRepository.save(OAuth2RefreshToken.builder()
+        return repository.save(OAuth2RefreshToken.builder()
                 .tokenId(token.getTokenId())
                 .userId(token.getUserId())
                 .clientId(token.getClientId())

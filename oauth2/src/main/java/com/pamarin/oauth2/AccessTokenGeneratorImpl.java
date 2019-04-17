@@ -21,7 +21,7 @@ import static com.pamarin.commons.util.DateConverterUtils.convert2LocalDateTime;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2AuthorizationCode;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
-import com.pamarin.oauth2.domain.OAuth2Token;
+import com.pamarin.oauth2.model.OAuth2Token;
 import com.pamarin.oauth2.exception.InvalidTokenException;
 import com.pamarin.oauth2.service.AuthorizationCodeVerification;
 import com.pamarin.oauth2.service.RefreshTokenGenerator;
@@ -61,27 +61,34 @@ class AccessTokenGeneratorImpl implements AccessTokenGenerator {
     @Autowired
     private RevokeTokenService revokeTokenService;
 
-    private AccessTokenResponse buildAccessTokenResponse(OAuth2Token instance) {
-        OAuth2AccessToken accessToken = accessTokenRepository.save(OAuth2AccessToken.builder()
-                .userId(instance.getUserId())
-                .clientId(instance.getClientId())
-                .sessionId(instance.getSessionId())
+    private AccessTokenResponse buildAccessTokenResponse(OAuth2Token token) {
+        OAuth2AccessToken accessToken = generateAccessToken(token);
+        token.setTokenId(accessToken.getTokenId());
+        return AccessTokenResponse.builder()
+                .accessToken(hashToken(accessToken))
+                .expiresIn(accessToken.getExpireMinutes() * 60L)
+                .refreshToken(refreshTokenGenerator.generate(token))
+                .tokenType("bearer")
+                .build();
+    }
+
+    private OAuth2AccessToken generateAccessToken(OAuth2Token token) {
+        return accessTokenRepository.save(OAuth2AccessToken.builder()
+                .userId(token.getUserId())
+                .clientId(token.getClientId())
+                .sessionId(token.getSessionId())
                 .build()
         );
-        String token = hashBasedToken.hash(
+    }
+
+    private String hashToken(OAuth2AccessToken accessToken) {
+        return hashBasedToken.hash(
                 DefaultUserDetails.builder()
                         .username(accessToken.getTokenId())
                         .password(accessToken.getSecretKey())
                         .build(),
                 convert2LocalDateTime(new Date(accessToken.getExpiresAt()))
         );
-        instance.setTokenId(accessToken.getTokenId());
-        return AccessTokenResponse.builder()
-                .accessToken(token)
-                .expiresIn(accessToken.getExpireMinutes() * 60L)
-                .refreshToken(refreshTokenGenerator.generate(instance))
-                .tokenType("bearer")
-                .build();
     }
 
     @Override
