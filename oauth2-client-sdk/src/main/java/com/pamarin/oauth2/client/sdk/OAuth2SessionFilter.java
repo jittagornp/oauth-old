@@ -6,29 +6,13 @@ package com.pamarin.oauth2.client.sdk;
 import com.pamarin.commons.exception.AuthenticationException;
 import com.pamarin.commons.exception.AuthorizationException;
 import com.pamarin.commons.provider.HostUrlProvider;
-import com.pamarin.commons.security.DefaultUserDetails;
-import com.pamarin.commons.util.Base64Utils;
 import com.pamarin.commons.util.QuerystringBuilder;
-import static com.pamarin.oauth2.client.sdk.OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE;
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.List;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
 import static org.springframework.util.StringUtils.hasText;
-import org.springframework.web.client.HttpClientErrorException;
-import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,27 +28,21 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class OAuth2SessionFilter extends OncePerRequestFilter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OAuth2SessionFilter.class);
-
-    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
-
-    private static final int ONE_DAY_SECONDS = 60 * 60 * 24;
-
-    private static final int FOURTEEN_DAYS_SECONDS = ONE_DAY_SECONDS * 14;
-
-    private static final int STATE_SIZE = 11;
-
-    private final SecureRandom secureRandom = new SecureRandom();
-
     private final HostUrlProvider hostUrlProvider;
 
-    private final OAuth2ClientOperations oauth2ClientOperations;
+    private final OAuth2ClientOperations clientOperations;
 
-    private final OAuth2AccessTokenResolver oauth2AccessTokenResolver;
+    private final OAuth2AccessTokenResolver accessTokenResolver;
 
-    private final OAuth2RefreshTokenResolver oauth2RefreshTokenResolver;
+    private final OAuth2RefreshTokenResolver refreshTokenResolver;
 
-    private final List<OAuth2TokenResolver> accessTokenResolvers;
+    private final OAuth2TokenResolver accessTokenHeaderResolver;
+
+    private final OAuth2LoginSession loginSession;
+
+    private final OAuth2AccessTokenRepository accessTokenRepository;
+
+    private final OAuth2AuthorizationState authorizationState;
 
     @Value("${oauth2.session-filter.disabled}")
     private Boolean disabled;
@@ -72,19 +50,18 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
     @Autowired
     public OAuth2SessionFilter(
             HostUrlProvider hostUrlProvider,
-            OAuth2ClientOperations oauth2ClientOperations,
-            OAuth2AccessTokenResolver oauth2AccessTokenResolver,
-            OAuth2RefreshTokenResolver oauth2RefreshTokenResolver
+            OAuth2ClientOperations clientOperations,
+            OAuth2AccessTokenResolver accessTokenResolver,
+            OAuth2RefreshTokenResolver refreshTokenResolver
     ) {
         this.hostUrlProvider = hostUrlProvider;
-        this.oauth2ClientOperations = oauth2ClientOperations;
-        this.oauth2AccessTokenResolver = oauth2AccessTokenResolver;
-        this.oauth2RefreshTokenResolver = oauth2RefreshTokenResolver;
-        this.accessTokenResolvers = Arrays.asList(
-                new RequestHeaderOAuth2TokenResolver(),
-                new RequestParameterOAuth2TokenResolver(oauth2AccessTokenResolver.getTokenName())
-        );
-
+        this.clientOperations = clientOperations;
+        this.accessTokenResolver = accessTokenResolver;
+        this.refreshTokenResolver = refreshTokenResolver;
+        this.accessTokenHeaderResolver = new RequestHeaderOAuth2TokenResolver();
+        this.loginSession = new DefaultOAuth2LoginSession(clientOperations);
+        this.accessTokenRepository = new DefaultOAuth2AccessTokenRepository(hostUrlProvider, clientOperations);
+        this.authorizationState = new DefaultOAuth2AuthorizationState();
     }
 
     public void setDisabled(Boolean disabled) {
@@ -99,237 +76,113 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         return disabled;
     }
 
+    private String getAuthorizationUrl(HttpServletRequest httpReq) {
+        String state = authorizationState.create(httpReq);
+        return "{server}/authorize?".replace("{server}", clientOperations.getAuthorizationServerHostUrl())
+                + new QuerystringBuilder()
+                        .addParameter("response_type", "code")
+                        .addParameter("client_id", clientOperations.getClientId())
+                        .addParameter("redirect_uri", hostUrlProvider.provide())
+                        .addParameter("scope", clientOperations.getScope())
+                        .addParameter("state", state)
+                        .build();
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
         try {
-            doFilter(httpReq, httpResp);
+            filter(httpReq, httpResp);
             chain.doFilter(httpReq, httpResp);
         } catch (AuthorizationException ex) {
             httpResp.sendRedirect(getAuthorizationUrl(httpReq));
         } catch (RequireRedirectException ex) {
             httpResp.sendRedirect("/");
-        } catch (AuthenticationException ex) {
-            httpResp.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
-        } catch (HttpClientErrorException ex) {
-            httpResp.sendError(ex.getStatusCode().value(), ex.getStatusText());
-        } catch (InvalidAuthorizationStateException ex) {
-            httpResp.sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
-        } catch (OAuth2ErrorException ex) {
-            httpResp.sendError(ex.getErrorStatus(), ex.getMessage());
         }
     }
 
-    private String resolveAccessToken(HttpServletRequest httpReq) {
-        for (OAuth2TokenResolver resolver : accessTokenResolvers) {
-            String token = resolver.resolve(httpReq);
-            if (hasText(token)) {
-                return token;
-            }
-        }
-        return null;
-    }
-
-    private void doFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        String accessToken = resolveAccessToken(httpReq);
-        if (hasText(accessToken)) {
-            if (!getSession(accessToken, httpReq)) {
-                throw new AuthenticationException("Please login");
-            }
-        } else {
-            String code = httpReq.getParameter("code");
-            String state = httpReq.getParameter("state");
-            if (hasText(code) && hasText(state)) {
-                getAccessTokenByAuthorizationCode(code, state, httpReq, httpResp);
-            } else {
-                String error = httpReq.getParameter("error");
-                String errorStatus = httpReq.getParameter("error_status");
-                if (hasText(error) && hasText(errorStatus)) {
-                    redirectError(error, errorStatus, state, httpReq);
-                } else {
-                    getSession(httpReq, httpResp);
-                }
-            }
-        }
-    }
-
-    private void getAccessTokenByAuthorizationCode(String code, String state, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        verifyAuthorizationState(state, httpReq);
-        if (getAccessTokenByAuthorizationCode(code, httpReq, httpResp)) {
-            throw new RequireRedirectException("Get accessToken from authorizationCode success.");
-        }
-    }
-
-    private void redirectError(String error, String errorStatus, String state, HttpServletRequest httpReq) {
-        String errorDescription = httpReq.getParameter("error_description");
-        LOG.warn("authorization server return error => {} : {}", error, errorStatus);
-        if (hasText(state)) {
-            verifyAuthorizationState(state, httpReq);
-        }
-        throw new OAuth2ErrorException(error, Integer.valueOf(errorStatus), errorDescription);
-    }
-
-    private String randomState() {
-        byte[] bytes = new byte[STATE_SIZE];
-        secureRandom.nextBytes(bytes);
-        return Base64Utils.encode(bytes);
-    }
-
-    private String getAuthorizationUrl(HttpServletRequest httpReq) {
-        String state = randomState();
-        httpReq.getSession().setAttribute(OAUTH2_AUTHORIZATION_STATE, state);
-        return "{server}/authorize?".replace("{server}", oauth2ClientOperations.getAuthorizationServerHostUrl())
-                + new QuerystringBuilder()
-                        .addParameter("response_type", "code")
-                        .addParameter("client_id", oauth2ClientOperations.getClientId())
-                        .addParameter("redirect_uri", hostUrlProvider.provide())
-                        .addParameter("scope", oauth2ClientOperations.getScope())
-                        .addParameter("state", state)
-                        .build();
-    }
-
-    private void verifyAuthorizationState(String state, HttpServletRequest httpReq) {
-        LOG.debug("verify authorization state => {}", state);
-        HttpSession session = httpReq.getSession(false);
-        if (session != null) {
-            String sessionState = (String) session.getAttribute(OAUTH2_AUTHORIZATION_STATE);
-            if (Objects.equals(state, sessionState)) {
-                session.removeAttribute(OAUTH2_AUTHORIZATION_STATE);
-            } else {
-                clearSecurityContext(httpReq);
-                throw new InvalidAuthorizationStateException(state);
-            }
-        }
-    }
-
-    private void throwIfNotUnauthorized(HttpClientErrorException ex) {
-        if (ex.getStatusCode() != HttpStatus.UNAUTHORIZED) {
+    private void filter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        try {
+            doFilter(httpReq, httpResp);
+        } catch (Exception ex) {
+            loginSession.logout(httpReq);
             throw ex;
         }
     }
 
-    private boolean getAccessTokenByAuthorizationCode(String authorizationCode, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        try {
-            LOG.debug("authorizationCode => {}", authorizationCode);
-            OAuth2AccessToken accessToken = oauth2ClientOperations.getAccessTokenByAuthorizationCode(authorizationCode);
-            saveToken(accessToken, httpReq, httpResp);
-            return true;
-        } catch (HttpClientErrorException ex) {
-            LOG.debug("getAccessToken error => {}", ex);
-            clearSecurityContext(httpReq);
-            throwIfNotUnauthorized(ex);
-            return false;
+    private void doFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        String accessToken = accessTokenHeaderResolver.resolve(httpReq);
+        if (hasText(accessToken)) {
+            loginSession.login(accessToken, httpReq);
+            return;
+        }
+
+        if (isAuthorizationCode(httpReq)) {
+            getAccessTokenByCode(httpReq, httpResp);
+            return;
+        }
+
+        if (isError(httpReq)) {
+            throwError(httpReq);
+            return;
+        }
+
+        doLogin(httpReq, httpResp);
+    }
+
+    private boolean isError(HttpServletRequest httpReq) {
+        return hasText(httpReq.getParameter("error"))
+                && hasText(httpReq.getParameter("error_status"));
+    }
+
+    private boolean isAuthorizationCode(HttpServletRequest httpReq) {
+        return hasText(httpReq.getParameter("code"))
+                && hasText(httpReq.getParameter("state"));
+    }
+
+    private void getAccessTokenByCode(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        authorizationState.verify(httpReq);
+        OAuth2AccessToken accessToken = accessTokenRepository.getAccessTokenByAuthenticationCode(
+                httpReq.getParameter("code"),
+                httpReq,
+                httpResp
+        );
+
+        if (accessToken != null) {
+            throw new RequireRedirectException("Get accessToken from authorizationCode success.");
         }
     }
 
-    private void getSession(HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        if (!getSession(oauth2AccessTokenResolver.resolve(httpReq), httpReq)) {
-            if (!getSession(refreshToken(httpReq, httpResp), httpReq)) {
+    private void throwError(HttpServletRequest httpReq) {
+        String state = httpReq.getParameter("state");
+        if (hasText(state)) {
+            authorizationState.verify(httpReq);
+        }
+        throw OAuth2ErrorException.builder()
+                .error(httpReq.getParameter("error"))
+                .errorCode(httpReq.getParameter("error_code"))
+                .errorDescription(httpReq.getParameter("error_description"))
+                .errorStatus(Integer.valueOf(httpReq.getParameter("error_status")))
+                .errorUri(httpReq.getParameter("error_uri"))
+                .state(state)
+                .build();
+    }
+
+    private void doLogin(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        try {
+            String accessToken = accessTokenResolver.resolve(httpReq);
+            loginSession.login(accessToken, httpReq);
+        } catch (AuthenticationException ex) {;
+            try {
+                String refreshToken = refreshTokenResolver.resolve(httpReq);
+                String accessToken = accessTokenRepository.getAccessTokenByRefreshToken(
+                        refreshToken,
+                        httpReq,
+                        httpResp
+                ).getAccessToken();
+                loginSession.login(accessToken, httpReq);
+            } catch (AuthenticationException e) {
                 throw new AuthorizationException("Please authorize.");
             }
         }
-    }
-
-    private boolean getSession(String accessToken, HttpServletRequest httpReq) {
-        if (!hasText(accessToken)) {
-            clearSecurityContext(httpReq);
-            return false;
-        }
-
-        try {
-            LOG.debug("accessToken => {}", accessToken);
-            OAuth2Session session = oauth2ClientOperations.getSession(accessToken);
-            LOG.debug("loggedIn sessionId => {}", session.getId());
-            saveSession(session, httpReq);
-            return true;
-        } catch (HttpClientErrorException ex) {
-            LOG.debug("getSession error => {}", ex);
-            clearSecurityContext(httpReq);
-            throwIfNotUnauthorized(ex);
-            return false;
-        }
-    }
-
-    private void clearSecurityContext(HttpServletRequest httpReq) {
-        HttpSession session = httpReq.getSession(false);
-        if (session != null) {
-            session.setAttribute(SPRING_SECURITY_CONTEXT, null);
-        }
-    }
-
-    private String refreshToken(HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        String refreshToken = oauth2RefreshTokenResolver.resolve(httpReq);
-        if (!hasText(refreshToken)) {
-            return null;
-        }
-
-        try {
-            LOG.debug("refreshToken => {}", refreshToken);
-            OAuth2AccessToken accessToken = oauth2ClientOperations.getAccessTokenByRefreshToken(refreshToken);
-            saveToken(accessToken, httpReq, httpResp);
-            return accessToken.getAccessToken();
-        } catch (HttpClientErrorException ex) {
-            LOG.debug("refreshToken error => {}", ex);
-            clearSecurityContext(httpReq);
-            throwIfNotUnauthorized(ex);
-            return null;
-        }
-    }
-
-    private SecurityContext buildSecurityContext(OAuth2Session.User user) {
-        DefaultUserDetails userDetails = DefaultUserDetails.builder()
-                .username(user.getId())
-                .password("")
-                .authorities(user.getAuthorities())
-                .build();
-
-        SecurityContext context = new SecurityContextImpl();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities()
-        );
-        context.setAuthentication(token);
-        return context;
-    }
-
-    private void saveSession(OAuth2Session session, HttpServletRequest httpReq) {
-        SecurityContext context = buildSecurityContext(session.getUser());
-        HttpSession httpSession = httpReq.getSession(true);
-        httpSession.setAttribute(SPRING_SECURITY_CONTEXT, context);
-        OAuth2SessionContext.setSession(session);
-    }
-
-    private void saveToken(OAuth2AccessToken accessToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        //cookie
-        httpResp.addCookie(buildCookie(
-                oauth2AccessTokenResolver.getTokenName(),
-                accessToken.getAccessToken(),
-                ONE_DAY_SECONDS
-        ));
-
-        httpResp.addCookie(buildCookie(
-                oauth2RefreshTokenResolver.getTokenName(),
-                accessToken.getRefreshToken(),
-                FOURTEEN_DAYS_SECONDS
-        ));
-
-        //request attribute
-        httpReq.setAttribute(
-                oauth2RefreshTokenResolver.getTokenName(),
-                accessToken.getAccessToken()
-        );
-
-        httpReq.setAttribute(
-                oauth2RefreshTokenResolver.getTokenName(),
-                accessToken.getRefreshToken()
-        );
-    }
-
-    private Cookie buildCookie(String name, String value, int maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(maxAge);
-        cookie.setSecure(hostUrlProvider.provide().startsWith("https://"));
-        return cookie;
     }
 }

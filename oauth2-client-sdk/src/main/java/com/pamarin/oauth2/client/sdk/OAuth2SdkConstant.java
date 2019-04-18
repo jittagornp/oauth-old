@@ -8,13 +8,11 @@ package com.pamarin.oauth2.client.sdk;
  * @author jitta
  */
 public class OAuth2SdkConstant {
-    
-    private OAuth2SdkConstant(){
-        
+
+    private OAuth2SdkConstant() {
+
     }
-    
-    public static final String OAUTH2_AUTHORIZATION_STATE = "OAUTH2_AUTHORIZATION_STATE";
-    
-    public static final String OAUTH2_SESSION = "OAUTH2_SESSION";
-    
+
+    public static final String OAUTH2_SESSION = OAuth2SdkConstant.class.getName() + ".OAUTH2_SESSION";
+
 }

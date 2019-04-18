@@ -3,25 +3,40 @@
  */
 package com.pamarin.oauth2.client.sdk;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
  *
  * @author jitta
  */
+@Getter
+@Setter
+@Builder
 public class OAuth2ErrorException extends RuntimeException {
 
-    private final String error;
+    private String error;
 
-    private final Integer errorStatus;
+    private Integer errorStatus;
 
-    private final String errorDescription;
+    private String errorDescription;
 
-    public OAuth2ErrorException(String error, Integer errorStatus, String errorDescription) {
+    private String errorUri;
+
+    private String state;
+
+    private String errorCode;
+
+    public OAuth2ErrorException(String error, Integer errorStatus, String errorDescription, String errorUri, String state, String errorCode) {
         super(hasText(errorDescription) ? errorDescription : error);
         this.error = error;
         this.errorStatus = errorStatus;
         this.errorDescription = errorDescription;
+        this.errorUri = errorUri;
+        this.state = state;
+        this.errorCode = errorCode;
     }
 
     public String getError() {
