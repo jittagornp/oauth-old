@@ -60,9 +60,11 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
     }
 
     private void setPrincipal(OAuth2Session session, HttpServletRequest httpReq) {
-        HttpSession httpSession = httpReq.getSession(true);
-        httpSession.setAttribute(SPRING_SECURITY_CONTEXT, buildSecurityContext(session.getUser()));
-        httpReq.setAttribute(OAUTH2_SESSION, session);
+        HttpSession httpSession = httpReq.getSession(false);
+        if (httpSession != null) {
+            httpSession.setAttribute(SPRING_SECURITY_CONTEXT, buildSecurityContext(session.getUser()));
+            httpReq.setAttribute(OAUTH2_SESSION, session);
+        }
     }
 
     private SecurityContext buildSecurityContext(OAuth2Session.User user) {
