@@ -13,6 +13,6 @@ public class OAuth2SdkConstant {
 
     }
 
-    public static final String OAUTH2_SESSION = OAuth2SdkConstant.class.getName() + ".OAUTH2_SESSION";
+    public static final String OAUTH2_SESSION = "OAUTH2_SESSION";
 
 }
