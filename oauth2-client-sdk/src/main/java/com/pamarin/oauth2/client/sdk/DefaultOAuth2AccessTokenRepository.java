@@ -18,6 +18,8 @@ import org.springframework.web.client.HttpClientErrorException;
  */
 public class DefaultOAuth2AccessTokenRepository implements OAuth2AccessTokenRepository {
 
+    private static final String ERROR_MESSAGE = "Please authorize.";
+
     private static final int ONE_DAY_SECONDS = 60 * 60 * 24;
 
     private static final int FOURTEEN_DAYS_SECONDS = ONE_DAY_SECONDS * 14;
@@ -38,7 +40,7 @@ public class DefaultOAuth2AccessTokenRepository implements OAuth2AccessTokenRepo
     @Override
     public OAuth2AccessToken getAccessTokenByAuthenticationCode(String code, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         if (!hasText(code)) {
-            throw new AuthorizationException("Please authorize.");
+            throw new AuthorizationException(ERROR_MESSAGE);
         }
 
         return getTokenByCode(code, httpReq, httpResp);
@@ -51,7 +53,7 @@ public class DefaultOAuth2AccessTokenRepository implements OAuth2AccessTokenRepo
             return accessToken;
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new AuthorizationException("Please authorize.");
+                throw new AuthorizationException(ERROR_MESSAGE);
             }
             throw ex;
         }
@@ -60,7 +62,7 @@ public class DefaultOAuth2AccessTokenRepository implements OAuth2AccessTokenRepo
     @Override
     public OAuth2AccessToken getAccessTokenByRefreshToken(String refreshToken, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         if (!hasText(refreshToken)) {
-            throw new AuthorizationException("Please authorize.");
+            throw new AuthorizationException(ERROR_MESSAGE);
         }
 
         return getTokenByRefreshToken(refreshToken, httpReq, httpResp);
@@ -73,7 +75,7 @@ public class DefaultOAuth2AccessTokenRepository implements OAuth2AccessTokenRepo
             return accessToken;
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new AuthorizationException("Please authorize.");
+                throw new AuthorizationException(ERROR_MESSAGE);
             }
             throw ex;
         }

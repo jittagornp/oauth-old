@@ -28,6 +28,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class OAuth2SessionFilter extends OncePerRequestFilter {
 
+    private static final String STATE = "state";
+
+    private static final String CODE = "code";
+
     private final HostUrlProvider hostUrlProvider;
 
     private final OAuth2ClientOperations clientOperations;
@@ -97,11 +101,11 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         String state = authorizationState.create(httpReq);
         return "{server}/authorize?".replace("{server}", clientOperations.getAuthorizationServerHostUrl())
                 + new QuerystringBuilder()
-                        .addParameter("response_type", "code")
+                        .addParameter("response_type", CODE)
                         .addParameter("client_id", clientOperations.getClientId())
                         .addParameter("redirect_uri", hostUrlProvider.provide())
                         .addParameter("scope", clientOperations.getScope())
-                        .addParameter("state", state)
+                        .addParameter(STATE, state)
                         .build();
     }
 
@@ -152,14 +156,14 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
     }
 
     private boolean isAuthorizationCode(HttpServletRequest httpReq) {
-        return hasText(httpReq.getParameter("code"))
-                && hasText(httpReq.getParameter("state"));
+        return hasText(httpReq.getParameter(CODE))
+                && hasText(httpReq.getParameter(STATE));
     }
 
     private void getAccessTokenByAuthenticationCode(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         authorizationState.verify(httpReq);
         OAuth2AccessToken accessToken = accessTokenRepository.getAccessTokenByAuthenticationCode(
-                httpReq.getParameter("code"),
+                httpReq.getParameter(CODE),
                 httpReq,
                 httpResp
         );
@@ -170,7 +174,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
     }
 
     private void convertAndThrowError(HttpServletRequest httpReq) {
-        String state = httpReq.getParameter("state");
+        String state = httpReq.getParameter(STATE);
         if (hasText(state)) {
             authorizationState.verify(httpReq);
         }

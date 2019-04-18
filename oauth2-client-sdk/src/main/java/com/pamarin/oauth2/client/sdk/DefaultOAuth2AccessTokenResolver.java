@@ -16,13 +16,13 @@ import static org.springframework.util.StringUtils.hasText;
 @Component
 public class DefaultOAuth2AccessTokenResolver implements OAuth2AccessTokenResolver {
 
-    private static final String ACCESS_TOKEN = "access_token";
+    private static final String TOKEN_NAME = "access_token";
 
     private final List<OAuth2TokenResolver> resovlers = Arrays.asList(
             new RequestHeaderOAuth2TokenResolver(),
-            new RequestParameterOAuth2TokenResolver(ACCESS_TOKEN),
-            new RequestAttributeOAuth2TokenResolver(ACCESS_TOKEN),
-            new RequestCookieOAuth2TokenResolver(ACCESS_TOKEN)
+            new RequestParameterOAuth2TokenResolver(TOKEN_NAME),
+            new RequestAttributeOAuth2TokenResolver(TOKEN_NAME),
+            new RequestCookieOAuth2TokenResolver(TOKEN_NAME)
     );
 
     @Override
@@ -38,7 +38,7 @@ public class DefaultOAuth2AccessTokenResolver implements OAuth2AccessTokenResolv
 
     @Override
     public String getTokenName() {
-        return ACCESS_TOKEN;
+        return TOKEN_NAME;
     }
 
 }
