@@ -12,8 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultHttpAuthorizeBearerParser implements HttpAuthorizeBearerParser {
 
+    private final HttpAuthorizationParser parser;
+    
     @Autowired
-    private HttpAuthorizationParser parser;
+    public DefaultHttpAuthorizeBearerParser(HttpAuthorizationParser parser) {
+        this.parser = parser;
+    }
 
     @Override
     public String parse(String authorization) {

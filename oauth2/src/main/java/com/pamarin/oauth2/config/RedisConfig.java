@@ -15,6 +15,9 @@ import org.springframework.session.config.annotation.web.http.SpringHttpSessionC
 import org.springframework.session.data.redis.RedisFlushMode;
 import com.pamarin.oauth2.service.RevokeTokenService;
 import com.pamarin.oauth2.repository.DatabaseSessionRepository;
+import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepository;
+import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
+import org.springframework.data.mongodb.core.MongoOperations;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -41,9 +44,17 @@ public class RedisConfig extends SpringHttpSessionConfiguration {
         sessionRepository.setDatabaseSessionRepository(databaseSessionRepository);
         return sessionRepository;
     }
-    
+
     @Bean
-    public RevokeTokenService newRevokeTokenServiceImpl(){
-        return new RevokeTokenServiceImpl();
+    public RevokeTokenService newRevokeTokenServiceImpl(
+            RedisOAuth2AccessTokenRepository redisOAuth2AccessTokenRepository,
+            RedisOAuth2RefreshTokenRepository redisOAuth2RefreshTokenRepository,
+            MongoOperations mongoOperations
+    ) {
+        return new RevokeTokenServiceImpl(
+                redisOAuth2AccessTokenRepository,
+                redisOAuth2RefreshTokenRepository,
+                mongoOperations
+        );
     }
 }

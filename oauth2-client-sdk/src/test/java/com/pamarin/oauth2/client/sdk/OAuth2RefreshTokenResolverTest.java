@@ -35,7 +35,7 @@ public class OAuth2RefreshTokenResolverTest {
         String expected = TOKEN_NAME;
         assertThat(output).isEqualTo(expected);
     }
-    
+
     @Test
     public void shouldBeNull_whenRequestParameterIsAAA() {
         String token = "AAA";
@@ -45,7 +45,21 @@ public class OAuth2RefreshTokenResolverTest {
         String expected = null;
         assertThat(output).isEqualTo(expected);
     }
-    
+
+    @Test
+    public void shouldBeNull_whenRequestMethodIsPostAndParameterIsAAAButIsQuerystring() {
+        String token = "AAA";
+        when(httpServletRequest.getParameter(TOKEN_NAME))
+                .thenReturn(token);
+        when(httpServletRequest.getQueryString())
+                .thenReturn("refresh_token=xxxx&state=yyyy");
+        when(httpServletRequest.getMethod())
+                .thenReturn("POST");
+        String output = resolver.resolve(httpServletRequest);
+        String expected = null;
+        assertThat(output).isEqualTo(expected);
+    }
+
     @Test
     public void shouldBeAAA_whenRequestMethodAndParameterIsAAA() {
         String token = "AAA";

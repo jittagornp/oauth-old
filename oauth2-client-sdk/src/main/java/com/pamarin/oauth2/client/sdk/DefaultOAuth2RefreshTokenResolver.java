@@ -3,8 +3,8 @@
  */
 package com.pamarin.oauth2.client.sdk;
 
-import com.pamarin.commons.resolver.DefaultHttpCookieResolver;
-import com.pamarin.commons.resolver.HttpCookieResolver;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import static org.springframework.util.StringUtils.hasText;
@@ -16,30 +16,28 @@ import static org.springframework.util.StringUtils.hasText;
 @Component
 public class DefaultOAuth2RefreshTokenResolver implements OAuth2RefreshTokenResolver {
 
-    private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String ACCESS_TOKEN = "refresh_token";
 
-    private final HttpCookieResolver httpCookieResolver = new DefaultHttpCookieResolver(REFRESH_TOKEN);
+    private final List<OAuth2TokenResolver> resovlers = Arrays.asList(
+            new RequestParameterOAuth2TokenResolver(ACCESS_TOKEN),
+            new RequestAttributeOAuth2TokenResolver(ACCESS_TOKEN),
+            new RequestCookieOAuth2TokenResolver(ACCESS_TOKEN)
+    );
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
-        if ("POST".equalsIgnoreCase(httpReq.getMethod())) {
-            String token = httpReq.getParameter(REFRESH_TOKEN);
+        for (OAuth2TokenResolver resolver : resovlers) {
+            String token = resolver.resolve(httpReq);
             if (hasText(token)) {
                 return token;
             }
         }
-
-        String tokenAttr = (String) httpReq.getAttribute(REFRESH_TOKEN);
-        if (hasText(tokenAttr)) {
-            return tokenAttr;
-        }
-
-        return httpCookieResolver.resolve(httpReq);
+        return null;
     }
 
     @Override
     public String getTokenName() {
-        return REFRESH_TOKEN;
+        return ACCESS_TOKEN;
     }
 
 }

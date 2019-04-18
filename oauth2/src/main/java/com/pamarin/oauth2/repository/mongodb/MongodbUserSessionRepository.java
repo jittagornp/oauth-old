@@ -6,7 +6,6 @@ package com.pamarin.oauth2.repository.mongodb;
 import com.pamarin.oauth2.collection.UserSession;
 import static java.util.Collections.emptyList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
 import com.pamarin.oauth2.repository.UserSessionRepository;
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -57,7 +57,7 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
     }
 
     private List<String> map(List<UserSession> userSessions) {
-        return userSessions.stream().map(UserSession::getSessionId).collect(Collectors.toList());
+        return userSessions.stream().map(UserSession::getSessionId).collect(toList());
     }
 
     @Override
@@ -81,7 +81,7 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
         return findAllSessionIdsOnSameUserAgentBySessionId(sessionId)
                 .stream()
                 .filter(s -> !sessionId.equals(s))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override

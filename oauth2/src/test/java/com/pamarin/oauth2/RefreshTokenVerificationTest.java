@@ -4,11 +4,9 @@
 package com.pamarin.oauth2;
 
 import com.pamarin.commons.security.HashBasedToken;
-import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.service.RefreshTokenVerification;
-import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,7 +17,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.util.ReflectionTestUtils;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
 
 /**

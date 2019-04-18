@@ -20,14 +20,22 @@ import com.pamarin.oauth2.repository.UserSessionRepository;
 @Service
 public class RevokeSessionServiceImpl implements RevokeSessionService {
 
-    @Autowired
-    private UserSessionRepository userSessionRepository;
+    private final UserSessionRepository userSessionRepository;
+
+    private final SessionRepository sessionRepository;
+
+    private final RevokeTokenService revokeTokenService;
 
     @Autowired
-    private SessionRepository sessionRepository;
-
-    @Autowired
-    private RevokeTokenService revokeTokenService;
+    public RevokeSessionServiceImpl(
+            UserSessionRepository userSessionRepository,
+            SessionRepository sessionRepository,
+            RevokeTokenService revokeTokenService
+    ) {
+        this.userSessionRepository = userSessionRepository;
+        this.sessionRepository = sessionRepository;
+        this.revokeTokenService = revokeTokenService;
+    }
 
     @Override
     public void revokeBySessionId(String sessionId) {

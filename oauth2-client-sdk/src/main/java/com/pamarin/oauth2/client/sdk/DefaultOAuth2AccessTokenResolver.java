@@ -3,11 +3,9 @@
  */
 package com.pamarin.oauth2.client.sdk;
 
-import com.pamarin.commons.resolver.DefaultHttpCookieResolver;
-import com.pamarin.commons.resolver.HttpCookieResolver;
-import com.pamarin.commons.util.HttpAuthorizeBearerParser;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -20,38 +18,22 @@ public class DefaultOAuth2AccessTokenResolver implements OAuth2AccessTokenResolv
 
     private static final String ACCESS_TOKEN = "access_token";
 
-    private final HttpAuthorizeBearerParser httpAuthorizeBearerParser;
-
-    private final HttpCookieResolver httpCookieResolver = new DefaultHttpCookieResolver(ACCESS_TOKEN);
-
-    @Autowired
-    public DefaultOAuth2AccessTokenResolver(HttpAuthorizeBearerParser httpAuthorizeBearerParser) {
-        this.httpAuthorizeBearerParser = httpAuthorizeBearerParser;
-    }
+    private final List<OAuth2TokenResolver> resovlers = Arrays.asList(
+            new RequestHeaderOAuth2TokenResolver(ACCESS_TOKEN),
+            new RequestParameterOAuth2TokenResolver(ACCESS_TOKEN),
+            new RequestAttributeOAuth2TokenResolver(ACCESS_TOKEN),
+            new RequestCookieOAuth2TokenResolver(ACCESS_TOKEN)
+    );
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
-        String authorization = httpReq.getHeader("Authorization");
-        if (hasText(authorization)) {
-            String token = httpAuthorizeBearerParser.parse(authorization);
+        for (OAuth2TokenResolver resolver : resovlers) {
+            String token = resolver.resolve(httpReq);
             if (hasText(token)) {
                 return token;
             }
         }
-
-        if ("POST".equalsIgnoreCase(httpReq.getMethod())) {
-            String token = httpReq.getParameter(ACCESS_TOKEN);
-            if (hasText(token)) {
-                return token;
-            }
-        }
-
-        String tokenAttr = (String) httpReq.getAttribute(ACCESS_TOKEN);
-        if (hasText(tokenAttr)) {
-            return tokenAttr;
-        }
-
-        return httpCookieResolver.resolve(httpReq);
+        return null;
     }
 
     @Override

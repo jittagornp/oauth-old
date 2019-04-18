@@ -29,7 +29,7 @@ public class OAuth2AccessTokenResolverTest {
     @Before
     public void before() {
         httpAuthorizeBearerParser = mock(HttpAuthorizeBearerParser.class);
-        resolver = new DefaultOAuth2AccessTokenResolver(httpAuthorizeBearerParser);
+        resolver = new DefaultOAuth2AccessTokenResolver();
         httpServletRequest = mock(HttpServletRequest.class);
     }
 
@@ -75,7 +75,21 @@ public class OAuth2AccessTokenResolverTest {
         String expected = null;
         assertThat(output).isEqualTo(expected);
     }
-    
+
+    @Test
+    public void shouldBeNull_whenRequestMethodIsPostAndParameterIsAAAButIsQuerystring() {
+        String token = "AAA";
+        when(httpServletRequest.getParameter(TOKEN_NAME))
+                .thenReturn(token);
+         when(httpServletRequest.getQueryString())
+                .thenReturn("access_token=xxxx&state=yyyy");
+        when(httpServletRequest.getMethod())
+                .thenReturn("POST");
+        String output = resolver.resolve(httpServletRequest);
+        String expected = null;
+        assertThat(output).isEqualTo(expected);
+    }
+
     @Test
     public void shouldBeAAA_whenRequestMethodIsPostAndParameterIsAAA() {
         String token = "AAA";

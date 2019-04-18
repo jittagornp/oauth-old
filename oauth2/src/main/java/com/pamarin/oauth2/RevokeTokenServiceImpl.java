@@ -22,14 +22,22 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  */
 public class RevokeTokenServiceImpl implements RevokeTokenService {
 
-    @Autowired
-    private RedisOAuth2AccessTokenRepository redisOAuth2AccessTokenRepository;
+    private final RedisOAuth2AccessTokenRepository redisOAuth2AccessTokenRepository;
+
+    private final RedisOAuth2RefreshTokenRepository redisOAuth2RefreshTokenRepository;
+
+    private final MongoOperations mongoOperations;
 
     @Autowired
-    private RedisOAuth2RefreshTokenRepository redisOAuth2RefreshTokenRepository;
-
-    @Autowired
-    private MongoOperations mongoOperations;
+    public RevokeTokenServiceImpl(
+            RedisOAuth2AccessTokenRepository redisOAuth2AccessTokenRepository,
+            RedisOAuth2RefreshTokenRepository redisOAuth2RefreshTokenRepository,
+            MongoOperations mongoOperations
+    ) {
+        this.redisOAuth2AccessTokenRepository = redisOAuth2AccessTokenRepository;
+        this.redisOAuth2RefreshTokenRepository = redisOAuth2RefreshTokenRepository;
+        this.mongoOperations = mongoOperations;
+    }
 
     private Query makeAttributeQuery(String attributeName, Object attributeValue) {
         return Query.query(Criteria.where(attributeName).is(attributeValue));

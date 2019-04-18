@@ -43,18 +43,18 @@ public class RefreshTokenVerificationImpl implements RefreshTokenVerification {
 
     public static class UserDetailsServiceImpl implements UserDetailsService {
 
-        private final OAuth2RefreshTokenRepository refreshTokenRepo;
+        private final OAuth2RefreshTokenRepository repository;
 
         private final OAuth2RefreshToken output;
 
-        public UserDetailsServiceImpl(OAuth2RefreshTokenRepository refreshTokenRepo, OAuth2RefreshToken output) {
-            this.refreshTokenRepo = refreshTokenRepo;
+        public UserDetailsServiceImpl(OAuth2RefreshTokenRepository repository, OAuth2RefreshToken output) {
+            this.repository = repository;
             this.output = output;
         }
 
         @Override
         public UserDetails loadUserByUsername(String id) {
-            OAuth2RefreshToken refreshToken = refreshTokenRepo.findByTokenId(id);
+            OAuth2RefreshToken refreshToken = repository.findByTokenId(id);
             if (refreshToken == null) {
                 throw new UsernameNotFoundException("Not found refresh token");
             }
