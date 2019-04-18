@@ -13,6 +13,8 @@ public class OAuth2SdkConstant {
 
     }
 
+    public static final String OAUTH2_SECURITY_CONTEXT = "OAUTH2_SECURITY_CONTEXT";
+
     public static final String OAUTH2_SESSION = "OAUTH2_SESSION";
 
 }

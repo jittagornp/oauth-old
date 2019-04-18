@@ -5,9 +5,9 @@ package com.pamarin.oauth2.client.sdk;
 
 import com.pamarin.commons.exception.AuthenticationException;
 import com.pamarin.commons.security.DefaultUserDetails;
+import static com.pamarin.oauth2.client.sdk.OAuth2SdkConstant.OAUTH2_SECURITY_CONTEXT;
 import static com.pamarin.oauth2.client.sdk.OAuth2SdkConstant.OAUTH2_SESSION;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -20,8 +20,6 @@ import org.springframework.web.client.HttpClientErrorException;
  * @author jitta
  */
 public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
-
-    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
     private final OAuth2ClientOperations clientOperations;
 
@@ -42,7 +40,7 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
     private void doLogin(String accessToken, HttpServletRequest httpReq) {
         try {
             OAuth2Session session = clientOperations.getSession(accessToken);
-            setPrincipal(session, httpReq);
+            savePrincipal(session, httpReq);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 throw new AuthenticationException("Please login");
@@ -53,18 +51,13 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
 
     @Override
     public void logout(HttpServletRequest httpReq) {
-        HttpSession session = httpReq.getSession(false);
-        if (session != null) {
-            session.setAttribute(SPRING_SECURITY_CONTEXT, null);
-        }
+        httpReq.setAttribute(OAUTH2_SECURITY_CONTEXT, null);
     }
 
-    private void setPrincipal(OAuth2Session session, HttpServletRequest httpReq) {
-        HttpSession httpSession = httpReq.getSession(false);
-        if (httpSession != null) {
-            httpSession.setAttribute(SPRING_SECURITY_CONTEXT, buildSecurityContext(session.getUser()));
-            httpReq.setAttribute(OAUTH2_SESSION, session);
-        }
+    private void savePrincipal(OAuth2Session session, HttpServletRequest httpReq) {
+        SecurityContext context = buildSecurityContext(session.getUser());
+        httpReq.setAttribute(OAUTH2_SESSION, session);
+        httpReq.setAttribute(OAUTH2_SECURITY_CONTEXT, context);
     }
 
     private SecurityContext buildSecurityContext(OAuth2Session.User user) {

@@ -3,6 +3,7 @@
  */
 package com.pamarin.api.config;
 
+import com.pamarin.oauth2.client.sdk.SecurityContextRepositoryImpl;
 import java.util.UUID;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -21,7 +22,10 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.headers().frameOptions().disable()
+        http.securityContext()
+                .securityContextRepository(new SecurityContextRepositoryImpl())
+                .and()
+                .headers().frameOptions().disable()
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
