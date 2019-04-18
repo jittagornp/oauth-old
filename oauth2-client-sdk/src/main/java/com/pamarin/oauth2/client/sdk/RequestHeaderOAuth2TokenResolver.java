@@ -15,14 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RequestHeaderOAuth2TokenResolver implements OAuth2TokenResolver {
 
-    private final String tokenName;
-
-    private final HttpAuthorizeBearerParser httpAuthorizeBearerParser;
-
-    public RequestHeaderOAuth2TokenResolver(String tokenName) {
-        this.tokenName = tokenName;
-        this.httpAuthorizeBearerParser = new DefaultHttpAuthorizeBearerParser(new DefaultHttpAuthorizationParser());
-    }
+    private final HttpAuthorizeBearerParser httpAuthorizeBearerParser = new DefaultHttpAuthorizeBearerParser(new DefaultHttpAuthorizationParser());
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
@@ -33,10 +26,4 @@ public class RequestHeaderOAuth2TokenResolver implements OAuth2TokenResolver {
             return null;
         }
     }
-
-    @Override
-    public String getTokenName() {
-        return tokenName;
-    }
-
 }

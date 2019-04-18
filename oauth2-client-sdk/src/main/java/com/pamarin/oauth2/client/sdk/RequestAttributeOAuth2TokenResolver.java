@@ -21,10 +21,4 @@ public class RequestAttributeOAuth2TokenResolver implements OAuth2TokenResolver 
     public String resolve(HttpServletRequest httpReq) {
         return (String) httpReq.getAttribute(tokenName);
     }
-
-    @Override
-    public String getTokenName() {
-        return tokenName;
-    }
-
 }

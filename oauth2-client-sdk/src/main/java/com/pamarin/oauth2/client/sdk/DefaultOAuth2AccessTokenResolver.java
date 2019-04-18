@@ -19,7 +19,7 @@ public class DefaultOAuth2AccessTokenResolver implements OAuth2AccessTokenResolv
     private static final String ACCESS_TOKEN = "access_token";
 
     private final List<OAuth2TokenResolver> resovlers = Arrays.asList(
-            new RequestHeaderOAuth2TokenResolver(ACCESS_TOKEN),
+            new RequestHeaderOAuth2TokenResolver(),
             new RequestParameterOAuth2TokenResolver(ACCESS_TOKEN),
             new RequestAttributeOAuth2TokenResolver(ACCESS_TOKEN),
             new RequestCookieOAuth2TokenResolver(ACCESS_TOKEN)

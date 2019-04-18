@@ -12,7 +12,5 @@ import javax.servlet.http.HttpServletRequest;
 public interface OAuth2TokenResolver {
 
     String resolve(HttpServletRequest httpReq);
-    
-    String getTokenName();
 
 }

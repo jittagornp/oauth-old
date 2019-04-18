@@ -36,10 +36,4 @@ public class RequestParameterOAuth2TokenResolver implements OAuth2TokenResolver 
         }
         return queryString.contains(tokenName);
     }
-
-    @Override
-    public String getTokenName() {
-        return tokenName;
-    }
-
 }
