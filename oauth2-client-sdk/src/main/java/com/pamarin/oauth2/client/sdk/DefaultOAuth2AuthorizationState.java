@@ -25,7 +25,7 @@ public class DefaultOAuth2AuthorizationState implements OAuth2AuthorizationState
     @Override
     public String create(HttpServletRequest httpReq) {
         String state = randomState();
-        HttpSession session = httpReq.getSession(false);
+        HttpSession session = httpReq.getSession(true);
         if (session != null) {
             session.setAttribute(OAUTH2_AUTHORIZATION_STATE, state);
         }
@@ -39,13 +39,14 @@ public class DefaultOAuth2AuthorizationState implements OAuth2AuthorizationState
             return;
         }
         HttpSession session = httpReq.getSession(false);
-        if (session != null) {
-            String sessionState = (String) session.getAttribute(OAUTH2_AUTHORIZATION_STATE);
-            if (Objects.equals(state, sessionState)) {
-                session.removeAttribute(OAUTH2_AUTHORIZATION_STATE);
-            } else {
-                throw new InvalidAuthorizationStateException(state);
-            }
+        if (session == null) {
+            throw new InvalidAuthorizationStateException(state);
+        }
+        String sessionState = (String) session.getAttribute(OAUTH2_AUTHORIZATION_STATE);
+        if (Objects.equals(state, sessionState)) {
+            session.removeAttribute(OAUTH2_AUTHORIZATION_STATE);
+        } else {
+            throw new InvalidAuthorizationStateException(state);
         }
     }
 

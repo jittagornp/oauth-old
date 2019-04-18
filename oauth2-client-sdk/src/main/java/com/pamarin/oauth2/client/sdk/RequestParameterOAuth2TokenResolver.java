@@ -12,6 +12,8 @@ import static org.springframework.util.StringUtils.hasText;
  */
 public class RequestParameterOAuth2TokenResolver implements OAuth2TokenResolver {
 
+    private static final String POST_METHOD = "POST";
+
     private final String tokenName;
 
     public RequestParameterOAuth2TokenResolver(String tokenName) {
@@ -20,7 +22,7 @@ public class RequestParameterOAuth2TokenResolver implements OAuth2TokenResolver 
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
-        if ("POST".equalsIgnoreCase(httpReq.getMethod())) {
+        if (POST_METHOD.equalsIgnoreCase(httpReq.getMethod())) {
             if (isQuerystringParameter(httpReq)) {
                 return null;
             }

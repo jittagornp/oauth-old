@@ -60,8 +60,25 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         this.refreshTokenResolver = refreshTokenResolver;
         this.accessTokenHeaderResolver = new RequestHeaderOAuth2TokenResolver();
         this.loginSession = new DefaultOAuth2LoginSession(clientOperations);
-        this.accessTokenRepository = new DefaultOAuth2AccessTokenRepository(hostUrlProvider, clientOperations);
         this.authorizationState = new DefaultOAuth2AuthorizationState();
+        this.accessTokenRepository = createOAuth2AccessTokenRepository(
+                hostUrlProvider,
+                clientOperations,
+                accessTokenResolver.getTokenName(),
+                refreshTokenResolver.getTokenName()
+        );
+    }
+
+    private DefaultOAuth2AccessTokenRepository createOAuth2AccessTokenRepository(
+            HostUrlProvider hostUrlProvider,
+            OAuth2ClientOperations clientOperations,
+            String accessTokenName,
+            String refreshTokenName
+    ) {
+        DefaultOAuth2AccessTokenRepository repository = new DefaultOAuth2AccessTokenRepository(hostUrlProvider, clientOperations);
+        repository.setAccessTokenName(accessTokenName);
+        repository.setRefreshTokenName(refreshTokenName);
+        return repository;
     }
 
     public void setDisabled(Boolean disabled) {
@@ -117,12 +134,12 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         }
 
         if (isAuthorizationCode(httpReq)) {
-            getAccessTokenByCode(httpReq, httpResp);
+            getAccessTokenByAuthenticationCode(httpReq, httpResp);
             return;
         }
 
         if (isError(httpReq)) {
-            throwError(httpReq);
+            convertAndThrowError(httpReq);
             return;
         }
 
@@ -139,7 +156,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                 && hasText(httpReq.getParameter("state"));
     }
 
-    private void getAccessTokenByCode(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private void getAccessTokenByAuthenticationCode(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         authorizationState.verify(httpReq);
         OAuth2AccessToken accessToken = accessTokenRepository.getAccessTokenByAuthenticationCode(
                 httpReq.getParameter("code"),
@@ -148,11 +165,11 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         );
 
         if (accessToken != null) {
-            throw new RequireRedirectException("Get accessToken from authorizationCode success.");
+            throw new RequireRedirectException("Get accessToken by authorizationCode success.");
         }
     }
 
-    private void throwError(HttpServletRequest httpReq) {
+    private void convertAndThrowError(HttpServletRequest httpReq) {
         String state = httpReq.getParameter("state");
         if (hasText(state)) {
             authorizationState.verify(httpReq);
@@ -171,7 +188,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         try {
             String accessToken = accessTokenResolver.resolve(httpReq);
             loginSession.login(accessToken, httpReq);
-        } catch (AuthenticationException ex) {;
+        } catch (AuthenticationException ex) {
             try {
                 String refreshToken = refreshTokenResolver.resolve(httpReq);
                 String accessToken = accessTokenRepository.getAccessTokenByRefreshToken(

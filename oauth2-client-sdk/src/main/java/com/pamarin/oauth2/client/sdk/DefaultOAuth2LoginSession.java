@@ -8,6 +8,7 @@ import com.pamarin.commons.security.DefaultUserDetails;
 import static com.pamarin.oauth2.client.sdk.OAuth2SdkConstant.OAUTH2_SECURITY_CONTEXT;
 import static com.pamarin.oauth2.client.sdk.OAuth2SdkConstant.OAUTH2_SESSION;
 import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,6 +20,7 @@ import org.springframework.web.client.HttpClientErrorException;
  *
  * @author jitta
  */
+@Slf4j
 public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
 
     private final OAuth2ClientOperations clientOperations;
@@ -31,7 +33,7 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
     public void login(String accessToken, HttpServletRequest httpReq) {
         if (!hasText(accessToken)) {
             logout(httpReq);
-            throw new AuthenticationException("Please login");
+            throw new AuthenticationException("Please login.");
         }
 
         doLogin(accessToken, httpReq);
@@ -43,7 +45,7 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
             savePrincipal(session, httpReq);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new AuthenticationException("Please login");
+                throw new AuthenticationException("Please login.");
             }
             throw ex;
         }
@@ -51,16 +53,19 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
 
     @Override
     public void logout(HttpServletRequest httpReq) {
+        httpReq.setAttribute(OAUTH2_SESSION, null);
         httpReq.setAttribute(OAUTH2_SECURITY_CONTEXT, null);
     }
 
     private void savePrincipal(OAuth2Session session, HttpServletRequest httpReq) {
-        SecurityContext context = buildSecurityContext(session.getUser());
         httpReq.setAttribute(OAUTH2_SESSION, session);
-        httpReq.setAttribute(OAUTH2_SECURITY_CONTEXT, context);
+        httpReq.setAttribute(OAUTH2_SECURITY_CONTEXT, convertToSecurityContext(session.getUser()));
+        int maxAge = (int) (session.getExpiresAt() - session.getIssuedAt()) / 1000; //convert from milliseconds to seconds
+        log.debug("session.maxInactiveInterval => {} seconds", maxAge);
+        httpReq.getSession().setMaxInactiveInterval(maxAge);
     }
 
-    private SecurityContext buildSecurityContext(OAuth2Session.User user) {
+    private SecurityContext convertToSecurityContext(OAuth2Session.User user) {
         DefaultUserDetails userDetails = DefaultUserDetails.builder()
                 .username(user.getId())
                 .password(null)
@@ -68,12 +73,11 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
                 .build();
 
         SecurityContext context = new SecurityContextImpl();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,
                 userDetails.getAuthorities()
-        );
-        context.setAuthentication(token);
+        ));
         return context;
     }
 }
