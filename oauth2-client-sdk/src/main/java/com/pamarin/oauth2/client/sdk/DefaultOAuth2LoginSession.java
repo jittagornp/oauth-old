@@ -32,6 +32,7 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
     @Override
     public void login(String accessToken, HttpServletRequest httpReq) {
         if (!hasText(accessToken)) {
+            logout(httpReq);
             throw new AuthenticationException("Please login");
         }
 
@@ -43,7 +44,6 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
             OAuth2Session session = clientOperations.getSession(accessToken);
             setPrincipal(session, httpReq);
         } catch (HttpClientErrorException ex) {
-            logout(httpReq);
             if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 throw new AuthenticationException("Please login");
             }
