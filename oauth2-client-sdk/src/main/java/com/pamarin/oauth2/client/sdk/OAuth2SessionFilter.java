@@ -8,11 +8,12 @@ import com.pamarin.commons.exception.AuthorizationException;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.DefaultUserDetails;
 import com.pamarin.commons.util.Base64Utils;
-import com.pamarin.commons.util.HttpAuthorizeBearerParser;
 import com.pamarin.commons.util.QuerystringBuilder;
 import static com.pamarin.oauth2.client.sdk.OAuth2SdkConstant.OAUTH2_AUTHORIZATION_STATE;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,7 +64,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
 
     private final OAuth2RefreshTokenResolver oauth2RefreshTokenResolver;
 
-    private final HttpAuthorizeBearerParser httpAuthorizeBearerParser;
+    private final List<OAuth2TokenResolver> accessTokenResolvers;
 
     @Value("${oauth2.session-filter.disabled}")
     private Boolean disabled;
@@ -73,14 +74,17 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             HostUrlProvider hostUrlProvider,
             OAuth2ClientOperations oauth2ClientOperations,
             OAuth2AccessTokenResolver oauth2AccessTokenResolver,
-            OAuth2RefreshTokenResolver oauth2RefreshTokenResolver,
-            HttpAuthorizeBearerParser httpAuthorizeBearerParser
+            OAuth2RefreshTokenResolver oauth2RefreshTokenResolver
     ) {
         this.hostUrlProvider = hostUrlProvider;
         this.oauth2ClientOperations = oauth2ClientOperations;
         this.oauth2AccessTokenResolver = oauth2AccessTokenResolver;
         this.oauth2RefreshTokenResolver = oauth2RefreshTokenResolver;
-        this.httpAuthorizeBearerParser = httpAuthorizeBearerParser;
+        this.accessTokenResolvers = Arrays.asList(
+                new RequestHeaderOAuth2TokenResolver(),
+                new RequestParameterOAuth2TokenResolver(oauth2AccessTokenResolver.getTokenName())
+        );
+
     }
 
     public void setDisabled(Boolean disabled) {
@@ -115,10 +119,22 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         }
     }
 
+    private String resolveAccessToken(HttpServletRequest httpReq) {
+        for (OAuth2TokenResolver resolver : accessTokenResolvers) {
+            String token = resolver.resolve(httpReq);
+            if (hasText(token)) {
+                return token;
+            }
+        }
+        return null;
+    }
+
     private void doFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        String accessToken = getAccessTokenHeader(httpReq.getHeader("Authorization"));
+        String accessToken = resolveAccessToken(httpReq);
         if (hasText(accessToken)) {
-            getSessionByAuthorizationHeader(accessToken, httpReq);
+            if (!getSession(accessToken, httpReq)) {
+                throw new AuthenticationException("Please login");
+            }
         } else {
             String code = httpReq.getParameter("code");
             String state = httpReq.getParameter("state");
@@ -133,12 +149,6 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                     getSession(httpReq, httpResp);
                 }
             }
-        }
-    }
-
-    private void getSessionByAuthorizationHeader(String accessToken, HttpServletRequest httpReq) {
-        if (!getSession(accessToken, httpReq)) {
-            throw new AuthenticationException("Please login");
         }
     }
 
@@ -177,13 +187,6 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                         .build();
     }
 
-    private String getAccessTokenHeader(String authorization) {
-        if (!hasText(authorization)) {
-            return null;
-        }
-        return httpAuthorizeBearerParser.parse(authorization);
-    }
-
     private void verifyAuthorizationState(String state, HttpServletRequest httpReq) {
         LOG.debug("verify authorization state => {}", state);
         HttpSession session = httpReq.getSession(false);
@@ -219,10 +222,8 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
     }
 
     private void getSession(HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        String accessToken = oauth2AccessTokenResolver.resolve(httpReq);
-        if (!getSession(accessToken, httpReq)) {
-            accessToken = refreshToken(httpReq, httpResp);
-            if (!getSession(accessToken, httpReq)) {
+        if (!getSession(oauth2AccessTokenResolver.resolve(httpReq), httpReq)) {
+            if (!getSession(refreshToken(httpReq, httpResp), httpReq)) {
                 throw new AuthorizationException("Please authorize.");
             }
         }
@@ -268,6 +269,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             return accessToken.getAccessToken();
         } catch (HttpClientErrorException ex) {
             LOG.debug("refreshToken error => {}", ex);
+            clearSecurityContext(httpReq);
             throwIfNotUnauthorized(ex);
             return null;
         }
