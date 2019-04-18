@@ -15,7 +15,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
  *
  * @author jitta
  */
-public class SecurityContextRepositoryImpl implements SecurityContextRepository {
+public class OAuth2SecurityContextRepository implements SecurityContextRepository {
 
     @Override
     public SecurityContext loadContext(HttpRequestResponseHolder holder) {
