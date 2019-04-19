@@ -27,6 +27,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 @AllArgsConstructor
 public class AuthorizationRequest implements ClientDetails {
 
+    private static final String STRING_TYPE = "String";
+
     private String responseType;
     private String clientId;
     private String redirectUri;
@@ -59,15 +61,15 @@ public class AuthorizationRequest implements ClientDetails {
 
     public void requireParameters() throws MissingServletRequestParameterException {
         if (!hasText(responseType)) {
-            throw new MissingServletRequestParameterException("response_type", "String");
+            throw new MissingServletRequestParameterException("response_type", STRING_TYPE);
         }
 
         if (!hasText(clientId)) {
-            throw new MissingServletRequestParameterException("client_id", "String");
+            throw new MissingServletRequestParameterException("client_id", STRING_TYPE);
         }
 
         if (!hasText(redirectUri)) {
-            throw new MissingServletRequestParameterException("redirect_uri", "String");
+            throw new MissingServletRequestParameterException("redirect_uri", STRING_TYPE);
         }
     }
 

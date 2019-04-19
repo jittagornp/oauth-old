@@ -3,50 +3,42 @@
  */
 package com.pamarin.oauth2.security;
 
+import com.pamarin.commons.provider.HostUrlProvider;
 import java.io.IOException;
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/13
  */
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
-public class SecurityHeaderFilter implements Filter {
+public class SecurityHeaderFilter extends OncePerRequestFilter {
 
     private static final int STS_MAX_AGE_A_YEAR = 60 * 60 * 24 * 365; //1 year
 
     @NotBlank
-    @Value("${server.hostUrl}")
-    private String serverHostUrl;
-
-    @NotBlank
     @Value("${secure.strict-transport-security.allow-source}")
     private String allowSource;
-    
-    private boolean isSecure;
 
-    @Override
-    public void init(FilterConfig config) throws ServletException {
-        isSecure = serverHostUrl.startsWith("https://");
+    private final boolean isSecure;
+
+    @Autowired
+    public SecurityHeaderFilter(HostUrlProvider hostUrlProvider) {
+        isSecure = hostUrlProvider.provide().startsWith("https://");
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpReq = (HttpServletRequest) req;
-        HttpServletResponse httpResp = (HttpServletResponse) resp;
-
+    protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
         httpResp.addHeader("X-Download-Options", "noopen");
         httpResp.setHeader("Content-Security-Policy", "default-src " + allowSource + " 'unsafe-eval' 'unsafe-inline'; object-src 'none'");
         if (isSecure) {
@@ -56,10 +48,4 @@ public class SecurityHeaderFilter implements Filter {
         httpResp.setHeader("X-Frame-Options", "SAMEORIGIN");
         chain.doFilter(httpReq, httpResp);
     }
-
-    @Override
-    public void destroy() {
-
-    }
-
 }
