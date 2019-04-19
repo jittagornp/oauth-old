@@ -16,7 +16,7 @@ import org.springframework.web.client.HttpClientErrorException;
  *
  * @author jitta
  */
-public class DefaultOAuth2AccessTokenRepository implements OAuth2AccessTokenRepository {
+public class DefaultOAuth2AccessTokenOperations implements OAuth2AccessTokenOperations {
 
     private static final String ERROR_MESSAGE = "Please authorize.";
 
@@ -32,7 +32,7 @@ public class DefaultOAuth2AccessTokenRepository implements OAuth2AccessTokenRepo
 
     private String refreshTokenName = "refresh_token";
 
-    public DefaultOAuth2AccessTokenRepository(HostUrlProvider hostUrlProvider, OAuth2ClientOperations clientOperations) {
+    public DefaultOAuth2AccessTokenOperations(HostUrlProvider hostUrlProvider, OAuth2ClientOperations clientOperations) {
         this.hostUrlProvider = hostUrlProvider;
         this.clientOperations = clientOperations;
     }

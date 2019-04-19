@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author jitta
  */
-public interface OAuth2AccessTokenRepository {
+public interface OAuth2AccessTokenOperations {
 
     OAuth2AccessToken getAccessTokenByAuthenticationCode(String code, HttpServletRequest httpReq, HttpServletResponse httpResp);
 

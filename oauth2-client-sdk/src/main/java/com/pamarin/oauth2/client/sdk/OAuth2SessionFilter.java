@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import static org.springframework.util.StringUtils.hasText;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -24,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * @author jitta
  */
+@Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class OAuth2SessionFilter extends OncePerRequestFilter {
@@ -44,11 +46,12 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
 
     private final OAuth2LoginSession loginSession;
 
-    private final OAuth2AccessTokenRepository accessTokenRepository;
+    private final OAuth2AccessTokenOperations accessTokenOperations;
 
     private final OAuth2AuthorizationState authorizationState;
 
-    @Value("${oauth2.session-filter.disabled}")
+    //default is false, if not define
+    @Value("${oauth2.session-filter.disabled:#{false}}")
     private Boolean disabled;
 
     @Autowired
@@ -65,7 +68,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         this.accessTokenHeaderResolver = new RequestHeaderOAuth2TokenResolver();
         this.loginSession = new DefaultOAuth2LoginSession(clientOperations);
         this.authorizationState = new DefaultOAuth2AuthorizationState();
-        this.accessTokenRepository = createOAuth2AccessTokenRepository(
+        this.accessTokenOperations = createOAuth2AccessTokenOperations(
                 hostUrlProvider,
                 clientOperations,
                 accessTokenResolver.getTokenName(),
@@ -73,13 +76,13 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
         );
     }
 
-    private DefaultOAuth2AccessTokenRepository createOAuth2AccessTokenRepository(
+    private DefaultOAuth2AccessTokenOperations createOAuth2AccessTokenOperations(
             HostUrlProvider hostUrlProvider,
             OAuth2ClientOperations clientOperations,
             String accessTokenName,
             String refreshTokenName
     ) {
-        DefaultOAuth2AccessTokenRepository repository = new DefaultOAuth2AccessTokenRepository(hostUrlProvider, clientOperations);
+        DefaultOAuth2AccessTokenOperations repository = new DefaultOAuth2AccessTokenOperations(hostUrlProvider, clientOperations);
         repository.setAccessTokenName(accessTokenName);
         repository.setRefreshTokenName(refreshTokenName);
         return repository;
@@ -109,10 +112,22 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                         .build();
     }
 
+    private boolean ignoreRequest(HttpServletRequest httpReq) {
+        String path = httpReq.getServletPath();
+        log.debug("request path => {}", path);
+        return path.startsWith("/public")
+                || path.startsWith("/assets")
+                || path.startsWith("/static")
+                || path.startsWith("/resources")
+                || path.startsWith("/favicon.ico");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
         try {
-            filter(httpReq, httpResp);
+            if (!ignoreRequest(httpReq)) {
+                filter(httpReq, httpResp);
+            }
             chain.doFilter(httpReq, httpResp);
         } catch (AuthorizationException ex) {
             httpResp.sendRedirect(getAuthorizationUrl(httpReq));
@@ -162,7 +177,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
 
     private void getAccessTokenByAuthenticationCode(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         authorizationState.verify(httpReq);
-        OAuth2AccessToken accessToken = accessTokenRepository.getAccessTokenByAuthenticationCode(
+        OAuth2AccessToken accessToken = accessTokenOperations.getAccessTokenByAuthenticationCode(
                 httpReq.getParameter(CODE),
                 httpReq,
                 httpResp
@@ -194,16 +209,20 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             loginSession.login(accessToken, httpReq);
         } catch (AuthenticationException ex) {
             try {
-                String refreshToken = refreshTokenResolver.resolve(httpReq);
-                String accessToken = accessTokenRepository.getAccessTokenByRefreshToken(
-                        refreshToken,
-                        httpReq,
-                        httpResp
-                ).getAccessToken();
+                String accessToken = refreshToken(httpReq, httpResp);
                 loginSession.login(accessToken, httpReq);
             } catch (AuthenticationException e) {
                 throw new AuthorizationException("Please authorize.");
             }
         }
+    }
+
+    private String refreshToken(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+        String refreshToken = refreshTokenResolver.resolve(httpReq);
+        return accessTokenOperations.getAccessTokenByRefreshToken(
+                refreshToken,
+                httpReq,
+                httpResp
+        ).getAccessToken();
     }
 }
