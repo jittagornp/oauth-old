@@ -3,7 +3,6 @@
  */
 package com.pamarin.commons.generator;
 
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
 /**
