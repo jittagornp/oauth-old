@@ -8,6 +8,7 @@ import com.pamarin.commons.exception.AuthorizationException;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.util.QuerystringBuilder;
 import java.io.IOException;
+import static java.lang.String.format;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,14 +103,16 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
 
     private String getAuthorizationUrl(HttpServletRequest httpReq) {
         String state = authorizationState.create(httpReq);
-        return "{server}/authorize?".replace("{server}", clientOperations.getAuthorizationServerHostUrl())
-                + new QuerystringBuilder()
+        return format("%s/authorize?%s",
+                clientOperations.getAuthorizationServerHostUrl(),
+                new QuerystringBuilder()
                         .addParameter("response_type", CODE)
                         .addParameter("client_id", clientOperations.getClientId())
                         .addParameter("redirect_uri", hostUrlProvider.provide())
                         .addParameter("scope", clientOperations.getScope())
                         .addParameter(STATE, state)
-                        .build();
+                        .build()
+        );
     }
 
     private boolean ignoreRequest(HttpServletRequest httpReq) {
@@ -138,14 +141,14 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
 
     private void filter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         try {
-            doFilter(httpReq, httpResp);
+            sessionFilter(httpReq, httpResp);
         } catch (Exception ex) {
             loginSession.logout(httpReq);
             throw ex;
         }
     }
 
-    private void doFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private void sessionFilter(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         String accessToken = accessTokenHeaderResolver.resolve(httpReq);
         if (hasText(accessToken)) {
             loginSession.login(accessToken, httpReq);

@@ -34,12 +34,12 @@ public class SimpleCtrl {
     private HostUrlProvider hostUrlProvider;
 
     @Autowired
-    private OAuth2ClientOperations oauth2ClientOperations;
+    private OAuth2ClientOperations operations;
 
     private String getAuthorizeUrl() throws UnsupportedEncodingException {
         return "{oauth2_host}/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&state={state}"
-                .replace("{oauth2_host}", oauth2ClientOperations.getAuthorizationServerHostUrl())
-                .replace("{client_id}", oauth2ClientOperations.getClientId())
+                .replace("{oauth2_host}", operations.getAuthorizationServerHostUrl())
+                .replace("{client_id}", operations.getClientId())
                 .replace("{redirect_uri}", URLEncoder.encode(hostUrlProvider.provide() + "/code", "utf-8"))
                 .replace("{scope}", "user:public_profile")
                 .replace("{state}", "xyz");
@@ -49,7 +49,7 @@ public class SimpleCtrl {
     public ModelAndView home() {
         return new ModelAndViewBuilder()
                 .setName("index")
-                .addAttribute("serverDomain", oauth2ClientOperations.getAuthorizationServerHostUrl())
+                .addAttribute("serverDomain", operations.getAuthorizationServerHostUrl())
                 .build();
     }
 
@@ -61,8 +61,8 @@ public class SimpleCtrl {
     @GetMapping("/code")
     public ModelAndView getToken(@RequestParam("code") String code) throws JsonProcessingException {
 
-        OAuth2AccessToken accessToken = oauth2ClientOperations.getAccessTokenByAuthorizationCode(code);
-        OAuth2Session session = oauth2ClientOperations.getSession(accessToken.getAccessToken());
+        OAuth2AccessToken accessToken = operations.getAccessTokenByAuthorizationCode(code);
+        OAuth2Session session = operations.getSession(accessToken.getAccessToken());
 
         ObjectWriter writter = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
