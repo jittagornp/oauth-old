@@ -45,13 +45,6 @@ public class SimpleCtrl {
                 .replace("{state}", "xyz");
     }
 
-    private String getLogoutUrl() throws UnsupportedEncodingException {
-        return "{oauth2_host}/logout?client_id={client_id}&redirect_uri={redirect_uri}"
-                .replace("{oauth2_host}", oauth2ClientOperations.getAuthorizationServerHostUrl())
-                .replace("{client_id}", oauth2ClientOperations.getClientId())
-                .replace("{redirect_uri}", URLEncoder.encode(hostUrlProvider.provide(), "utf-8"));
-    }
-
     @GetMapping({"", "/"})
     public ModelAndView home() {
         return new ModelAndViewBuilder()
@@ -79,10 +72,5 @@ public class SimpleCtrl {
                 .addAttribute("response", writter.writeValueAsString(accessToken))
                 .addAttribute("loginSession", writter.writeValueAsString(session))
                 .build();
-    }
-
-    @GetMapping("/logout")
-    public void logout(HttpServletResponse response) throws IOException {
-        response.sendRedirect(getLogoutUrl());
     }
 }
