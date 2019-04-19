@@ -5,7 +5,6 @@ package com.pamarin.commons.provider;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import static org.springframework.util.StringUtils.hasText;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -13,16 +12,8 @@ import static org.springframework.util.StringUtils.hasText;
 @Component
 public class DefaultHostUrlProvider implements HostUrlProvider {
 
-    private static final String DEFAULT_HOST_URL = "http://localhost:8080";
-
-    private final String hostUrl;
-
-    public DefaultHostUrlProvider(@Value("${server.hostUrl}") String hostUrl) {
-        if (!hasText(hostUrl)) {
-            hostUrl = DEFAULT_HOST_URL;
-        }
-        this.hostUrl = hostUrl;
-    }
+    @Value("${server.hostUrl:#{http://localhost:8080}}")
+    private String hostUrl;
 
     @Override
     public String provide() {
