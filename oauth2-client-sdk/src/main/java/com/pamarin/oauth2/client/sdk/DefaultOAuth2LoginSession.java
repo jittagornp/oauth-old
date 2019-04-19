@@ -30,19 +30,20 @@ public class DefaultOAuth2LoginSession implements OAuth2LoginSession {
     }
 
     @Override
-    public void login(String accessToken, HttpServletRequest httpReq) {
+    public OAuth2Session login(String accessToken, HttpServletRequest httpReq) {
         if (!hasText(accessToken)) {
             logout(httpReq);
             throw new AuthenticationException("Please login.");
         }
 
-        doLogin(accessToken, httpReq);
+        return doLogin(accessToken, httpReq);
     }
 
-    private void doLogin(String accessToken, HttpServletRequest httpReq) {
+    private OAuth2Session doLogin(String accessToken, HttpServletRequest httpReq) {
         try {
             OAuth2Session session = clientOperations.getSession(accessToken);
             savePrincipal(session, httpReq);
+            return session;
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 throw new AuthenticationException("Please login.");

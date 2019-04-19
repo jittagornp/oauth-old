@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface OAuth2LoginSession {
 
-    void login(String accessToken, HttpServletRequest httpReq);
+    OAuth2Session login(String accessToken, HttpServletRequest httpReq);
 
     void logout(HttpServletRequest httpReq);
 

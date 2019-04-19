@@ -82,10 +82,10 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             String accessTokenName,
             String refreshTokenName
     ) {
-        DefaultOAuth2AccessTokenOperations repository = new DefaultOAuth2AccessTokenOperations(hostUrlProvider, clientOperations);
-        repository.setAccessTokenName(accessTokenName);
-        repository.setRefreshTokenName(refreshTokenName);
-        return repository;
+        DefaultOAuth2AccessTokenOperations operations = new DefaultOAuth2AccessTokenOperations(hostUrlProvider, clientOperations);
+        operations.setAccessTokenName(accessTokenName);
+        operations.setRefreshTokenName(refreshTokenName);
+        return operations;
     }
 
     public void setDisabled(Boolean disabled) {
@@ -162,7 +162,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
             return;
         }
 
-        doLogin(httpReq, httpResp);
+        selfLogin(httpReq, httpResp);
     }
 
     private boolean isError(HttpServletRequest httpReq) {
@@ -203,7 +203,7 @@ public class OAuth2SessionFilter extends OncePerRequestFilter {
                 .build();
     }
 
-    private void doLogin(HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    private void selfLogin(HttpServletRequest httpReq, HttpServletResponse httpResp) {
         try {
             String accessToken = accessTokenResolver.resolve(httpReq);
             loginSession.login(accessToken, httpReq);
