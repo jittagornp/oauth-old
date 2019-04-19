@@ -5,12 +5,9 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
-import com.pamarin.commons.provider.HostUrlProvider;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,15 +30,7 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
     private MockMvc mockMvc;
 
     @MockBean
-    private HostUrlProvider hostUrlProvider;
-
-    @MockBean
     private LoginService loginService;
-
-    @Before
-    public void before() {
-        when(hostUrlProvider.provide()).thenReturn("http://localhost");
-    }
 
     @Test
     public void shouldBeInvalidRequest_whenUsernameAndPasswordIsEmpty() throws Exception {
@@ -50,7 +39,7 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
                 .login(null, null);
         this.mockMvc.perform(post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read"))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
+                .andExpect(redirectedUrl("http://localhost:-1/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
     }
 
     @Test
@@ -64,7 +53,7 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
                         .param("password", "AAA")
         )
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
+                .andExpect(redirectedUrl("http://localhost:-1/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
     }
 
     @Test
@@ -75,6 +64,6 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
                         .param("password", "password")
         )
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost/authorize?response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
+                .andExpect(redirectedUrl("http://localhost:-1/authorize?response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
     }
 }

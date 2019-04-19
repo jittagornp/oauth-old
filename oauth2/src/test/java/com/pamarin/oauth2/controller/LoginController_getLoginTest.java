@@ -5,15 +5,12 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.commons.exception.InvalidSignatureException;
 import com.pamarin.oauth2.IntegrationTestBase;
-import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.hashing.StringSignature;
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,15 +34,7 @@ public class LoginController_getLoginTest extends IntegrationTestBase {
     private MockMvc mockMvc;
 
     @MockBean
-    private HostUrlProvider hostUrlProvider;
-
-    @MockBean
     private StringSignature stringSignature;
-    
-    @Before
-    public void before() {
-        when(hostUrlProvider.provide()).thenReturn("http://localhost");
-    }
 
     @Test
     public void shouldBeErrorInvalidRequest_whenResponseTypeIsAAA() throws Exception {
@@ -134,6 +123,6 @@ public class LoginController_getLoginTest extends IntegrationTestBase {
         this.mockMvc.perform(get("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read&signature=BBBBB"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("login"))
-                .andExpect(model().attribute("processUrl", "http://localhost/login?response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
+                .andExpect(model().attribute("processUrl", "http://localhost:-1/login?response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
     }
 }
