@@ -271,6 +271,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         if (attributes != null) {
             attributes.entrySet().forEach((entry) -> {
                 session.setAttribute(entry.getKey(), entry.getValue());
+                log.debug("deserialize mongodb document => {} : {}", entry.getKey(), entry.getValue());
             });
         }
     }
