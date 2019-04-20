@@ -4,7 +4,7 @@
 package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.util.HttpAuthorizeBearerParser;
-import com.pamarin.oauth2.DatabaseSessionRepositoryImpl;
+import com.pamarin.oauth2.session.DatabaseSessionRepositoryImpl;
 import com.pamarin.oauth2.security.SessionCookieSerializer;
 import com.pamarin.oauth2.service.AccessTokenVerification;
 import org.springframework.beans.factory.annotation.Value;

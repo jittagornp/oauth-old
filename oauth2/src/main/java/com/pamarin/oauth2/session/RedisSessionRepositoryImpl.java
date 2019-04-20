@@ -1,6 +1,6 @@
-package com.pamarin.oauth2;
+package com.pamarin.oauth2.session;
 
-import com.pamarin.oauth2.RedisSessionRepositoryImpl.RedisSession;
+import com.pamarin.oauth2.session.RedisSessionRepositoryImpl.RedisSession;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
 
     private static final String LAST_ACCESSED_ATTR = "lastAccessedTime";
 
-    private static final String SESSION_ATTR_PREFIX = "sessionAttr:";
+    private static final String SESSION_ATTR_PREFIX = "attr:";
 
     private String keyPrefix = SESSION_KEY_PREFIX;
 
@@ -164,7 +164,7 @@ public class RedisSessionRepositoryImpl implements FindByIndexNameSessionReposit
         return template;
     }
 
-    public class RedisSession implements ExpiringSession {
+    public final class RedisSession implements ExpiringSession {
 
         private final MapSession cached;
         private Map<String, Object> attributeMap = new HashMap<>();

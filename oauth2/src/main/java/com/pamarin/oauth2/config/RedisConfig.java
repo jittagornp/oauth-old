@@ -3,7 +3,9 @@
  */
 package com.pamarin.oauth2.config;
 
-import com.pamarin.oauth2.RedisSessionRepositoryImpl;
+import com.pamarin.commons.provider.HttpServletRequestProvider;
+import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
+import com.pamarin.oauth2.session.RedisSessionRepositoryImpl;
 import com.pamarin.oauth2.RevokeTokenServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +19,12 @@ import com.pamarin.oauth2.service.RevokeTokenService;
 import com.pamarin.oauth2.repository.DatabaseSessionRepository;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepository;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
+import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
+import com.pamarin.oauth2.session.SessionRepositoryImpl;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.util.Assert;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -35,6 +42,7 @@ public class RedisConfig extends SpringHttpSessionConfiguration {
     @Value("${spring.session.redis.flush-mode}")
     private String flushMode;
 
+    /*
     @Bean
     public SessionRepository sessionRepository(RedisConnectionFactory factory, DatabaseSessionRepository databaseSessionRepository) {
         RedisSessionRepositoryImpl sessionRepository = new RedisSessionRepositoryImpl(factory);
@@ -43,6 +51,32 @@ public class RedisConfig extends SpringHttpSessionConfiguration {
         sessionRepository.setRedisFlushMode("on-save".equals(flushMode) ? RedisFlushMode.ON_SAVE : RedisFlushMode.IMMEDIATE);
         sessionRepository.setDatabaseSessionRepository(databaseSessionRepository);
         return sessionRepository;
+    }
+     */
+    @Bean
+    public SessionRepository newSessionRepository(
+            RedisConnectionFactory factory,
+            MongoOperations mongoOperations,
+            HttpServletRequestProvider httpServletRequestProvider,
+            UserAgentTokenIdResolver userAgentTokenIdResolver,
+            HttpClientIPAddressResolver httpClientIPAddressResolver
+    ) {
+        return new SessionRepositoryImpl(
+                createDefaultTemplate(factory),
+                mongoOperations,
+                httpServletRequestProvider,
+                userAgentTokenIdResolver,
+                httpClientIPAddressResolver
+        );
+    }
+
+    private static RedisTemplate<Object, Object> createDefaultTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<Object, Object> template = new RedisTemplate<>();
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setConnectionFactory(connectionFactory);
+        template.afterPropertiesSet();
+        return template;
     }
 
     @Bean
