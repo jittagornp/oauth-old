@@ -123,7 +123,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
             Long firstTimeWithLogin = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
             if (firstTimeWithLogin == null) {
                 boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
-                if (alreadyLogin) { 
+                if (alreadyLogin) {
                     session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
                     session.setAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR, currentTime);
                     saveToMongodb(session);
@@ -136,12 +136,16 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     public MapSession getSession(String id) {
         MapSession session = findRedisSessionById(id);
         if (session == null || session.isExpired()) {
+            log.debug("redis session expires => {}", session);
             session = findMongoSessionById(id);
             if (session != null) {
                 log.debug("find session in mongodb => {}", session.getId());
             }
         }
-        log.debug("getSession => {}", session);
+        log.debug("get session => {}", session);
+        if (session != null) {
+            log.debug("get session id => {}", session.getId());
+        }
         return session;
     }
 
