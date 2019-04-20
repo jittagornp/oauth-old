@@ -126,6 +126,9 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         MapSession session = findRedisSessionById(id);
         if (session == null) {
             session = findMongoSessionById(id);
+            if (session != null) {
+                log.debug("find session in mongodb => {}", session.getId());
+            }
         }
         return session;
     }
