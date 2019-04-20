@@ -10,10 +10,13 @@ import com.pamarin.commons.resolver.DefaultPrincipalNameResolver;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.commons.resolver.PrincipalNameResolver;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import static java.util.stream.Collectors.toSet;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -46,11 +49,11 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     private static final String CREATION_TIME = "creationTime";
     private static final String LAST_ACCESSED_TIME = "lastAccessedTime";
     private static final String MAX_INACTIVE_INTERVAL = "maxInactiveInterval";
+    //
     private static final String AGENT_ID = "agentId";
     private static final String USER_ID = "userId";
     private static final String IP_ADDRESS = "ipAddress";
     private static final String ATTRIBUTES = "attrs";
-    //
     private static final String LAST_ACCESSED_TIME_ATTR = "lastAccessedTime";
     private static final String LAST_ACCESSED_TIME_WITH_LOGIN_ATTR = "lastAccessedTimeWithLogin";
 
@@ -70,6 +73,8 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
 
     private final HttpClientIPAddressResolver httpClientIPAddressResolver;
 
+    private final PublishSubject<MapSession> saveSubject = PublishSubject.create();
+
     public SessionRepositoryImpl(
             RedisOperations<Object, Object> redisOperations,
             MongoOperations mongoOperations,
@@ -85,6 +90,16 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         this.serializer = new SerializingConverter();
         this.deserializer = new DeserializingConverter();
         this.principalNameResolver = new DefaultPrincipalNameResolver();
+
+        saveSubject
+                .debounce(1, TimeUnit.SECONDS)
+                //.distinctUntilChanged(session -> session.getId())
+                .subscribeOn(Schedulers.io())
+                .subscribe(session -> {
+                    log.debug("debunce save ****************** \"{}\"", session.getId());
+                    saveToRedis(session);
+                    synchronizeToMongodb(session);
+                });
     }
 
     public void setMaxInactiveIntervalInSeconds(int maxInactiveIntervalInSeconds) {
