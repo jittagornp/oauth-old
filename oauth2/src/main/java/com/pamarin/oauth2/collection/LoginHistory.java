@@ -15,7 +15,6 @@ import lombok.Setter;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  *
@@ -34,22 +33,16 @@ public class LoginHistory implements Serializable {
     @Id
     private String id;
 
-    @Field("login_date")
     private LocalDateTime loginDate;
 
-    @Field("logout_date")
     private LocalDateTime logoutDate;
 
-    @Field("session_id")
     private String sessionId;
 
-    @Field("agent_id")
     private String agentId;
 
-    @Field("user_id")
     private String userId;
 
-    @Field("ip_address")
     private String ipAddress;
 
     @Override

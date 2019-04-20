@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -33,28 +32,20 @@ public class OAuth2RefreshToken implements OAuth2Token {
     private String id;
 
     @Indexed
-    @Field("token_id")
     private String tokenId;
 
-    @Field("issued_at")
     private long issuedAt;
 
-    @Field("expires_at")
     private long expiresAt;
 
-    @Field("user_id")
     private String userId;
 
-    @Field("client_id")
     private String clientId;
 
-    @Field("expire_minutes")
     private int expireMinutes;
 
-    @Field("secret_key")
     private String secretKey;
 
-    @Field("session_id")
     private String sessionId;
 
     @Override

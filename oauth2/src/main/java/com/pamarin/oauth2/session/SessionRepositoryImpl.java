@@ -6,7 +6,9 @@ package com.pamarin.oauth2.session;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
+import com.pamarin.commons.resolver.DefaultPrincipalNameResolver;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
+import com.pamarin.commons.resolver.PrincipalNameResolver;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +26,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.session.MapSession;
 import org.springframework.session.SessionRepository;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -62,7 +62,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     private final Converter<Object, byte[]> serializer;
     private final Converter<byte[], Object> deserializer;
 
-    private final AuthenticationParser authenticationParser;
+    private final PrincipalNameResolver principalNameResolver;
 
     private final HttpServletRequestProvider httpServletRequestProvider;
 
@@ -84,7 +84,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         this.httpClientIPAddressResolver = httpClientIPAddressResolver;
         this.serializer = new SerializingConverter();
         this.deserializer = new DeserializingConverter();
-        this.authenticationParser = new AuthenticationParser();
+        this.principalNameResolver = new DefaultPrincipalNameResolver();
     }
 
     public void setMaxInactiveIntervalInSeconds(int maxInactiveIntervalInSeconds) {
@@ -217,7 +217,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         map.put(CREATION_TIME, session.getCreationTime());
         map.put(MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
         map.put(LAST_ACCESSED_TIME, session.getLastAccessedTime());
-        map.put(USER_ID, resolveUserId(session));
+        map.put(USER_ID, principalNameResolver.resolve(session));
         getAttributeMap(session).entrySet().forEach(attribute -> {
             map.put(ATTRIBUTES + ":" + attribute.getKey(), attribute.getValue());
         });
@@ -305,35 +305,5 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
                 return value;
             }
         };
-    }
-
-    private String resolveUserId(MapSession session) {
-        Object authentication = session.getAttribute(SPRING_SECURITY_CONTEXT);
-        return authenticationParser.extractName(authentication);
-    }
-
-    public static class AuthenticationParser {
-
-        private static final String NAME_EXPRESSION = "authentication?.name";
-
-        private static final SpelExpressionParser PARSER = new SpelExpressionParser();
-
-        private AuthenticationParser() {
-        }
-
-        /**
-         * Extracts principal name from authentication.
-         *
-         * @param authentication Authentication object
-         * @return principal name
-         */
-        private String extractName(Object authentication) {
-            if (authentication == null) {
-                return null;
-            }
-            Expression expression = PARSER.parseExpression(NAME_EXPRESSION);
-            return expression.getValue(authentication, String.class);
-        }
-
     }
 }
