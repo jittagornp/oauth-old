@@ -135,7 +135,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     @Override
     public MapSession getSession(String id) {
         MapSession session = findRedisSessionById(id);
-        if (session == null) {
+        if (session == null || session.isExpired()) {
             session = findMongoSessionById(id);
             if (session != null) {
                 log.debug("find session in mongodb => {}", session.getId());
