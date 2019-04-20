@@ -38,7 +38,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
-    private static final String COLLECTION_NAME = "test_session";
+    private static final String COLLECTION_NAME = "user_session";
 
     private static final String OBJECT_ID = "_id";
     private static final String SESSION_ID = "sessionId";
@@ -94,15 +94,15 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
 
     @Override
     public void save(MapSession session) {
-        saveRedis(session);
+        saveToRedis(session);
         synchronizeToMongodb(session);
     }
 
-    private void saveRedis(MapSession session) {
+    private void saveToRedis(MapSession session) {
         redisOperations.boundHashOps(getRedisKey(session.getId())).putAll(toRedisMap(session));
     }
 
-    private void saveMongodb(MapSession session) {
+    private void saveToMongodb(MapSession session) {
         DBObject obj = toDBObject(session);
         Query query = Query.query(Criteria.where(SESSION_ID).is(session.getId()));
         Document db = mongoOperations.findOne(query, Document.class, COLLECTION_NAME);
@@ -117,7 +117,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         Long lastAcccessedTime = session.getAttribute(LAST_ACCESSED_TIME_ATTR);
         if (lastAcccessedTime == null || (currentTime - lastAcccessedTime > synchronizeTimeout)) {
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
-            saveMongodb(session);
+            saveToMongodb(session);
         }
     }
 
