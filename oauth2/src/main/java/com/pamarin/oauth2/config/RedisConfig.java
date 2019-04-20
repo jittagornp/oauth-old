@@ -5,7 +5,6 @@ package com.pamarin.oauth2.config;
 
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
-import com.pamarin.oauth2.session.RedisSessionRepositoryImpl;
 import com.pamarin.oauth2.RevokeTokenServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.session.SessionRepository;
 import org.springframework.session.config.annotation.web.http.SpringHttpSessionConfiguration;
-import org.springframework.session.data.redis.RedisFlushMode;
 import com.pamarin.oauth2.service.RevokeTokenService;
-import com.pamarin.oauth2.repository.DatabaseSessionRepository;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepository;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
@@ -24,7 +21,6 @@ import com.pamarin.oauth2.session.SessionRepositoryImpl;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.util.Assert;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12

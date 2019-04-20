@@ -3,14 +3,12 @@
  */
 package com.pamarin.oauth2.config;
 
-import com.pamarin.oauth2.session.MongodbSessionRepository;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
@@ -18,7 +16,6 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.session.SessionRepository;
 
 /**
  *
@@ -42,9 +39,4 @@ public class MongodbConfig {
         mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return mappingConverter;
     } 
-//    
-//    @Bean
-//    public SessionRepository newSessionRepository(MongoOperations mongoOperations){
-//        return new MongodbSessionRepository(mongoOperations);
-//    }
 }
