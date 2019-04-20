@@ -142,10 +142,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
                 log.debug("find session in mongodb => {}", session.getId());
             }
         }
-        log.debug("get session => {}", session);
-        if (session != null) {
-            log.debug("get session id => {}", session.getId());
-        }
+        printSeessionAttributes(session);
         return session;
     }
 
@@ -329,5 +326,20 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
             return expression.getValue(authentication, String.class);
         }
 
+    }
+    
+    private void printSeessionAttributes(MapSession session){
+        log.debug("print session {}", session);
+        if(session == null){
+            return;
+        }
+        Set<String> attributeNames = session.getAttributeNames();
+        log.debug("session {} => {} : {}", session.getId(), CREATION_TIME, session.getCreationTime());
+        log.debug("session {} => {} : {}", session.getId(), LAST_ACCESSED_TIME, session.getLastAccessedTime());
+        log.debug("session {} => {} : {}", session.getId(), MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
+        for(String name : attributeNames){
+            Object value = session.getAttribute(name);
+            log.debug("session {} => {} : {}", session.getId(), name, value);
+        }
     }
 }
