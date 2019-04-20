@@ -33,26 +33,12 @@ import org.springframework.util.Assert;
 @Profile("!test") //inactive for test profile
 public class RedisConfig extends SpringHttpSessionConfiguration {
 
-    @Value("${spring.session.timeout}")
-    private Integer sessionTimeout;
+    @Value("${spring.session.timeout:#{1800}}")
+    private int sessionTimeout;
 
     @Value("${spring.session.redis.namespace}")
     private String namespace;
 
-    @Value("${spring.session.redis.flush-mode}")
-    private String flushMode;
-
-    /*
-    @Bean
-    public SessionRepository sessionRepository(RedisConnectionFactory factory, DatabaseSessionRepository databaseSessionRepository) {
-        RedisSessionRepositoryImpl sessionRepository = new RedisSessionRepositoryImpl(factory);
-        sessionRepository.setRedisKeyNamespace(namespace);
-        sessionRepository.setDefaultMaxInactiveInterval(sessionTimeout);
-        sessionRepository.setRedisFlushMode("on-save".equals(flushMode) ? RedisFlushMode.ON_SAVE : RedisFlushMode.IMMEDIATE);
-        sessionRepository.setDatabaseSessionRepository(databaseSessionRepository);
-        return sessionRepository;
-    }
-     */
     @Bean
     public SessionRepository newSessionRepository(
             RedisConnectionFactory factory,
@@ -61,13 +47,17 @@ public class RedisConfig extends SpringHttpSessionConfiguration {
             UserAgentTokenIdResolver userAgentTokenIdResolver,
             HttpClientIPAddressResolver httpClientIPAddressResolver
     ) {
-        return new SessionRepositoryImpl(
+        SessionRepositoryImpl repository =  new SessionRepositoryImpl(
                 createDefaultTemplate(factory),
                 mongoOperations,
                 httpServletRequestProvider,
                 userAgentTokenIdResolver,
                 httpClientIPAddressResolver
         );
+        repository.setMaxInactiveIntervalInSeconds(sessionTimeout);
+        repository.setSessionNameSpace(namespace);
+        repository.setSynchronizeTimeout(1000 * 30); //30 seconds
+        return repository;
     }
 
     private static RedisTemplate<Object, Object> createDefaultTemplate(RedisConnectionFactory connectionFactory) {

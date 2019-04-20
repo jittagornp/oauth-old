@@ -28,6 +28,7 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.session.MapSession;
 import org.springframework.session.SessionRepository;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  *
@@ -38,7 +39,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
-    private static final String COLLECTION_NAME = "user_session";
+    private String sessionNameSpace = "user_session";
 
     private static final String OBJECT_ID = "_id";
     private static final String SESSION_ID = "sessionId";
@@ -53,8 +54,8 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     private static final String LAST_ACCESSED_TIME_ATTR = "lastAccessedTime";
     private static final String LAST_ACCESSED_TIME_WITH_LOGIN_ATTR = "lastAccessedTimeWithLogin";
 
-    private final int maxInactiveIntervalInSeconds = 1800;
-    private final int synchronizeTimeout = 1000 * 30;
+    private int maxInactiveIntervalInSeconds = 1800;
+    private int synchronizeTimeout = 1000 * 30;
 
     private final RedisOperations<Object, Object> redisOperations;
     private final MongoOperations mongoOperations;
@@ -86,6 +87,18 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         this.authenticationParser = new AuthenticationParser();
     }
 
+    public void setMaxInactiveIntervalInSeconds(int maxInactiveIntervalInSeconds) {
+        this.maxInactiveIntervalInSeconds = maxInactiveIntervalInSeconds;
+    }
+
+    public void setSynchronizeTimeout(int synchronizeTimeout) {
+        this.synchronizeTimeout = synchronizeTimeout;
+    }
+
+    public void setSessionNameSpace(String sessionNameSpace) {
+        this.sessionNameSpace = sessionNameSpace;
+    }
+
     @Override
     public MapSession createSession() {
         MapSession session = new MapSession();
@@ -101,17 +114,16 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     }
 
     private void saveToRedis(MapSession session) {
-        redisOperations.boundHashOps(getRedisKey(session.getId())).putAll(toRedisMap(session));
+        redisOperations.boundHashOps(getRedisKey(session.getId())).putAll(toRedisMapEntries(session));
     }
 
     private void saveToMongodb(MapSession session) {
         DBObject obj = toDBObject(session);
-        Query query = Query.query(Criteria.where(SESSION_ID).is(session.getId()));
-        Document db = mongoOperations.findOne(query, Document.class, COLLECTION_NAME);
+        Document db = mongoOperations.findOne(sessionIdQuery(session.getId()), Document.class, sessionNameSpace);
         if (db != null) {
             obj.put(OBJECT_ID, db.get(OBJECT_ID));
         }
-        mongoOperations.save(obj, COLLECTION_NAME);
+        mongoOperations.save(obj, sessionNameSpace);
     }
 
     private void synchronizeToMongodb(MapSession session) {
@@ -137,29 +149,27 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     public MapSession getSession(String id) {
         MapSession session = findRedisSessionById(id);
         if (session == null || session.isExpired()) {
-            log.debug("redis session expires => {}", session);
             session = findMongoSessionById(id);
             if (session != null) {
-                log.debug("find session in mongodb => {}", session.getId());
+                saveToRedis(session);
             }
         }
-        printSeessionAttributes(session);
         return session;
     }
 
     @Override
     public void delete(String id) {
-
+        redisOperations.delete(getRedisKey(id));
+        mongoOperations.remove(sessionIdQuery(id), sessionNameSpace);
     }
 
     private String getRedisKey(String sessionId) {
-        return COLLECTION_NAME + ":" + sessionId;
+        return sessionNameSpace + ":" + sessionId;
     }
 
     private MapSession findRedisSessionById(String id) {
-        log.debug("find session in redis => {}", id);
         Map<Object, Object> entries = redisOperations.boundHashOps(getRedisKey(id)).entries();
-        if (entries == null || entries.isEmpty()) {
+        if (isEmpty(entries)) {
             return null;
         }
         return toMapSession(
@@ -201,7 +211,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         return session;
     }
 
-    private Map<String, Object> toRedisMap(MapSession session) {
+    private Map<String, Object> toRedisMapEntries(MapSession session) {
         Map<String, Object> map = new HashMap<>();
         map.put(SESSION_ID, session.getId());
         map.put(CREATION_TIME, session.getCreationTime());
@@ -210,9 +220,6 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         map.put(USER_ID, resolveUserId(session));
         getAttributeMap(session).entrySet().forEach(attribute -> {
             map.put(ATTRIBUTES + ":" + attribute.getKey(), attribute.getValue());
-        });
-        map.entrySet().forEach(entry -> {
-            log.debug("save session attribute => {} : {}", entry.getKey(), entry.getValue());
         });
         return map;
     }
@@ -249,29 +256,29 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         return this.serializer.convert(getAttributeMap(session));
     }
 
+    private Query sessionIdQuery(String id) {
+        return Query.query(Criteria.where(SESSION_ID).is(id));
+    }
+
     private MapSession findMongoSessionById(String id) {
-        Query query = Query.query(Criteria.where(SESSION_ID).is(id));
-        Document document = mongoOperations.findOne(query, Document.class, COLLECTION_NAME);
+        Document document = mongoOperations.findOne(sessionIdQuery(id), Document.class, sessionNameSpace);
         if (document == null) {
             return null;
         }
-        return toSession(document);
+        return toMapSession(document);
     }
 
-    private MapSession toSession(Document document) {
+    private MapSession toMapSession(Document document) {
         MapSession session = toMapSession(document.entrySet());
         deserializeAttributes(document, session);
         return session;
     }
 
     private void deserializeAttributes(Document document, MapSession session) {
-        Object sessionAttributes = document.get(ATTRIBUTES);
-        Map<String, Object> attributes = (Map<String, Object>) this.deserializer.convert(toBytes(sessionAttributes));
-        if (attributes != null) {
-            attributes.entrySet().forEach((entry) -> {
-                session.setAttribute(entry.getKey(), entry.getValue());
-                log.debug("deserialize mongodb document => {} : {}", entry.getKey(), entry.getValue());
-            });
+        Object obj = document.get(ATTRIBUTES);
+        Map<String, Object> attrs = (Map<String, Object>) this.deserializer.convert(toBytes(obj));
+        if (attrs != null) {
+            attrs.entrySet().forEach(entry -> session.setAttribute(entry.getKey(), entry.getValue()));
         }
     }
 
@@ -328,21 +335,5 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
             return expression.getValue(authentication, String.class);
         }
 
-    }
-    
-    private void printSeessionAttributes(MapSession session){
-        log.debug("print session {}", session);
-        if(session == null){
-            return;
-        }
-        Set<String> attributeNames = session.getAttributeNames();
-        log.debug("session {} : {}", SESSION_ID, session.getId());
-        log.debug("session {} : {}", CREATION_TIME, session.getCreationTime());
-        log.debug("session {} : {}", LAST_ACCESSED_TIME, session.getLastAccessedTime());
-        log.debug("session {} : {}", MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
-        for(String name : attributeNames){
-            Object value = session.getAttribute(name);
-            log.debug("session {} : {}",name, value);
-        }
     }
 }
