@@ -89,6 +89,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     @Override
     public MapSession createSession() {
         MapSession session = new MapSession();
+        session.setAttribute(SESSION_ID, session.getId());
         session.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds);
         return session;
     }
@@ -235,7 +236,8 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         session.getAttributeNames().forEach(attrName -> {
             boolean ignore = AGENT_ID.equals(attrName)
                     || USER_ID.equals(attrName)
-                    || IP_ADDRESS.equals(attrName);
+                    || IP_ADDRESS.equals(attrName)
+                    || SESSION_ID.equals(attrName);
             if (!ignore) {
                 attributes.put(attrName, session.getAttribute(attrName));
             }
@@ -334,12 +336,13 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
             return;
         }
         Set<String> attributeNames = session.getAttributeNames();
-        log.debug("session {} => {} : {}", session.getId(), CREATION_TIME, session.getCreationTime());
-        log.debug("session {} => {} : {}", session.getId(), LAST_ACCESSED_TIME, session.getLastAccessedTime());
-        log.debug("session {} => {} : {}", session.getId(), MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
+        log.debug("session {} : {}", SESSION_ID, session.getId());
+        log.debug("session {} : {}", CREATION_TIME, session.getCreationTime());
+        log.debug("session {} : {}", LAST_ACCESSED_TIME, session.getLastAccessedTime());
+        log.debug("session {} : {}", MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
         for(String name : attributeNames){
             Object value = session.getAttribute(name);
-            log.debug("session {} => {} : {}", session.getId(), name, value);
+            log.debug("session {} : {}",name, value);
         }
     }
 }
