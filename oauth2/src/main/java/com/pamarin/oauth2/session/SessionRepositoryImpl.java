@@ -51,6 +51,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     private static final String ATTRIBUTES = "attrs";
     //
     private static final String LAST_ACCESSED_TIME_ATTR = "lastAccessedTime";
+    private static final String LAST_ACCESSED_TIME_WITH_LOGIN_ATTR = "lastAccessedTimeWithLogin";
 
     private final int maxInactiveIntervalInSeconds = 1800;
     private final int synchronizeTimeout = 1000 * 30;
@@ -118,6 +119,16 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         if (lastAcccessedTime == null || (currentTime - lastAcccessedTime > synchronizeTimeout)) {
             session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
             saveToMongodb(session);
+        } else {
+            Long firstTimeWithLogin = session.getAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR);
+            if (firstTimeWithLogin == null) {
+                boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
+                if (alreadyLogin) { 
+                    session.setAttribute(LAST_ACCESSED_TIME_ATTR, currentTime);
+                    session.setAttribute(LAST_ACCESSED_TIME_WITH_LOGIN_ATTR, currentTime);
+                    saveToMongodb(session);
+                }
+            }
         }
     }
 
