@@ -141,6 +141,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
                 log.debug("find session in mongodb => {}", session.getId());
             }
         }
+        log.debug("getSession => {}", session);
         return session;
     }
 
@@ -154,6 +155,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     }
 
     private MapSession findRedisSessionById(String id) {
+        log.debug("find session in redis => {}", id);
         Map<Object, Object> entries = redisOperations.boundHashOps(getRedisKey(id)).entries();
         if (entries == null) {
             return null;
