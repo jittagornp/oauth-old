@@ -21,4 +21,5 @@ public interface RevokeSessionService {
 
     void revokeByUserId(String userId);
 
+    void revokeExpiredSessions();
 }

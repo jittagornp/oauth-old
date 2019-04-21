@@ -3,15 +3,16 @@
  */
 package com.pamarin.oauth2.session;
 
+import static com.pamarin.oauth2.session.SessionAttributeConstant.EXPIRATION_TIME;
 import static java.util.Collections.emptyList;
 import java.util.List;
+import static java.util.stream.Collectors.toList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
-import static java.util.stream.Collectors.toList;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  *
@@ -77,5 +78,17 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
             return emptyList();
         }
         return map(userSessions);
+    }
+
+    @Override
+    public List<String> findExpiredSessions() {
+        Query query = Query.query(Criteria.where(EXPIRATION_TIME).lt(System.currentTimeMillis()));
+        List<UserSession> sessions = mongoOperations.find(query, UserSession.class);
+        if (isEmpty(sessions)) {
+            return emptyList();
+        }
+        return sessions.stream()
+                .map(userSession -> userSession.getSessionId())
+                .collect(toList());
     }
 }

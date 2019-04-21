@@ -23,12 +23,17 @@ public class OAuth2AccessTokenRepoImpl implements OAuth2AccessTokenRepository {
 
     @Override
     public OAuth2AccessToken save(OAuth2AccessToken token) {
-        return redisOAuth2AccessTokenRepository.save(mongodbOAuth2AccessTokenRepository.save(token));
+        OAuth2AccessToken accessToken = mongodbOAuth2AccessTokenRepository.save(token);
+        return redisOAuth2AccessTokenRepository.save(accessToken);
     }
 
     @Override
     public OAuth2AccessToken findByTokenId(String tokenId) {
-        return redisOAuth2AccessTokenRepository.findByTokenId(tokenId);
+        OAuth2AccessToken accessToken = redisOAuth2AccessTokenRepository.findByTokenId(tokenId);
+        if (accessToken == null) {
+            return mongodbOAuth2AccessTokenRepository.findByTokenId(tokenId);
+        }
+        return accessToken;
     }
 
     @Override
@@ -36,5 +41,4 @@ public class OAuth2AccessTokenRepoImpl implements OAuth2AccessTokenRepository {
         redisOAuth2AccessTokenRepository.deleteByTokenId(tokenId);
         mongodbOAuth2AccessTokenRepository.deleteByTokenId(tokenId);
     }
-
 }

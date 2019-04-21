@@ -48,5 +48,4 @@ public abstract class MongodbOAuth2TokenRepositoryAdapter<T extends OAuth2Token>
         WriteResult result = mongoOperations.remove(makeTokenIdQuery(tokenId), getTokenClass());
         LOG.debug("Mongodb deleteByTokenId \"{}\" = {}", tokenId, result);
     }
-
 }

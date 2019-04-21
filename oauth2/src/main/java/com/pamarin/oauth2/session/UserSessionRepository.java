@@ -16,4 +16,6 @@ public interface UserSessionRepository {
     List<String> findOtherSessionIdsOnSameUserAgentBySessionId(String sessionId);
 
     List<String> findAllSessionIdsByUserId(String userId);
+    
+    List<String> findExpiredSessions();
 }

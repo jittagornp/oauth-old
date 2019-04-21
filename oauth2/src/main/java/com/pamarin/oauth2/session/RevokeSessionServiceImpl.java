@@ -6,6 +6,7 @@ package com.pamarin.oauth2.session;
 import com.pamarin.oauth2.service.RevokeSessionService;
 import com.pamarin.oauth2.service.RevokeTokenService;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import static org.springframework.util.StringUtils.hasText;
  *
  * @author jitta
  */
+@Slf4j
 @Service
 public class RevokeSessionServiceImpl implements RevokeSessionService {
 
@@ -72,4 +74,8 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
         }
     }
 
+    @Override
+    public void revokeExpiredSessions() {
+        revokeBySessionIds(userSessionRepository.findExpiredSessions());
+    }
 }

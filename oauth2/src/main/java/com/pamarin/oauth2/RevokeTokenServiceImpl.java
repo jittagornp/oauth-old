@@ -5,9 +5,12 @@ package com.pamarin.oauth2;
 
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
+import com.pamarin.oauth2.model.OAuth2Token;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepository;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
 import com.pamarin.oauth2.service.RevokeTokenService;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import static java.util.Collections.emptyList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +61,7 @@ public class RevokeTokenServiceImpl implements RevokeTokenService {
 
     private void revokeTokenByAttribute(String attributeName, Object attributeValue) {
         Query query = makeAttributeQuery(attributeName, attributeValue);
-        findAccessTokens(query)
-                .forEach(accessToken -> revokeRedisToken(accessToken.getTokenId()));
+        findAccessTokens(query).forEach(accessToken -> revokeRedisToken(accessToken.getTokenId()));
         mongoOperations.remove(query, OAuth2AccessToken.class);
         mongoOperations.remove(query, OAuth2RefreshToken.class);
     }
@@ -89,4 +91,15 @@ public class RevokeTokenServiceImpl implements RevokeTokenService {
         revokeTokenByAttribute("clientId", clientId);
     }
 
+    @Override
+    public void revokeExpiredTokens() {
+        revokeExpiredTokens(OAuth2AccessToken.class);
+        revokeExpiredTokens(OAuth2RefreshToken.class);
+    }
+
+    private <T extends OAuth2Token> void revokeExpiredTokens(Class<T> typeClass) {
+        long nowTimestamp = Timestamp.valueOf(LocalDateTime.now()).getTime();
+        Query query = Query.query(Criteria.where("expiresAt").lt(nowTimestamp));
+        mongoOperations.remove(query, typeClass);
+    }
 }

@@ -18,4 +18,6 @@ public interface RevokeTokenService {
     void revokeByUserId(String userId);
 
     void revokeByClientId(String clientId);
+
+    void revokeExpiredTokens();
 }

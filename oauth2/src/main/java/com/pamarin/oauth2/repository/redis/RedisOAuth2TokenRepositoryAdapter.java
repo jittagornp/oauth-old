@@ -29,7 +29,7 @@ public abstract class RedisOAuth2TokenRepositoryAdapter<T extends OAuth2Token> e
     private ObjectMapper objectMapper;
 
     protected abstract String getTokenProfix();
-    
+
     private String makeKey(String tokenId) {
         return getTokenProfix() + ":" + tokenId;
     }
@@ -44,7 +44,7 @@ public abstract class RedisOAuth2TokenRepositoryAdapter<T extends OAuth2Token> e
             return token;
         } catch (JsonProcessingException ex) {
             throw new RuntimeException("Can't parse object to JSON string", ex);
-        } 
+        }
     }
 
     @Override
@@ -66,4 +66,5 @@ public abstract class RedisOAuth2TokenRepositoryAdapter<T extends OAuth2Token> e
     public void deleteByTokenId(String tokenId) {
         redisTemplate.delete(makeKey(tokenId));
     }
+
 }
