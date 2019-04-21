@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.session.MapSession;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  *
@@ -35,7 +36,7 @@ public class DefaultSessionConverter implements SessionConverter {
 
     @Override
     public MapSession entriesToSession(Set<Map.Entry<String, Object>> entries) {
-        if (entries == null) {
+        if (isEmpty(entries)) {
             return null;
         }
 
