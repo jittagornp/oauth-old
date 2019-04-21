@@ -3,8 +3,6 @@
  */
 package com.pamarin.oauth2.config;
 
-import com.pamarin.commons.provider.HttpServletRequestProvider;
-import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.oauth2.RevokeTokenServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -39,16 +37,12 @@ public class RedisConfig extends SpringHttpSessionConfiguration {
     public SessionRepository newSessionRepository(
             RedisConnectionFactory factory,
             MongoOperations mongoOperations,
-            HttpServletRequestProvider httpServletRequestProvider,
-            UserAgentTokenIdResolver userAgentTokenIdResolver,
-            HttpClientIPAddressResolver httpClientIPAddressResolver
+            UserAgentTokenIdResolver userAgentTokenIdResolver
     ) {
-        SessionRepositoryImpl repository =  new SessionRepositoryImpl(
+        SessionRepositoryImpl repository = new SessionRepositoryImpl(
                 createDefaultTemplate(factory),
                 mongoOperations,
-                httpServletRequestProvider,
-                userAgentTokenIdResolver,
-                httpClientIPAddressResolver
+                userAgentTokenIdResolver
         );
         repository.setMaxInactiveIntervalInSeconds(sessionTimeout);
         repository.setSessionNameSpace(namespace);
