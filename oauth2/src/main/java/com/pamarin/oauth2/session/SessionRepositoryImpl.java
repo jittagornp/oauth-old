@@ -74,17 +74,20 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         MapSession session = new MapSession();
         session.setAttribute(SESSION_ID, session.getId());
         session.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds);
+        log.debug("create \"{}\".\"{}\"", sessionNameSpace, session.getId());
         return session;
     }
 
     @Override
     public void save(MapSession session) {
+        log.debug("save \"{}\".\"{}\"", sessionNameSpace, session.getId());
         saveToRedis(session);
         synchronizeToMongodb(session);
     }
 
     @Override
     public MapSession getSession(String id) {
+        log.debug("get \"{}\".\"{}\"", sessionNameSpace, id);
         MapSession session = findRedisSessionById(id);
         if (isExpired(session)) {
             session = findMongoSessionById(id);
@@ -105,6 +108,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
 
     @Override
     public void delete(String id) {
+        log.debug("delete \"{}\".\"{}\"", sessionNameSpace, id);
         redisOperations.delete(getRedisKey(id));
         mongoOperations.remove(sessionIdQuery(id), sessionNameSpace);
     }
