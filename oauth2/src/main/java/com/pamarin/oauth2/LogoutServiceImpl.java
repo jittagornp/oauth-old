@@ -31,6 +31,8 @@ public class LogoutServiceImpl implements LogoutService {
     @Override
     public void logout() {
         loginHistoryService.stampLogout();
-        revokeSessionService.revokeBySessionId(loginSession.getSessionId());
+        String sessionId = loginSession.getSessionId();
+        loginSession.logout();
+        revokeSessionService.revokeBySessionId(sessionId);
     }
 }
