@@ -56,7 +56,7 @@ public abstract class RedisOAuth2TokenRepositoryAdapter<T extends OAuth2Token> e
             if (value == null) {
                 return null;
             }
-            return objectMapper.readValue(value, getTokenClass());
+            return returnNullIfExpired(objectMapper.readValue(value, getTokenClass()));
         } catch (IOException ex) {
             throw new RuntimeException("Can't parse JSON string to object", ex);
         }

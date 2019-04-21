@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.pamarin.commons.generator.IdGenerator;
 import com.pamarin.commons.util.Base64Utils;
 import org.springframework.beans.BeanUtils;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  *
@@ -37,13 +38,13 @@ public abstract class OAuth2TokenRepositoryAdapter<T extends OAuth2Token> implem
     protected abstract T doSave(T token);
 
     private void setIdIfNotPresent(T clone) {
-        if (clone.getId() == null) {
+        if (!hasText(clone.getId())) {
             clone.setId(idGenerator.generate());
         }
     }
 
     private void setTokenIdIfNotPresent(T clone) {
-        if (clone.getTokenId() == null) {
+        if (!hasText(clone.getTokenId())) {
             clone.setTokenId(uuidGenerator.generate());
         }
     }
@@ -59,7 +60,7 @@ public abstract class OAuth2TokenRepositoryAdapter<T extends OAuth2Token> implem
     }
 
     private void setSecretKeyIfNotPresent(T clone) {
-        if (clone.getSecretKey() == null) {
+        if (!hasText(clone.getSecretKey())) {
             byte[] bytes = new byte[SECRET_KEY_SIZE];
             secureRandom.nextBytes(bytes);
             String secret = Base64Utils.encode(bytes);
@@ -80,5 +81,18 @@ public abstract class OAuth2TokenRepositoryAdapter<T extends OAuth2Token> implem
         } catch (InstantiationException | IllegalAccessException ex) {
             throw new RuntimeException("Can't save token", ex);
         }
+    }
+
+    protected T returnNullIfExpired(T token) {
+        if (token == null) {
+            return null;
+        }
+        long now = Timestamp.valueOf(LocalDateTime.now()).getTime();
+        long expiresAt = token.getExpiresAt();
+        if (expiresAt <= now) {
+            deleteByTokenId(token.getTokenId());
+            return null;
+        }
+        return token;
     }
 }

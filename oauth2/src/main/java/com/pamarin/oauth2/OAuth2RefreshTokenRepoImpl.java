@@ -23,15 +23,18 @@ public class OAuth2RefreshTokenRepoImpl implements OAuth2RefreshTokenRepository 
 
     @Override
     public OAuth2RefreshToken save(OAuth2RefreshToken token) {
-        OAuth2RefreshToken refreshToken = redisOAuth2RefreshTokenRepository.save(token);
-        return mongodbOAuth2RefreshTokenRepository.save(refreshToken);
+        OAuth2RefreshToken refreshToken = mongodbOAuth2RefreshTokenRepository.save(token);
+        return redisOAuth2RefreshTokenRepository.save(refreshToken);
     }
 
     @Override
     public OAuth2RefreshToken findByTokenId(String tokenId) {
         OAuth2RefreshToken refreshToken = redisOAuth2RefreshTokenRepository.findByTokenId(tokenId);
         if (refreshToken == null) {
-            return mongodbOAuth2RefreshTokenRepository.findByTokenId(tokenId);
+            refreshToken = mongodbOAuth2RefreshTokenRepository.findByTokenId(tokenId);
+            if (refreshToken != null) {
+                return redisOAuth2RefreshTokenRepository.save(refreshToken);
+            }
         }
         return refreshToken;
     }

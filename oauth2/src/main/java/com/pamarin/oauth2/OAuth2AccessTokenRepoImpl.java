@@ -31,7 +31,10 @@ public class OAuth2AccessTokenRepoImpl implements OAuth2AccessTokenRepository {
     public OAuth2AccessToken findByTokenId(String tokenId) {
         OAuth2AccessToken accessToken = redisOAuth2AccessTokenRepository.findByTokenId(tokenId);
         if (accessToken == null) {
-            return mongodbOAuth2AccessTokenRepository.findByTokenId(tokenId);
+            accessToken = mongodbOAuth2AccessTokenRepository.findByTokenId(tokenId);
+            if (accessToken != null) {
+                return redisOAuth2AccessTokenRepository.save(accessToken);
+            }
         }
         return accessToken;
     }

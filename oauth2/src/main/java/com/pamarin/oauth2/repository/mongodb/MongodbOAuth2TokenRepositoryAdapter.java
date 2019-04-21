@@ -40,7 +40,7 @@ public abstract class MongodbOAuth2TokenRepositoryAdapter<T extends OAuth2Token>
     public T findByTokenId(String tokenId) {
         T token = mongoOperations.findOne(makeTokenIdQuery(tokenId), getTokenClass());
         LOG.debug("Mongodb findByTokenId \"{}\" = {}", tokenId, token);
-        return token;
+        return returnNullIfExpired(token);
     }
 
     @Override
