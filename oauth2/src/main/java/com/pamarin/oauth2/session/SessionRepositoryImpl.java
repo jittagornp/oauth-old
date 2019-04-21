@@ -91,10 +91,6 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         MapSession session = findRedisSessionById(id);
         if (isExpired(session)) {
             session = findMongoSessionById(id);
-            if (!isExpired(session)) {
-                saveToRedis(session);
-                return session;
-            }
         }
         if (session == null) {
             return null;
