@@ -21,6 +21,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.session.MapSession;
 import org.springframework.session.SessionRepository;
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  *
@@ -150,7 +151,10 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
 
     private void additionalAttributes(MapSession session) {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
-        session.setAttribute(AGENT_ID, userAgentTokenIdResolver.resolve(httpReq));
+        String agentId = userAgentTokenIdResolver.resolve(httpReq);
+        if (hasText(agentId)) {
+            session.setAttribute(AGENT_ID, agentId);
+        }
         session.setAttribute(IP_ADDRESS, httpClientIPAddressResolver.resolve(httpReq));
     }
 
