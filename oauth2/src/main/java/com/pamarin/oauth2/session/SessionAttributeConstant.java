@@ -16,6 +16,7 @@ public final class SessionAttributeConstant {
     public static final String MAX_INACTIVE_INTERVAL = "maxInactiveInterval";
     
     //additional
+    public static final String EXPIRATION_TIME = "expirationTime";
     public static final String AGENT_ID = "agentId";
     public static final String USER_ID = "userId";
     public static final String IP_ADDRESS = "ipAddress";

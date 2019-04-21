@@ -11,6 +11,7 @@ import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import static com.pamarin.oauth2.session.SessionAttributeConstant.*;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -81,6 +82,8 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     @Override
     public void save(MapSession session) {
         log.debug("save \"{}\".\"{}\"", sessionNameSpace, session.getId());
+        session.setMaxInactiveIntervalInSeconds(synchronizeTimeout);
+        session.setAttribute(EXPIRATION_TIME, session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(maxInactiveIntervalInSeconds));
         saveToRedis(session);
         synchronizeToMongodb(session);
     }

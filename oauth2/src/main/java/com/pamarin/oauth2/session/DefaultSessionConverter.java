@@ -20,7 +20,8 @@ public class DefaultSessionConverter implements SessionConverter {
         return AGENT_ID.equals(attrName)
                 || USER_ID.equals(attrName)
                 || IP_ADDRESS.equals(attrName)
-                || SESSION_ID.equals(attrName);
+                || SESSION_ID.equals(attrName)
+                || EXPIRATION_TIME.equals(attrName);
     }
 
     @Override
@@ -51,7 +52,9 @@ public class DefaultSessionConverter implements SessionConverter {
                 session.setMaxInactiveIntervalInSeconds((Integer) entry.getValue());
             } else if (LAST_ACCESSED_TIME.equals(key)) {
                 session.setLastAccessedTime((Long) entry.getValue());
-            } else if (AGENT_ID.equals(key)) {
+            } else if (EXPIRATION_TIME.equals(key)) {
+                session.setAttribute(EXPIRATION_TIME, (Long) entry.getValue());
+            }else if (AGENT_ID.equals(key)) {
                 session.setAttribute(AGENT_ID, (String) entry.getValue());
             } else if (USER_ID.equals(key)) {
                 session.setAttribute(USER_ID, (String) entry.getValue());

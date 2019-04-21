@@ -33,6 +33,7 @@ public class DefaultRedisSessionConverter implements RedisSessionConverter {
         map.put(CREATION_TIME, session.getCreationTime());
         map.put(MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
         map.put(LAST_ACCESSED_TIME, session.getLastAccessedTime());
+        map.put(EXPIRATION_TIME, session.getAttribute(EXPIRATION_TIME));
         map.put(USER_ID, principalNameResolver.resolve(session));
         sessionConverter.getSessionAttributes(session)
                 .entrySet()

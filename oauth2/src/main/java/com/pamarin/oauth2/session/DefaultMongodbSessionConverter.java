@@ -41,6 +41,7 @@ public class DefaultMongodbSessionConverter implements MongodbSessionConverter {
         obj.put(CREATION_TIME, session.getCreationTime());
         obj.put(MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
         obj.put(LAST_ACCESSED_TIME, session.getLastAccessedTime());
+        obj.put(EXPIRATION_TIME, session.getAttribute(EXPIRATION_TIME));
         obj.put(AGENT_ID, session.getAttribute(AGENT_ID));
         obj.put(USER_ID, principalNameResolver.resolve(session));
         obj.put(IP_ADDRESS, session.getAttribute(IP_ADDRESS));
