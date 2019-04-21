@@ -26,7 +26,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class CleanExpiredSessionJobRunner implements JobRunner {
 
-    private static final long RUN_EVERY_MINUTES = 1;
+    private static final long RUN_EVERY_MINUTES = 60;
 
     private final MongoOperations mongoOperations;
 
