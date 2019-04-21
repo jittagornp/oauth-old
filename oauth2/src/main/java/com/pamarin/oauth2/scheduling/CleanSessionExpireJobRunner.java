@@ -4,9 +4,9 @@
 package com.pamarin.oauth2.scheduling;
 
 import com.pamarin.oauth2.service.RevokeSessionService;
-import com.pamarin.oauth2.session.SessionAttributeConstant;
 import static com.pamarin.oauth2.session.SessionAttributeConstant.EXPIRATION_TIME;
 import com.pamarin.oauth2.session.UserSession;
+import static java.util.Collections.emptyList;
 import java.util.List;
 import static java.util.stream.Collectors.toList;
 import lombok.extern.slf4j.Slf4j;
@@ -49,20 +49,23 @@ public class CleanSessionExpireJobRunner implements JobRunner {
     @Scheduled(fixedDelay = RUN_EVERY_MINUTES * 60 * 1000)
     public void run() {
         if (jobSchedulerService.isChampion()) {
-            log.debug("check session expired...");
-            Query query = Query.query(Criteria.where(EXPIRATION_TIME).lt(System.currentTimeMillis()));
-            List<UserSession> sessions = mongoOperations.find(query, UserSession.class);
-            if (isEmpty(sessions)) {
-                log.debug("not found session expired.");
-            } else {
-                log.debug("found session expired => {}", sessions.size());
-                revokeSessionService.revokeBySessionIds(
-                        sessions.stream()
-                                .map(userSession -> userSession.getSessionId())
-                                .collect(toList())
-                );
-            }
+            List<UserSession> sessions = findExpiredSessions();
+            log.debug("found session expired => {}", sessions.size());
+            revokeSessionService.revokeBySessionIds(
+                    sessions.stream()
+                            .map(userSession -> userSession.getSessionId())
+                            .collect(toList())
+            );
         }
+    }
+
+    private List<UserSession> findExpiredSessions() {
+        Query query = Query.query(Criteria.where(EXPIRATION_TIME).lt(System.currentTimeMillis()));
+        List<UserSession> sessions = mongoOperations.find(query, UserSession.class);
+        if (isEmpty(sessions)) {
+            return emptyList();
+        }
+        return sessions;
     }
 
 }
