@@ -50,7 +50,7 @@ public class CleanSessionExpireJobRunner implements JobRunner {
     public void run() {
         if (jobSchedulerService.isChampion()) {
             List<UserSession> sessions = findExpiredSessions();
-            log.debug("found session expired => {}", sessions.size());
+            log.debug("found expired session => {}", sessions.size());
             revokeSessionService.revokeBySessionIds(
                     sessions.stream()
                             .map(userSession -> userSession.getSessionId())
