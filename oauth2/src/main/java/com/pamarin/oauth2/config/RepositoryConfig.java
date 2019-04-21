@@ -10,7 +10,7 @@ import com.pamarin.oauth2.repository.redis.RedisOAuth2AuthorizationCodeRepositor
 import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
 import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2AccessTokenRepository;
 import com.pamarin.oauth2.repository.mongodb.MongodbOAuth2RefreshTokenRepository;
-import com.pamarin.oauth2.repository.mongodb.MongodbUserSessionRepository;
+import com.pamarin.oauth2.session.MongodbUserSessionRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Profile;
 import com.pamarin.oauth2.repository.OAuth2AccessTokenRepository;
 import com.pamarin.oauth2.repository.OAuth2AuthorizationCodeRepository;
 import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
-import com.pamarin.oauth2.repository.UserSessionRepository;
+import com.pamarin.oauth2.session.UserSessionRepository;
 
 /**
  *

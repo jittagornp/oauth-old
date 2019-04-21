@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2;
+package com.pamarin.oauth2.session;
 
 import com.pamarin.oauth2.service.RevokeSessionService;
 import com.pamarin.oauth2.service.RevokeTokenService;
@@ -11,7 +11,6 @@ import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Service;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
-import com.pamarin.oauth2.repository.UserSessionRepository;
 
 /**
  *
@@ -41,7 +40,6 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     public void revokeBySessionId(String sessionId) {
         if (hasText(sessionId)) {
             sessionRepository.delete(sessionId);
-            userSessionRepository.deleteBySessionId(sessionId);
             revokeTokenService.revokeBySessionId(sessionId);
         }
     }

@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2.collection;
+package com.pamarin.oauth2.session;
 
 import com.pamarin.commons.util.ObjectEquals;
 import java.io.Serializable;

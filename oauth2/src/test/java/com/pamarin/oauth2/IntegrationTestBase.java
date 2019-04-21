@@ -45,7 +45,7 @@ import com.pamarin.oauth2.repository.OAuth2RefreshTokenRepository;
 import com.pamarin.oauth2.repository.OAuth2ScopeRepository;
 import com.pamarin.oauth2.repository.UserAgentRepository;
 import com.pamarin.oauth2.repository.UserRepository;
-import com.pamarin.oauth2.repository.UserSessionRepository;
+import com.pamarin.oauth2.session.UserSessionRepository;
 import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepository;
 
 /**
