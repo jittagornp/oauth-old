@@ -24,7 +24,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  */
 @Slf4j
 @Service
-public class CleanSessionExpireJobRunner implements JobRunner {
+public class CleanExpiredSessionJobRunner implements JobRunner {
 
     private static final long RUN_EVERY_MINUTES = 1;
 
@@ -35,7 +35,7 @@ public class CleanSessionExpireJobRunner implements JobRunner {
     private final RevokeSessionService revokeSessionService;
 
     @Autowired
-    public CleanSessionExpireJobRunner(
+    public CleanExpiredSessionJobRunner(
             MongoOperations mongoOperations,
             ChampionshipJobSchedulerService jobSchedulerService,
             RevokeSessionService revokeSessionService
