@@ -155,7 +155,10 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         if (hasText(agentId)) {
             session.setAttribute(AGENT_ID, agentId);
         }
-        session.setAttribute(IP_ADDRESS, httpClientIPAddressResolver.resolve(httpReq));
+        String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
+        if (hasText(ipAddress)) {
+            session.setAttribute(IP_ADDRESS, ipAddress);
+        }
     }
 
     private boolean isExpired(MapSession session) {

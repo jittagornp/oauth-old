@@ -15,15 +15,18 @@ import org.springframework.session.MapSession;
  */
 public class DefaultSessionConverter implements SessionConverter {
 
+    private boolean ignoreAttribute(String attrName) {
+        return AGENT_ID.equals(attrName)
+                || USER_ID.equals(attrName)
+                || IP_ADDRESS.equals(attrName)
+                || SESSION_ID.equals(attrName);
+    }
+
     @Override
     public Map<String, Object> getSessionAttributes(MapSession session) {
         Map<String, Object> attributes = new HashMap<>();
         session.getAttributeNames().forEach(attrName -> {
-            boolean ignore = AGENT_ID.equals(attrName)
-                    || USER_ID.equals(attrName)
-                    || IP_ADDRESS.equals(attrName)
-                    || SESSION_ID.equals(attrName);
-            if (!ignore) {
+            if (!ignoreAttribute(attrName)) {
                 attributes.put(attrName, session.getAttribute(attrName));
             }
         });
