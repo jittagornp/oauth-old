@@ -6,11 +6,11 @@ package com.pamarin.oauth2.repository;
 import com.pamarin.commons.generator.UUIDGenerator;
 import com.pamarin.oauth2.model.OAuth2Token;
 import java.security.SecureRandom;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.pamarin.commons.generator.IdGenerator;
 import com.pamarin.commons.util.Base64Utils;
+import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import org.springframework.beans.BeanUtils;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -54,8 +54,8 @@ public abstract class OAuth2TokenRepositoryAdapter<T extends OAuth2Token> implem
         if (clone.getIssuedAt() < 1) {
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime expires = now.plusMinutes(getExpiresMinutes());
-            clone.setIssuedAt(Timestamp.valueOf(now).getTime());
-            clone.setExpiresAt(Timestamp.valueOf(expires).getTime());
+            clone.setIssuedAt(convert2Timestamp(now));
+            clone.setExpiresAt(convert2Timestamp(expires));
         }
     }
 
@@ -87,7 +87,7 @@ public abstract class OAuth2TokenRepositoryAdapter<T extends OAuth2Token> implem
         if (token == null) {
             return null;
         }
-        long now = Timestamp.valueOf(LocalDateTime.now()).getTime();
+        long now = convert2Timestamp(LocalDateTime.now());
         long expiresAt = token.getExpiresAt();
         if (expiresAt <= now) {
             deleteByTokenId(token.getTokenId());

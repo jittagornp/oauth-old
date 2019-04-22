@@ -45,4 +45,10 @@ public class DateConverterUtils {
         return convert2LocalDateTime(date).toLocalDate();
     }
 
+     public static long convert2Timestamp(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return -1;
+        }
+        return convert2Date(localDateTime).getTime();
+    }
 }

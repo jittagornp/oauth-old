@@ -14,7 +14,6 @@ import org.bson.types.Binary;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.serializer.support.DeserializingConverter;
 import org.springframework.core.serializer.support.SerializingConverter;
-import org.springframework.session.MapSession;
 
 /**
  *
@@ -35,7 +34,7 @@ public class DefaultMongodbSessionConverter implements MongodbSessionConverter {
     }
 
     @Override
-    public DBObject sessionToDBObject(MapSession session) {
+    public DBObject sessionToDBObject(UserSession session) {
         BasicDBObject obj = new BasicDBObject();
         obj.put(SESSION_ID, session.getId());
         obj.put(CREATION_TIME, session.getCreationTime());
@@ -49,18 +48,18 @@ public class DefaultMongodbSessionConverter implements MongodbSessionConverter {
         return obj;
     }
 
-    private byte[] serializeAttributes(MapSession session) {
+    private byte[] serializeAttributes(UserSession session) {
         return this.serializer.convert(sessionConverter.getSessionAttributes(session));
     }
 
     @Override
-    public MapSession documentToSession(Document document) {
-        MapSession session = sessionConverter.entriesToSession(document.entrySet());
+    public UserSession documentToSession(Document document) {
+        UserSession session = sessionConverter.entriesToSession(document.entrySet());
         deserializeAttributes(document, session);
         return session;
     }
 
-    private void deserializeAttributes(Document document, MapSession session) {
+    private void deserializeAttributes(Document document, UserSession session) {
         Object obj = document.get(ATTRIBUTES);
         Map<String, Object> attrs = (Map<String, Object>) this.deserializer.convert(toBytes(obj));
         if (attrs != null) {

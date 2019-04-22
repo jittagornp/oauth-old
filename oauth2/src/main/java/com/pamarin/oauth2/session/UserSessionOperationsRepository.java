@@ -8,8 +8,10 @@ import com.pamarin.commons.provider.DefaultHttpServletRequestProvider;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.DefaultHttpClientIPAddressResolver;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
+import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import static com.pamarin.oauth2.session.SessionAttributeConstant.*;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +22,6 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import org.springframework.data.mongodb.core.query.Query;
 import static org.springframework.data.mongodb.core.query.Query.query;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.session.MapSession;
 import org.springframework.session.SessionRepository;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -29,7 +30,7 @@ import static org.springframework.util.StringUtils.hasText;
  * @author jitta
  */
 @Slf4j
-public class SessionRepositoryImpl implements SessionRepository<MapSession> {
+public class UserSessionOperationsRepository implements SessionRepository<UserSession> {
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
@@ -56,7 +57,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
 
     private final HttpClientIPAddressResolver httpClientIPAddressResolver;
 
-    public SessionRepositoryImpl(
+    public UserSessionOperationsRepository(
             RedisOperations<Object, Object> redisOperations,
             MongoOperations mongoOperations,
             UserAgentTokenIdResolver userAgentTokenIdResolver
@@ -71,8 +72,8 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     }
 
     @Override
-    public MapSession createSession() {
-        MapSession session = new MapSession();
+    public UserSession createSession() {
+        UserSession session = new UserSession();
         session.setAttribute(SESSION_ID, session.getId());
         session.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds);
         log.debug("create \"{}\".\"{}\"", sessionNameSpace, session.getId());
@@ -80,18 +81,19 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
     }
 
     @Override
-    public void save(MapSession session) {
+    public void save(UserSession session) {
         log.debug("save \"{}\".\"{}\"", sessionNameSpace, session.getId());
         session.setMaxInactiveIntervalInSeconds(synchronizeTimeout);
+        session.setLastAccessedTime(convert2Timestamp(LocalDateTime.now()));
         session.setAttribute(EXPIRATION_TIME, session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(maxInactiveIntervalInSeconds));
         saveToRedis(session);
         synchronizeToMongodb(session);
     }
 
     @Override
-    public MapSession getSession(String id) {
+    public UserSession getSession(String id) {
         log.debug("get \"{}\".\"{}\"", sessionNameSpace, id);
-        MapSession session = findRedisSessionById(id);
+        UserSession session = findRedisSessionById(id);
         if (isExpired(session)) {
             session = findMongoSessionById(id);
         }
@@ -112,12 +114,12 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         mongoOperations.remove(sessionIdQuery(id), sessionNameSpace);
     }
 
-    private void saveToRedis(MapSession session) {
+    private void saveToRedis(UserSession session) {
         redisOperations.boundHashOps(getRedisKey(session.getId()))
                 .putAll(redisConverter.sessionToMap(session));
     }
 
-    private void saveToMongodb(MapSession session) {
+    private void saveToMongodb(UserSession session) {
         additionalAttributes(session);
         DBObject dbObject = mongodbConverter.sessionToDBObject(session);
         Document document = mongoOperations.findOne(
@@ -133,7 +135,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         mongoOperations.save(dbObject, sessionNameSpace);
     }
 
-    private void synchronizeToMongodb(MapSession session) {
+    private void synchronizeToMongodb(UserSession session) {
         long currentTime = System.currentTimeMillis();
         Long lastSyncTime = session.getAttribute(LAST_SYNCHONIZED);
         if (lastSyncTime == null || (currentTime - lastSyncTime > synchronizeTimeout)) {
@@ -152,7 +154,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         }
     }
 
-    private void additionalAttributes(MapSession session) {
+    private void additionalAttributes(UserSession session) {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String agentId = userAgentTokenIdResolver.resolve(httpReq);
         if (hasText(agentId)) {
@@ -164,7 +166,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         }
     }
 
-    private boolean isExpired(MapSession session) {
+    private boolean isExpired(UserSession session) {
         return session == null || session.isExpired();
     }
 
@@ -172,7 +174,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         return sessionNameSpace + ":" + sessionId;
     }
 
-    private MapSession findRedisSessionById(String id) {
+    private UserSession findRedisSessionById(String id) {
         Map<Object, Object> entries = redisOperations.boundHashOps(getRedisKey(id)).entries();
         return redisConverter.mapToSession(entries);
     }
@@ -181,7 +183,7 @@ public class SessionRepositoryImpl implements SessionRepository<MapSession> {
         return query(where(SESSION_ID).is(id));
     }
 
-    private MapSession findMongoSessionById(String id) {
+    private UserSession findMongoSessionById(String id) {
         Document document = mongoOperations.findOne(sessionIdQuery(id), Document.class, sessionNameSpace);
         if (document == null) {
             return null;

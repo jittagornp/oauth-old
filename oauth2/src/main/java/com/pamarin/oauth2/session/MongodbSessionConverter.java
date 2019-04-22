@@ -5,7 +5,6 @@ package com.pamarin.oauth2.session;
 
 import com.mongodb.DBObject;
 import org.bson.Document;
-import org.springframework.session.MapSession;
 
 /**
  *
@@ -13,8 +12,8 @@ import org.springframework.session.MapSession;
  */
 public interface MongodbSessionConverter {
 
-    DBObject sessionToDBObject(MapSession session);
+    DBObject sessionToDBObject(UserSession session);
 
-    MapSession documentToSession(Document document);
+    UserSession documentToSession(Document document);
 
 }

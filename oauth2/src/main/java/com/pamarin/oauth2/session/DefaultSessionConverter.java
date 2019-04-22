@@ -7,7 +7,6 @@ import static com.pamarin.oauth2.session.SessionAttributeConstant.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.session.MapSession;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
@@ -25,7 +24,7 @@ public class DefaultSessionConverter implements SessionConverter {
     }
 
     @Override
-    public Map<String, Object> getSessionAttributes(MapSession session) {
+    public Map<String, Object> getSessionAttributes(UserSession session) {
         Map<String, Object> attributes = new HashMap<>();
         session.getAttributeNames().forEach(attrName -> {
             if (!ignoreAttribute(attrName)) {
@@ -36,12 +35,12 @@ public class DefaultSessionConverter implements SessionConverter {
     }
 
     @Override
-    public MapSession entriesToSession(Set<Map.Entry<String, Object>> entries) {
+    public UserSession entriesToSession(Set<Map.Entry<String, Object>> entries) {
         if (isEmpty(entries)) {
             return null;
         }
 
-        MapSession session = new MapSession();
+        UserSession session = new UserSession();
         entries.forEach((entry) -> {
             String key = (String) entry.getKey();
             if (SESSION_ID.equals(key)) {

@@ -4,7 +4,6 @@
 package com.pamarin.oauth2.session;
 
 import java.util.Map;
-import org.springframework.session.MapSession;
 
 /**
  *
@@ -12,8 +11,8 @@ import org.springframework.session.MapSession;
  */
 public interface RedisSessionConverter {
 
-    Map<String, Object> sessionToMap(MapSession session);
+    Map<String, Object> sessionToMap(UserSession session);
 
-    MapSession mapToSession(Map<Object, Object> map);
+    UserSession mapToSession(Map<Object, Object> map);
 
 }

@@ -15,7 +15,7 @@ import com.pamarin.oauth2.service.RevokeTokenService;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepository;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
-import com.pamarin.oauth2.session.SessionRepositoryImpl;
+import com.pamarin.oauth2.session.UserSessionOperationsRepository;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -39,7 +39,7 @@ public class RedisConfig extends SpringHttpSessionConfiguration {
             MongoOperations mongoOperations,
             UserAgentTokenIdResolver userAgentTokenIdResolver
     ) {
-        SessionRepositoryImpl repository = new SessionRepositoryImpl(
+        UserSessionOperationsRepository repository = new UserSessionOperationsRepository(
                 createDefaultTemplate(factory),
                 mongoOperations,
                 userAgentTokenIdResolver
