@@ -47,6 +47,7 @@ import com.pamarin.oauth2.repository.UserAgentRepository;
 import com.pamarin.oauth2.repository.UserRepository;
 import com.pamarin.oauth2.session.UserSessionRepository;
 import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepository;
+import org.springframework.data.redis.core.RedisOperations;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
@@ -125,6 +126,9 @@ public class IntegrationTestBase {
     
     @MockBean
     protected RevokeTokenService revokeTokenService;
+    
+    @MockBean
+    protected RedisOperations<String, String> redisOperations;
 
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()

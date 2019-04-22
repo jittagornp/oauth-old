@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2;
+package com.pamarin.oauth2.session;
 
 import com.pamarin.oauth2.session.OAuth2SessionBuilderServiceImpl;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;

@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2;
+package com.pamarin.oauth2.session;
 
 import com.pamarin.oauth2.session.OAuth2SessionServiceImpl;
 import com.pamarin.commons.provider.HttpSessionProvider;
@@ -91,7 +91,7 @@ public class OAuth2SessionService_getSessionByOAuth2AccessTokenTest {
 
         OAuth2AccessToken accessToken = stubAccessToken();
         OAuth2Session oauth2Session = subOAuth2Session();
-        String attributeKey = "oauth2-session:" + accessToken.getClientId();
+        String attributeKey = "OAUTH2_SESSION:" + accessToken.getClientId();
 
         //already have session attribute
         when(httpSession.getAttribute(attributeKey)).thenReturn(oauth2Session);
@@ -106,7 +106,7 @@ public class OAuth2SessionService_getSessionByOAuth2AccessTokenTest {
 
         OAuth2AccessToken accessToken = stubAccessToken();
         OAuth2Session oauth2Session = subOAuth2Session();
-        String attributeKey = "oauth2-session:" + accessToken.getClientId();
+        String attributeKey = "OAUTH2_SESSION:" + accessToken.getClientId();
 
         //dont' have session attribute
         when(httpSession.getAttribute(attributeKey)).thenReturn(null);
