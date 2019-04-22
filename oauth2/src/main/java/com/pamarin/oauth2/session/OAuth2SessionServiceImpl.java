@@ -1,18 +1,16 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2;
+package com.pamarin.oauth2.session;
 
 import com.pamarin.commons.provider.HttpSessionProvider;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
-import com.pamarin.oauth2.service.OAuth2SessionService;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.pamarin.oauth2.service.OAuth2SessionBuilderService;
 
 /**
  *
@@ -22,7 +20,7 @@ import com.pamarin.oauth2.service.OAuth2SessionBuilderService;
 @Transactional
 public class OAuth2SessionServiceImpl implements OAuth2SessionService {
 
-    private static final String OAUTH2_SESSION = "oauth2-session";
+    private static final String OAUTH2_SESSION = "OAUTH2_SESSION";
 
     @Autowired
     private OAuth2SessionBuilderService sessionBuilderService;

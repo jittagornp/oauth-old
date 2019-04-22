@@ -7,7 +7,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.pamarin.commons.resolver.DefaultPrincipalNameResolver;
 import com.pamarin.commons.resolver.PrincipalNameResolver;
-import static com.pamarin.oauth2.session.SessionAttributeConstant.*;
+import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
 import java.util.Map;
 import org.bson.Document;
 import org.bson.types.Binary;
@@ -23,43 +23,43 @@ public class DefaultMongodbSessionConverter implements MongodbSessionConverter {
 
     private final Converter<Object, byte[]> serializer;
     private final Converter<byte[], Object> deserializer;
-    private final SessionConverter sessionConverter;
+    private final CustomSessionConverter sessionConverter;
     private final PrincipalNameResolver principalNameResolver;
 
     public DefaultMongodbSessionConverter() {
-        this.sessionConverter = new DefaultSessionConverter();
+        this.sessionConverter = new DefaultCustomSessionConverter();
         this.serializer = new SerializingConverter();
         this.deserializer = new DeserializingConverter();
         this.principalNameResolver = new DefaultPrincipalNameResolver();
     }
 
     @Override
-    public DBObject sessionToDBObject(UserSession session) {
+    public DBObject sessionToDBObject(CustomSession session) {
         BasicDBObject obj = new BasicDBObject();
         obj.put(SESSION_ID, session.getId());
         obj.put(CREATION_TIME, session.getCreationTime());
         obj.put(MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
         obj.put(LAST_ACCESSED_TIME, session.getLastAccessedTime());
-        obj.put(EXPIRATION_TIME, session.getAttribute(EXPIRATION_TIME));
-        obj.put(AGENT_ID, session.getAttribute(AGENT_ID));
+        obj.put(EXPIRATION_TIME, session.getExpirationTime());
+        obj.put(AGENT_ID, session.getAgentId());
         obj.put(USER_ID, principalNameResolver.resolve(session));
-        obj.put(IP_ADDRESS, session.getAttribute(IP_ADDRESS));
+        obj.put(IP_ADDRESS, session.getIpAddress());
         obj.put(ATTRIBUTES, serializeAttributes(session));
         return obj;
     }
 
-    private byte[] serializeAttributes(UserSession session) {
-        return this.serializer.convert(sessionConverter.getSessionAttributes(session));
+    private byte[] serializeAttributes(CustomSession session) {
+        return this.serializer.convert(session.getAttributes());
     }
 
     @Override
-    public UserSession documentToSession(Document document) {
-        UserSession session = sessionConverter.entriesToSession(document.entrySet());
+    public CustomSession documentToSession(Document document) {
+        CustomSession session = sessionConverter.entriesToSession(document.entrySet());
         deserializeAttributes(document, session);
         return session;
     }
 
-    private void deserializeAttributes(Document document, UserSession session) {
+    private void deserializeAttributes(Document document, CustomSession session) {
         Object obj = document.get(ATTRIBUTES);
         Map<String, Object> attrs = (Map<String, Object>) this.deserializer.convert(toBytes(obj));
         if (attrs != null) {

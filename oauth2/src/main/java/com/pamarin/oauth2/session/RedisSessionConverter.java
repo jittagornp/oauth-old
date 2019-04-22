@@ -11,8 +11,8 @@ import java.util.Map;
  */
 public interface RedisSessionConverter {
 
-    Map<String, Object> sessionToMap(UserSession session);
+    Map<String, Object> sessionToMap(CustomSession session);
 
-    UserSession mapToSession(Map<Object, Object> map);
+    CustomSession mapToSession(Map<Object, Object> map);
 
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2;
+package com.pamarin.oauth2.session;
 
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2Approval;
@@ -9,7 +9,6 @@ import com.pamarin.oauth2.domain.OAuth2Client;
 import com.pamarin.oauth2.exception.OAuth2ClientNotFoundException;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
-import com.pamarin.oauth2.service.OAuth2SessionBuilderService;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

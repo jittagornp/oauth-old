@@ -3,8 +3,7 @@
  */
 package com.pamarin.oauth2.session;
 
-import static com.pamarin.oauth2.session.SessionAttributeConstant.*;
-import java.util.HashMap;
+import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
 import java.util.Map;
 import java.util.Set;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -13,38 +12,20 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  *
  * @author jitta
  */
-public class DefaultSessionConverter implements SessionConverter {
-
-    private boolean ignoreAttribute(String attrName) {
-        return AGENT_ID.equals(attrName)
-                || USER_ID.equals(attrName)
-                || IP_ADDRESS.equals(attrName)
-                || SESSION_ID.equals(attrName)
-                || EXPIRATION_TIME.equals(attrName);
-    }
+public class DefaultCustomSessionConverter implements CustomSessionConverter {
 
     @Override
-    public Map<String, Object> getSessionAttributes(UserSession session) {
-        Map<String, Object> attributes = new HashMap<>();
-        session.getAttributeNames().forEach(attrName -> {
-            if (!ignoreAttribute(attrName)) {
-                attributes.put(attrName, session.getAttribute(attrName));
-            }
-        });
-        return attributes;
-    }
-
-    @Override
-    public UserSession entriesToSession(Set<Map.Entry<String, Object>> entries) {
+    public CustomSession entriesToSession(Set<Map.Entry<String, Object>> entries) {
         if (isEmpty(entries)) {
             return null;
         }
 
-        UserSession session = new UserSession();
+        CustomSession session = new CustomSession();
         entries.forEach((entry) -> {
             String key = (String) entry.getKey();
             if (SESSION_ID.equals(key)) {
                 session.setId((String) entry.getValue());
+                session.setSessionId((String) entry.getValue());
             } else if (CREATION_TIME.equals(key)) {
                 session.setCreationTime((Long) entry.getValue());
             } else if (MAX_INACTIVE_INTERVAL.equals(key)) {
@@ -52,13 +33,13 @@ public class DefaultSessionConverter implements SessionConverter {
             } else if (LAST_ACCESSED_TIME.equals(key)) {
                 session.setLastAccessedTime((Long) entry.getValue());
             } else if (EXPIRATION_TIME.equals(key)) {
-                session.setAttribute(EXPIRATION_TIME, (Long) entry.getValue());
+                session.setExpirationTime((Long) entry.getValue());
             }else if (AGENT_ID.equals(key)) {
-                session.setAttribute(AGENT_ID, (String) entry.getValue());
+                session.setAgentId((String) entry.getValue());
             } else if (USER_ID.equals(key)) {
-                session.setAttribute(USER_ID, (String) entry.getValue());
+                session.setUserId((String) entry.getValue());
             } else if (IP_ADDRESS.equals(key)) {
-                session.setAttribute(IP_ADDRESS, (String) entry.getValue());
+                session.setIpAddress((String) entry.getValue());
             } else if (ATTRIBUTES.equals(key)) {
                 //for mongodb
             } else if (key.startsWith(ATTRIBUTES)) {

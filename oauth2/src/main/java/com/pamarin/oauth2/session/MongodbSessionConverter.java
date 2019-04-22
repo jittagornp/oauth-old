@@ -12,8 +12,8 @@ import org.bson.Document;
  */
 public interface MongodbSessionConverter {
 
-    DBObject sessionToDBObject(UserSession session);
+    DBObject sessionToDBObject(CustomSession session);
 
-    UserSession documentToSession(Document document);
+    CustomSession documentToSession(Document document);
 
 }

@@ -10,8 +10,8 @@ import com.pamarin.commons.resolver.DefaultHttpClientIPAddressResolver;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
-import static com.pamarin.oauth2.session.SessionAttributeConstant.*;
-import java.time.LocalDateTime;
+import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
+import static java.time.LocalDateTime.now;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +30,7 @@ import static org.springframework.util.StringUtils.hasText;
  * @author jitta
  */
 @Slf4j
-public class UserSessionOperationsRepository implements SessionRepository<UserSession> {
+public class CustomSessionRepository implements SessionRepository<CustomSession> {
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
@@ -57,7 +57,7 @@ public class UserSessionOperationsRepository implements SessionRepository<UserSe
 
     private final HttpClientIPAddressResolver httpClientIPAddressResolver;
 
-    public UserSessionOperationsRepository(
+    public CustomSessionRepository(
             RedisOperations<Object, Object> redisOperations,
             MongoOperations mongoOperations,
             UserAgentTokenIdResolver userAgentTokenIdResolver
@@ -72,28 +72,26 @@ public class UserSessionOperationsRepository implements SessionRepository<UserSe
     }
 
     @Override
-    public UserSession createSession() {
-        UserSession session = new UserSession();
-        session.setAttribute(SESSION_ID, session.getId());
-        session.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds);
+    public CustomSession createSession() {
+        CustomSession session = new CustomSession(maxInactiveIntervalInSeconds);
         log.debug("create \"{}\".\"{}\"", sessionNameSpace, session.getId());
         return session;
     }
 
     @Override
-    public void save(UserSession session) {
+    public void save(CustomSession session) {
         log.debug("save \"{}\".\"{}\"", sessionNameSpace, session.getId());
-        session.setMaxInactiveIntervalInSeconds(synchronizeTimeout);
-        session.setLastAccessedTime(convert2Timestamp(LocalDateTime.now()));
-        session.setAttribute(EXPIRATION_TIME, session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(maxInactiveIntervalInSeconds));
+        session.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds);
+        session.setLastAccessedTime(convert2Timestamp(now()));
+        session.setExpirationTime(session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(maxInactiveIntervalInSeconds));
         saveToRedis(session);
         synchronizeToMongodb(session);
     }
 
     @Override
-    public UserSession getSession(String id) {
+    public CustomSession getSession(String id) {
         log.debug("get \"{}\".\"{}\"", sessionNameSpace, id);
-        UserSession session = findRedisSessionById(id);
+        CustomSession session = findRedisSessionById(id);
         if (isExpired(session)) {
             session = findMongoSessionById(id);
         }
@@ -114,12 +112,12 @@ public class UserSessionOperationsRepository implements SessionRepository<UserSe
         mongoOperations.remove(sessionIdQuery(id), sessionNameSpace);
     }
 
-    private void saveToRedis(UserSession session) {
+    private void saveToRedis(CustomSession session) {
         redisOperations.boundHashOps(getRedisKey(session.getId()))
                 .putAll(redisConverter.sessionToMap(session));
     }
 
-    private void saveToMongodb(UserSession session) {
+    private void saveToMongodb(CustomSession session) {
         additionalAttributes(session);
         DBObject dbObject = mongodbConverter.sessionToDBObject(session);
         Document document = mongoOperations.findOne(
@@ -135,38 +133,38 @@ public class UserSessionOperationsRepository implements SessionRepository<UserSe
         mongoOperations.save(dbObject, sessionNameSpace);
     }
 
-    private void synchronizeToMongodb(UserSession session) {
-        long currentTime = System.currentTimeMillis();
+    private void synchronizeToMongodb(CustomSession session) {
+        long now = convert2Timestamp(now());
         Long lastSyncTime = session.getAttribute(LAST_SYNCHONIZED);
-        if (lastSyncTime == null || (currentTime - lastSyncTime > synchronizeTimeout)) {
-            session.setAttribute(LAST_SYNCHONIZED, currentTime);
+        if (lastSyncTime == null || (now - lastSyncTime > synchronizeTimeout)) {
+            session.setAttribute(LAST_SYNCHONIZED, now);
             saveToMongodb(session);
         } else {
             Long firstTimeLogin = session.getAttribute(LAST_SYNCHONIZED_LOGIN);
             if (firstTimeLogin == null) {
                 boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
                 if (alreadyLogin) {
-                    session.setAttribute(LAST_SYNCHONIZED, currentTime);
-                    session.setAttribute(LAST_SYNCHONIZED_LOGIN, currentTime);
+                    session.setAttribute(LAST_SYNCHONIZED, now);
+                    session.setAttribute(LAST_SYNCHONIZED_LOGIN, now);
                     saveToMongodb(session);
                 }
             }
         }
     }
 
-    private void additionalAttributes(UserSession session) {
+    private void additionalAttributes(CustomSession session) {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         String agentId = userAgentTokenIdResolver.resolve(httpReq);
         if (hasText(agentId)) {
-            session.setAttribute(AGENT_ID, agentId);
+            session.setAgentId(agentId);
         }
         String ipAddress = httpClientIPAddressResolver.resolve(httpReq);
         if (hasText(ipAddress)) {
-            session.setAttribute(IP_ADDRESS, ipAddress);
+            session.setIpAddress(ipAddress);
         }
     }
 
-    private boolean isExpired(UserSession session) {
+    private boolean isExpired(CustomSession session) {
         return session == null || session.isExpired();
     }
 
@@ -174,7 +172,7 @@ public class UserSessionOperationsRepository implements SessionRepository<UserSe
         return sessionNameSpace + ":" + sessionId;
     }
 
-    private UserSession findRedisSessionById(String id) {
+    private CustomSession findRedisSessionById(String id) {
         Map<Object, Object> entries = redisOperations.boundHashOps(getRedisKey(id)).entries();
         return redisConverter.mapToSession(entries);
     }
@@ -183,7 +181,7 @@ public class UserSessionOperationsRepository implements SessionRepository<UserSe
         return query(where(SESSION_ID).is(id));
     }
 
-    private UserSession findMongoSessionById(String id) {
+    private CustomSession findMongoSessionById(String id) {
         Document document = mongoOperations.findOne(sessionIdQuery(id), Document.class, sessionNameSpace);
         if (document == null) {
             return null;

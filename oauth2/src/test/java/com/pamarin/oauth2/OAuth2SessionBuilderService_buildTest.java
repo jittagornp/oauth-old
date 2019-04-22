@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.oauth2.session.OAuth2SessionBuilderServiceImpl;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.domain.OAuth2Approval;
 import com.pamarin.oauth2.domain.OAuth2Client;

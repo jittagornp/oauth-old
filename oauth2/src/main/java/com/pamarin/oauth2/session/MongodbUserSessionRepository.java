@@ -3,7 +3,9 @@
  */
 package com.pamarin.oauth2.session;
 
-import static com.pamarin.oauth2.session.SessionAttributeConstant.EXPIRATION_TIME;
+import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
+import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
+import static java.time.LocalDateTime.now;
 import static java.util.Collections.emptyList;
 import java.util.List;
 import static java.util.stream.Collectors.toList;
@@ -23,28 +25,28 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
     @Autowired
     private MongoOperations mongoOperations;
 
-    private Query makeAttributeQuery(String attributeName, Object attributeValue) {
-        return Query.query(Criteria.where(attributeName).is(attributeValue));
+    private Query attributeQuery(String name, Object value) {
+        return Query.query(Criteria.where(name).is(value));
     }
 
-    private Query makeSessionIdQuery(Object attributeValue) {
-        return makeAttributeQuery("sessionId", attributeValue);
+    private Query sessionIdQuery(Object value) {
+        return attributeQuery(SESSION_ID, value);
     }
 
-    private Query makeAgentIdQuery(Object attributeValue) {
-        return makeAttributeQuery("agentId", attributeValue);
+    private Query agentIdQuery(Object value) {
+        return attributeQuery(AGENT_ID, value);
     }
 
-    private Query makeUserIdQuery(Object attributeValue) {
-        return makeAttributeQuery("userId", attributeValue);
+    private Query userIdQuery(Object value) {
+        return attributeQuery(USER_ID, value);
     }
 
     public UserSession findBySessionId(String sessionId) {
-        return mongoOperations.findOne(makeSessionIdQuery(sessionId), UserSession.class);
+        return mongoOperations.findOne(sessionIdQuery(sessionId), UserSession.class);
     }
 
-    private List<String> map(List<UserSession> userSessions) {
-        return userSessions.stream().map(UserSession::getSessionId).collect(toList());
+    private List<String> map(List<UserSession> session) {
+        return session.stream().map(UserSession::getSessionId).collect(toList());
     }
 
     @Override
@@ -52,15 +54,15 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
         if (!hasText(sessionId)) {
             return emptyList();
         }
-        UserSession userSession = findBySessionId(sessionId);
-        if (userSession == null) {
+        UserSession session = findBySessionId(sessionId);
+        if (session == null) {
             return emptyList();
         }
-        List<UserSession> userSessions = mongoOperations.find(makeAgentIdQuery(userSession.getAgentId()), UserSession.class);
-        if (isEmpty(userSessions)) {
+        List<UserSession> sessions = mongoOperations.find(agentIdQuery(session.getAgentId()), UserSession.class);
+        if (isEmpty(sessions)) {
             return emptyList();
         }
-        return map(userSessions);
+        return map(sessions);
     }
 
     @Override
@@ -73,16 +75,16 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
 
     @Override
     public List<String> findAllSessionIdsByUserId(String userId) {
-        List<UserSession> userSessions = mongoOperations.find(makeUserIdQuery(userId), UserSession.class);
-        if (isEmpty(userSessions)) {
+        List<UserSession> sessions = mongoOperations.find(userIdQuery(userId), UserSession.class);
+        if (isEmpty(sessions)) {
             return emptyList();
         }
-        return map(userSessions);
+        return map(sessions);
     }
 
     @Override
     public List<String> findExpiredSessions() {
-        Query query = Query.query(Criteria.where(EXPIRATION_TIME).lt(System.currentTimeMillis()));
+        Query query = Query.query(Criteria.where(EXPIRATION_TIME).lt(convert2Timestamp(now())));
         List<UserSession> sessions = mongoOperations.find(query, UserSession.class);
         if (isEmpty(sessions)) {
             return emptyList();

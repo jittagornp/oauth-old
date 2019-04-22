@@ -3,12 +3,13 @@
  */
 package com.pamarin.oauth2;
 
+import com.pamarin.oauth2.session.OAuth2SessionServiceImpl;
 import com.pamarin.commons.provider.HttpSessionProvider;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.exception.UnauthorizedClientException;
 import com.pamarin.oauth2.model.OAuth2Session;
-import com.pamarin.oauth2.service.OAuth2SessionBuilderService;
-import com.pamarin.oauth2.service.OAuth2SessionService;
+import com.pamarin.oauth2.session.OAuth2SessionBuilderService;
+import com.pamarin.oauth2.session.OAuth2SessionService;
 import javax.servlet.http.HttpSession;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;

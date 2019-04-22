@@ -5,7 +5,7 @@ package com.pamarin.oauth2.session;
 
 import com.pamarin.commons.resolver.DefaultPrincipalNameResolver;
 import com.pamarin.commons.resolver.PrincipalNameResolver;
-import static com.pamarin.oauth2.session.SessionAttributeConstant.*;
+import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.stream.Collectors.toSet;
@@ -18,23 +18,23 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class DefaultRedisSessionConverter implements RedisSessionConverter {
 
     private final PrincipalNameResolver principalNameResolver;
-    private final SessionConverter sessionConverter;
+    private final CustomSessionConverter sessionConverter;
 
     public DefaultRedisSessionConverter() {
         this.principalNameResolver = new DefaultPrincipalNameResolver();
-        this.sessionConverter = new DefaultSessionConverter();
+        this.sessionConverter = new DefaultCustomSessionConverter();
     }
 
     @Override
-    public Map<String, Object> sessionToMap(UserSession session) {
+    public Map<String, Object> sessionToMap(CustomSession session) {
         Map<String, Object> map = new HashMap<>();
         map.put(SESSION_ID, session.getId());
         map.put(CREATION_TIME, session.getCreationTime());
         map.put(MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
         map.put(LAST_ACCESSED_TIME, session.getLastAccessedTime());
-        map.put(EXPIRATION_TIME, session.getAttribute(EXPIRATION_TIME));
+        map.put(EXPIRATION_TIME, session.getExpirationTime());
         map.put(USER_ID, principalNameResolver.resolve(session));
-        sessionConverter.getSessionAttributes(session)
+        session.getAttributes()
                 .entrySet()
                 .forEach(attribute -> {
                     map.put(ATTRIBUTES + ":" + attribute.getKey(), attribute.getValue());
@@ -43,7 +43,7 @@ public class DefaultRedisSessionConverter implements RedisSessionConverter {
     }
 
     @Override
-    public UserSession mapToSession(Map<Object, Object> map) {
+    public CustomSession mapToSession(Map<Object, Object> map) {
         if (isEmpty(map)) {
             return null;
         }
