@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DefaultChampionshipJobSchedulerService implements ChampionshipJobSchedulerService, JobRunner {
 
-    private static final long RUN_EVERY_SECONDS = 5 * 60; //5 minutes
+    private static final long RUN_EVERY_SECONDS = 60; 
 
     private static final long CHAMPOIN_EXPIRE_SECONDS = RUN_EVERY_SECONDS + 10;
 
