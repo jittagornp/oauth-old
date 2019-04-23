@@ -40,6 +40,9 @@ public class OAuth2JobScheduler implements Serializable {
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+    
+    @Column(name = "server_ip")
+    private String serverIp;
 
     @Override
     public int hashCode() {
