@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.security;
 
-import com.pamarin.commons.exception.AuthorizationException;
+import com.pamarin.oauth2.exception.BlockRequestException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -24,23 +25,26 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * @author jitta
  */
+@Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class BlockLoginRequestFilter extends OncePerRequestFilter {
 
     private static final List<String> HEADERS = Arrays.asList("User-Agent");
 
-    private static final List<String> COOKIES = Arrays.asList("user-agent", "user-session");
+    private static final List<String> COOKIES = Arrays.asList("user-agent");
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
         if ("/login".equals(httpReq.getServletPath())) {
             if (!matchAllHeaders(httpReq)) {
-                throw new AuthorizationException("Block request");
+                log.debug("Not match some http headers.");
+                throw new BlockRequestException("Block request.");
             }
 
             if (!matchAllCookies(httpReq.getCookies())) {
-                throw new AuthorizationException("Block request");
+                log.debug("Not match some http cookies.");
+                throw new BlockRequestException("Block request.");
             }
         }
 

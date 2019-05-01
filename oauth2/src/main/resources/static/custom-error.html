@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Error</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="error" th:attr="content=${errorJSON}">
+    </head>
+    <body>
+        <span th:text="${error.error}"></span>
+        <br/>
+        <span th:text="${error.errorStatus}"></span>
+        <br/>
+        <span th:text="${error.errorDescription}"></span>
+    </body>
+</html>

@@ -68,7 +68,7 @@ public class OAuth2ControllerAdvice {
     private ModelAndView buildModelAndViewError(ErrorResponse err) throws IOException {
         String json = objectMapper.writeValueAsString(err);
         return new ModelAndViewBuilder()
-                .setName("error")
+                .setName("custom-error")
                 .addAttribute("error", err)
                 .addAttribute("errorJSON", json)
                 .build();

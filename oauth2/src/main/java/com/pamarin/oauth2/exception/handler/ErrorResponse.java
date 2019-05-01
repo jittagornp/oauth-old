@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public class ErrorResponse {
 
+    @JsonProperty("error")
     private String error;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -38,52 +39,13 @@ public class ErrorResponse {
     @JsonProperty("error_uri")
     private String errorUri;
 
+    @JsonProperty("state")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String state;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("error_code")
     private String errorCode;
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
-
-    public Integer getErrorStatus() {
-        return errorStatus;
-    }
-
-    public void setErrorStatus(Integer errorStatus) {
-        this.errorStatus = errorStatus;
-    }
-
-    public String getErrorDescription() {
-        return errorDescription;
-    }
-
-    public void setErrorDescription(String errorDescription) {
-        this.errorDescription = errorDescription;
-    }
-
-    public String getErrorUri() {
-        return errorUri;
-    }
-
-    public void setErrorUri(String errorUri) {
-        this.errorUri = errorUri;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
 
     /**
      * The request is missing a required parameter, includes an unsupported
