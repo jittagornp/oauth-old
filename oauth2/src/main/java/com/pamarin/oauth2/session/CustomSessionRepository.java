@@ -95,7 +95,10 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
         session.setUserId(userId);
 
         saveToRedis(session);
-        synchronizeToMongodb(session);
+
+        if (hasText(userId)) {
+            synchronizeToMongodb(session);
+        }
     }
 
     @Override
