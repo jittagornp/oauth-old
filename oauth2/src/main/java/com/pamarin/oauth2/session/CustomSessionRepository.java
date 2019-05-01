@@ -7,7 +7,9 @@ import com.mongodb.DBObject;
 import com.pamarin.commons.provider.DefaultHttpServletRequestProvider;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.DefaultHttpClientIPAddressResolver;
+import com.pamarin.commons.resolver.DefaultPrincipalNameResolver;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
+import com.pamarin.commons.resolver.PrincipalNameResolver;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
@@ -42,8 +44,9 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
     private static final String LAST_SYNCHONIZED = "lastSynchronizedTime";
     private static final String LAST_SYNCHONIZED_LOGIN = "lastSynchronizedTime:login";
 
-    private int maxInactiveIntervalInSeconds = 1800;
-    private int synchronizeTimeout = 1000 * 30;
+    private final int ANONYMOUS_MAX_INACTIVE_INTERVAL = 180;//3 minutes
+    private int maxInactiveIntervalInSeconds = 1800; //30 minutes
+    private int synchronizeTimeout = 1000 * 30; //30 seconds
 
     private final RedisOperations<Object, Object> redisOperations;
     private final MongoOperations mongoOperations;
@@ -57,6 +60,8 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
 
     private final HttpClientIPAddressResolver httpClientIPAddressResolver;
 
+    private final PrincipalNameResolver principalNameResolver;
+
     public CustomSessionRepository(
             RedisOperations<Object, Object> redisOperations,
             MongoOperations mongoOperations,
@@ -69,11 +74,12 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
         this.httpServletRequestProvider = new DefaultHttpServletRequestProvider();
         this.userAgentTokenIdResolver = userAgentTokenIdResolver;
         this.httpClientIPAddressResolver = new DefaultHttpClientIPAddressResolver();
+        this.principalNameResolver = new DefaultPrincipalNameResolver();
     }
 
     @Override
     public CustomSession createSession() {
-        CustomSession session = new CustomSession(maxInactiveIntervalInSeconds);
+        CustomSession session = new CustomSession(ANONYMOUS_MAX_INACTIVE_INTERVAL);
         log.debug("create \"{}\".\"{}\"", sessionNameSpace, session.getId());
         return session;
     }
@@ -81,9 +87,13 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
     @Override
     public void save(CustomSession session) {
         log.debug("save \"{}\".\"{}\"", sessionNameSpace, session.getId());
-        session.setMaxInactiveIntervalInSeconds(maxInactiveIntervalInSeconds);
+        String userId = principalNameResolver.resolve(session);
+        int interval = hasText(userId) ? maxInactiveIntervalInSeconds : ANONYMOUS_MAX_INACTIVE_INTERVAL;
+        session.setMaxInactiveIntervalInSeconds(interval);
         session.setLastAccessedTime(convert2Timestamp(now()));
-        session.setExpirationTime(session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(maxInactiveIntervalInSeconds));
+        session.setExpirationTime(session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(interval));
+        session.setUserId(userId);
+
         saveToRedis(session);
         synchronizeToMongodb(session);
     }

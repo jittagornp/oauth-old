@@ -3,8 +3,6 @@
  */
 package com.pamarin.oauth2.session;
 
-import com.pamarin.commons.resolver.DefaultPrincipalNameResolver;
-import com.pamarin.commons.resolver.PrincipalNameResolver;
 import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,11 +15,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  */
 public class DefaultRedisSessionConverter implements RedisSessionConverter {
 
-    private final PrincipalNameResolver principalNameResolver;
     private final CustomSessionConverter sessionConverter;
 
     public DefaultRedisSessionConverter() {
-        this.principalNameResolver = new DefaultPrincipalNameResolver();
         this.sessionConverter = new DefaultCustomSessionConverter();
     }
 
@@ -33,7 +29,7 @@ public class DefaultRedisSessionConverter implements RedisSessionConverter {
         map.put(MAX_INACTIVE_INTERVAL, session.getMaxInactiveIntervalInSeconds());
         map.put(LAST_ACCESSED_TIME, session.getLastAccessedTime());
         map.put(EXPIRATION_TIME, session.getExpirationTime());
-        map.put(USER_ID, principalNameResolver.resolve(session));
+        map.put(USER_ID, session.getUserId());
         session.getAttributes()
                 .entrySet()
                 .forEach(attribute -> map.put(

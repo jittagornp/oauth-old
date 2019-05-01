@@ -42,11 +42,15 @@ public class BlockLoginRequestFilter extends OncePerRequestFilter {
         if ("/login".equals(httpReq.getServletPath())) {
             if (!matchAllHeaders(httpReq)) {
                 log.debug("Not match some http headers.");
-                httpResp.sendError(HttpServletResponse.SC_FORBIDDEN, "Block request for IP address \"" + httpClientIPAddressResolver.resolve(httpReq) + "\".");
+                httpResp.sendError(HttpServletResponse.SC_FORBIDDEN, getMessage(httpReq));
             }
         }
 
         chain.doFilter(httpReq, httpResp);
+    }
+
+    private String getMessage(HttpServletRequest httpReq) {
+        return "Block request for IP address \"" + httpClientIPAddressResolver.resolve(httpReq) + "\".";
     }
 
     private boolean matchAllHeaders(HttpServletRequest httpReq) {

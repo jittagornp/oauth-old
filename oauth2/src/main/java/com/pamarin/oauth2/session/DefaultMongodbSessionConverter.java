@@ -5,8 +5,6 @@ package com.pamarin.oauth2.session;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.pamarin.commons.resolver.DefaultPrincipalNameResolver;
-import com.pamarin.commons.resolver.PrincipalNameResolver;
 import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
 import java.util.Map;
 import org.bson.Document;
@@ -24,13 +22,11 @@ public class DefaultMongodbSessionConverter implements MongodbSessionConverter {
     private final Converter<Object, byte[]> serializer;
     private final Converter<byte[], Object> deserializer;
     private final CustomSessionConverter sessionConverter;
-    private final PrincipalNameResolver principalNameResolver;
 
     public DefaultMongodbSessionConverter() {
         this.sessionConverter = new DefaultCustomSessionConverter();
         this.serializer = new SerializingConverter();
         this.deserializer = new DeserializingConverter();
-        this.principalNameResolver = new DefaultPrincipalNameResolver();
     }
 
     @Override
@@ -42,7 +38,7 @@ public class DefaultMongodbSessionConverter implements MongodbSessionConverter {
         obj.put(LAST_ACCESSED_TIME, session.getLastAccessedTime());
         obj.put(EXPIRATION_TIME, session.getExpirationTime());
         obj.put(AGENT_ID, session.getAgentId());
-        obj.put(USER_ID, principalNameResolver.resolve(session));
+        obj.put(USER_ID, session.getUserId());
         obj.put(IP_ADDRESS, session.getIpAddress());
         obj.put(ATTRIBUTES, serializeAttributes(session));
         return obj;
