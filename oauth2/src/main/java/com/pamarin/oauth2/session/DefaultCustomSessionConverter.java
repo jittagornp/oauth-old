@@ -21,8 +21,8 @@ public class DefaultCustomSessionConverter implements CustomSessionConverter {
         }
 
         CustomSession session = new CustomSession();
-        entries.forEach((entry) -> {
-            String key = (String) entry.getKey();
+        entries.forEach(entry -> {
+            String key = entry.getKey();
             if (SESSION_ID.equals(key)) {
                 session.setId((String) entry.getValue());
                 session.setSessionId((String) entry.getValue());
@@ -34,7 +34,7 @@ public class DefaultCustomSessionConverter implements CustomSessionConverter {
                 session.setLastAccessedTime((Long) entry.getValue());
             } else if (EXPIRATION_TIME.equals(key)) {
                 session.setExpirationTime((Long) entry.getValue());
-            }else if (AGENT_ID.equals(key)) {
+            } else if (AGENT_ID.equals(key)) {
                 session.setAgentId((String) entry.getValue());
             } else if (USER_ID.equals(key)) {
                 session.setUserId((String) entry.getValue());

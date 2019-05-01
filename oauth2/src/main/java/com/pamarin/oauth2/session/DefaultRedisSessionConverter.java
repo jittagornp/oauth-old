@@ -36,9 +36,10 @@ public class DefaultRedisSessionConverter implements RedisSessionConverter {
         map.put(USER_ID, principalNameResolver.resolve(session));
         session.getAttributes()
                 .entrySet()
-                .forEach(attribute -> {
-                    map.put(ATTRIBUTES + ":" + attribute.getKey(), attribute.getValue());
-                });
+                .forEach(attribute -> map.put(
+                ATTRIBUTES + ":" + attribute.getKey(),
+                attribute.getValue()
+        ));
         return map;
     }
 

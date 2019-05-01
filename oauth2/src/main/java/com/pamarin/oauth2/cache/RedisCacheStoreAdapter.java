@@ -8,8 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -18,9 +17,8 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author jitta
  * @param <T>
  */
+@Slf4j
 public abstract class RedisCacheStoreAdapter<T extends Serializable> implements CacheStore<T> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RedisCacheStoreAdapter.class);
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -41,7 +39,7 @@ public abstract class RedisCacheStoreAdapter<T extends Serializable> implements 
         try {
             String fullKey = makeKey(key);
             String json = objectMapper.writeValueAsString(value);
-            LOG.debug("Redis set \"{}\" = {}", fullKey, json);
+            log.debug("Redis set \"{}\" = {}", fullKey, json);
             redisTemplate.opsForValue().set(fullKey, json, getExpiresMinutes(), TimeUnit.MINUTES);
         } catch (JsonProcessingException ex) {
             throw new RuntimeException("Can't parse object to JSON string", ex);
@@ -53,7 +51,7 @@ public abstract class RedisCacheStoreAdapter<T extends Serializable> implements 
         try {
             String fullKey = makeKey(key);
             String value = redisTemplate.opsForValue().get(fullKey);
-            LOG.debug("Redis get \"{}\" = {}", fullKey, value);
+            log.debug("Redis get \"{}\" = {}", fullKey, value);
             if(value == null){
                 return null;
             }

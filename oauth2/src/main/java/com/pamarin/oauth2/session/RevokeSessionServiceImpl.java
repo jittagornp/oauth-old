@@ -47,9 +47,23 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
     }
 
     @Override
+    public void revokeBySessionIdWithoutToken(String sessionId) {
+        if (hasText(sessionId)) {
+            sessionRepository.delete(sessionId);
+        }
+    }
+
+    @Override
     public void revokeBySessionIds(List<String> sessionIds) {
         if (!isEmpty(sessionIds)) {
             sessionIds.forEach(this::revokeBySessionId);
+        }
+    }
+
+    @Override
+    public void revokeBySessionIdsWithoutToken(List<String> sessionIds) {
+        if (!isEmpty(sessionIds)) {
+            sessionIds.forEach(this::revokeBySessionIdWithoutToken);
         }
     }
 
@@ -76,6 +90,6 @@ public class RevokeSessionServiceImpl implements RevokeSessionService {
 
     @Override
     public void revokeExpiredSessions() {
-        revokeBySessionIds(userSessionRepository.findExpiredSessions());
+        revokeBySessionIdsWithoutToken(userSessionRepository.findExpiredSessions());
     }
 }

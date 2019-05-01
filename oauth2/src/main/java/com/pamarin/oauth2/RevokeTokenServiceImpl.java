@@ -3,14 +3,14 @@
  */
 package com.pamarin.oauth2;
 
+import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import com.pamarin.oauth2.collection.OAuth2AccessToken;
 import com.pamarin.oauth2.collection.OAuth2RefreshToken;
 import com.pamarin.oauth2.model.OAuth2Token;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2AccessTokenRepository;
 import com.pamarin.oauth2.repository.redis.RedisOAuth2RefreshTokenRepository;
 import com.pamarin.oauth2.service.RevokeTokenService;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import static java.time.LocalDateTime.now;
 import static java.util.Collections.emptyList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +98,7 @@ public class RevokeTokenServiceImpl implements RevokeTokenService {
     }
 
     private <T extends OAuth2Token> void revokeExpiredTokens(Class<T> typeClass) {
-        long nowTimestamp = Timestamp.valueOf(LocalDateTime.now()).getTime();
+        long nowTimestamp = convert2Timestamp(now());
         Query query = Query.query(Criteria.where("expiresAt").lt(nowTimestamp));
         mongoOperations.remove(query, typeClass);
     }

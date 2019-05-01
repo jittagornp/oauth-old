@@ -5,7 +5,6 @@ package com.pamarin.oauth2.scheduling;
 
 import com.pamarin.oauth2.service.RevokeSessionService;
 import com.pamarin.oauth2.service.RevokeTokenService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 /**
  * @author jitta
  */
-@Slf4j
 @Service
 public class CleanExpiredSessionTokenJobRunner implements JobRunner {
 

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CleanTokenCacheJobRunner implements JobRunner {
 
-    private static final long RUN_EVERY_HOURS = 3 * (60 * 60 * 1000);
+    private static final long RUN_EVERY_HOURS = 3L * (60 * 60 * 1_000);
 
     private final RedisOperations<String, String> redisOperations;
 

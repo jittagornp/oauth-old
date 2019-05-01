@@ -13,7 +13,11 @@ public interface RevokeSessionService {
 
     void revokeBySessionId(String sessionId);
 
+    void revokeBySessionIdWithoutToken(String sessionId);
+
     void revokeBySessionIds(List<String> sessionIds);
+    
+    void revokeBySessionIdsWithoutToken(List<String> sessionIds);
 
     void revokeAllOnSameUserAgentBySessionId(String sessionId);
 

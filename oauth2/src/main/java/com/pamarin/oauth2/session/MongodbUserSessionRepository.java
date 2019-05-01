@@ -11,8 +11,9 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Criteria;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 import org.springframework.data.mongodb.core.query.Query;
+import static org.springframework.data.mongodb.core.query.Query.query;
 import static org.springframework.util.StringUtils.hasText;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -26,7 +27,7 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
     private MongoOperations mongoOperations;
 
     private Query attributeQuery(String name, Object value) {
-        return Query.query(Criteria.where(name).is(value));
+        return query(where(name).is(value));
     }
 
     private Query sessionIdQuery(Object value) {
@@ -84,13 +85,13 @@ public class MongodbUserSessionRepository implements UserSessionRepository {
 
     @Override
     public List<String> findExpiredSessions() {
-        Query query = Query.query(Criteria.where(EXPIRATION_TIME).lt(convert2Timestamp(now())));
+        Query query = query(where(EXPIRATION_TIME).lt(convert2Timestamp(now())));
         List<UserSession> sessions = mongoOperations.find(query, UserSession.class);
         if (isEmpty(sessions)) {
             return emptyList();
         }
         return sessions.stream()
-                .map(userSession -> userSession.getSessionId())
+                .map(UserSession::getSessionId)
                 .collect(toList());
     }
 }
