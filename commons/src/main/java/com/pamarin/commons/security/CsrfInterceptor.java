@@ -23,8 +23,9 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/17
- * 
- * Implement follow https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md
+ *
+ * Implement follow
+ * https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md
  */
 public class CsrfInterceptor extends HandlerInterceptorAdapter {
 
@@ -121,7 +122,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         }
         return csrfToken;
     }
-    
+
     private boolean isHandlerMethod(Object handler) {
         return handler instanceof HandlerMethod;
     }
@@ -132,17 +133,21 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        if (modelAndView != null && isHandlerMethod(handler)) {
+    public void postHandle(HttpServletRequest httpReq, HttpServletResponse httpResp, Object handler, ModelAndView modelAndView) throws Exception {
+        if (isOK(httpResp) && modelAndView != null && isHandlerMethod(handler)) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             if (hasAnnotation(handlerMethod, GetCsrfToken.class)) {
                 AuthenticityToken.RandomOutput random = authenticityToken.random();
                 modelAndView.addObject(CSRF_ATTRIBUTE_KEY, CSRF_HEADER_KEY);
                 modelAndView.addObject(CSRF_ATTRIBUTE_VALUE, random.getAuthenticityToken());
-                saveToken(random, request);
-                addTokenCookieAndHeader(random.getAuthenticityToken(), request, response);
+                saveToken(random, httpReq);
+                addTokenCookieAndHeader(random.getAuthenticityToken(), httpReq, httpResp);
             }
         }
+    }
+
+    private boolean isOK(HttpServletResponse httpResp) {
+        return httpResp.getStatus() == HttpServletResponse.SC_OK;
     }
 
     private void saveToken(AuthenticityToken.RandomOutput random, HttpServletRequest request) {
