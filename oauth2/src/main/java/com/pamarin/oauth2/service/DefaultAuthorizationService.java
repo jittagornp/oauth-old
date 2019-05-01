@@ -54,16 +54,12 @@ class DefaultAuthorizationService implements AuthorizationService {
             if (!wasApprovedClient(req.getClientId())) {
                 throw new RequireApprovalException();
             }
-            return obtainingAuthorization(req);
+            return generateAuthorizationCode(req);
         } else {
             String querystring = req.buildQuerystring();
             String signature = stringSignature.sign(querystring);
             return hostUrlProvider.provide() + "/login?" + querystring + "&signature=" + signature;
         }
-    }
-
-    private String obtainingAuthorization(AuthorizationRequest req) {
-        return generateAuthorizationCode(req);
     }
 
     //https://tools.ietf.org/html/rfc6749#section-4.1.2
