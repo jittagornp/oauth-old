@@ -40,10 +40,11 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
     private static final String OBJECT_ID = "_id";
 
     private static final String LAST_SYNCHONIZED = "lastSynchronizedTime";
+    private static final String LAST_SYNCHONIZED_LOGIN = "lastSynchronizedTime:login";
 
     private final int ANONYMOUS_MAX_INACTIVE_INTERVAL = 60;//1 minute
     private int maxInactiveIntervalInSeconds = 1800; //30 minutes
-    private int synchronizeTimeout = 1000 * 30; //30 seconds
+    private int synchronizeTimeout = 1000 * 15; //15 seconds
 
     private final RedisOperations<Object, Object> redisOperations;
     private final MongoOperations mongoOperations;
@@ -86,17 +87,14 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
         log.debug("save \"{}\".\"{}\"", sessionNameSpace, session.getId());
         String userId = principalNameResolver.resolve(session);
         boolean anonymousUser = isAnonymousUser(userId);
-        int interval = anonymousUser ? ANONYMOUS_MAX_INACTIVE_INTERVAL : maxInactiveIntervalInSeconds;
-        session.setMaxInactiveIntervalInSeconds(interval);
+        int timeout = anonymousUser ? ANONYMOUS_MAX_INACTIVE_INTERVAL : maxInactiveIntervalInSeconds;
+        session.setMaxInactiveIntervalInSeconds(timeout);
         session.setLastAccessedTime(convert2Timestamp(now()));
-        session.setExpirationTime(session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(interval));
+        session.setExpirationTime(session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(timeout));
         session.setUserId(userId);
 
         saveToRedis(session);
-
-        if (!anonymousUser) {
-            synchronizeToMongodb(session);
-        }
+        synchronizeToMongodb(session, anonymousUser);
     }
 
     @Override
@@ -151,12 +149,18 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
         mongoOperations.save(dbObject, sessionNameSpace);
     }
 
-    private void synchronizeToMongodb(CustomSession session) {
+    private void synchronizeToMongodb(CustomSession session, boolean anonymous) {
         long now = convert2Timestamp(now());
         Long lastSyncTime = session.getAttribute(LAST_SYNCHONIZED);
         if (lastSyncTime == null || (now - lastSyncTime > synchronizeTimeout)) {
             session.setAttribute(LAST_SYNCHONIZED, now);
             saveToMongodb(session);
+        } else {
+            if (!anonymous && session.getAttribute(LAST_SYNCHONIZED_LOGIN) == null) {
+                session.setAttribute(LAST_SYNCHONIZED, now);
+                session.setAttribute(LAST_SYNCHONIZED_LOGIN, now);
+                saveToMongodb(session);
+            }
         }
     }
 
