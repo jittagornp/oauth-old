@@ -34,15 +34,12 @@ import static org.springframework.util.StringUtils.hasText;
 @Slf4j
 public class CustomSessionRepository implements SessionRepository<CustomSession> {
 
-    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
-
     private String sessionNameSpace = "user_session";
 
     //for mongodb
     private static final String OBJECT_ID = "_id";
 
     private static final String LAST_SYNCHONIZED = "lastSynchronizedTime";
-    private static final String LAST_SYNCHONIZED_LOGIN = "lastSynchronizedTime:login";
 
     private final int ANONYMOUS_MAX_INACTIVE_INTERVAL = 60;//1 minute
     private int maxInactiveIntervalInSeconds = 1800; //30 minutes
@@ -88,7 +85,8 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
     public void save(CustomSession session) {
         log.debug("save \"{}\".\"{}\"", sessionNameSpace, session.getId());
         String userId = principalNameResolver.resolve(session);
-        int interval = hasText(userId) ? maxInactiveIntervalInSeconds : ANONYMOUS_MAX_INACTIVE_INTERVAL;
+        boolean anonymousUser = isAnonymousUser(userId);
+        int interval = anonymousUser ? ANONYMOUS_MAX_INACTIVE_INTERVAL : maxInactiveIntervalInSeconds;
         session.setMaxInactiveIntervalInSeconds(interval);
         session.setLastAccessedTime(convert2Timestamp(now()));
         session.setExpirationTime(session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(interval));
@@ -96,7 +94,7 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
 
         saveToRedis(session);
 
-        if (hasText(userId)) {
+        if (!anonymousUser) {
             synchronizeToMongodb(session);
         }
     }
@@ -123,6 +121,13 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
         log.debug("delete \"{}\".\"{}\"", sessionNameSpace, id);
         redisOperations.delete(getRedisKey(id));
         mongoOperations.remove(sessionIdQuery(id), sessionNameSpace);
+    }
+
+    private boolean isAnonymousUser(String userId) {
+        if (!hasText(userId)) {
+            return true;
+        }
+        return "anonymousUser".equals(userId);
     }
 
     private void saveToRedis(CustomSession session) {
@@ -152,16 +157,6 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
         if (lastSyncTime == null || (now - lastSyncTime > synchronizeTimeout)) {
             session.setAttribute(LAST_SYNCHONIZED, now);
             saveToMongodb(session);
-        } else {
-            Long firstTimeLogin = session.getAttribute(LAST_SYNCHONIZED_LOGIN);
-            if (firstTimeLogin == null) {
-                boolean alreadyLogin = session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
-                if (alreadyLogin) {
-                    session.setAttribute(LAST_SYNCHONIZED, now);
-                    session.setAttribute(LAST_SYNCHONIZED_LOGIN, now);
-                    saveToMongodb(session);
-                }
-            }
         }
     }
 
