@@ -31,7 +31,7 @@ public class BeatController {
     @PostMapping("/beat")
     public void beat(HttpServletRequest httpReq) {
         sameOriginVerification.verify(httpReq);
-        HttpSession session = httpReq.getSession();
+        HttpSession session = httpReq.getSession(false);
         if (session != null) {
             log.debug("beat session.id => \"{}}\"", session.getId());
         }
