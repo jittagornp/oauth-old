@@ -6,13 +6,14 @@ package com.pamarin.commons.security;
 import com.pamarin.commons.exception.AuthenticationException;
 import com.pamarin.commons.provider.HttpSessionProvider;
 import javax.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import static org.springframework.security.core.context.SecurityContextHolder.clearContext;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+import static org.springframework.security.core.context.SecurityContextHolder.setContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -20,13 +21,18 @@ import org.springframework.stereotype.Component;
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/12
  */
+@Slf4j
 @Component
 class DefaultLoginSession implements LoginSession {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultLoginSession.class);
+    private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
+
+    private final HttpSessionProvider httpSessionProvider;
 
     @Autowired
-    private HttpSessionProvider httpSessionProvider;
+    public DefaultLoginSession(HttpSessionProvider httpSessionProvider) {
+        this.httpSessionProvider = httpSessionProvider;
+    }
 
     @Override
     public void create(UserDetails userDetails) {
@@ -37,7 +43,8 @@ class DefaultLoginSession implements LoginSession {
                 userDetails.getAuthorities()
         );
         context.setAuthentication(token);
-        SecurityContextHolder.setContext(context);
+        setContext(context);
+        setSessionContext(context);
     }
 
     @Override
@@ -46,7 +53,7 @@ class DefaultLoginSession implements LoginSession {
             getUserDetails();
             return true;
         } catch (AuthenticationException ex) {
-            LOG.warn(null, ex);
+            log.warn(null, ex);
             return false;
         }
     }
@@ -61,8 +68,8 @@ class DefaultLoginSession implements LoginSession {
         }
 
         if (!(principal instanceof UserDetails)) {
-            LOG.debug("principal class name => {}", principal.getClass().getName());
-            LOG.debug("principal value => {}", principal);
+            log.debug("principal class name => {}", principal.getClass().getName());
+            log.debug("principal value => {}", principal);
             throw new AuthenticationException("Please login, principal is not user details.");
         }
 
@@ -71,7 +78,10 @@ class DefaultLoginSession implements LoginSession {
 
     @Override
     public Authentication getAuthentication() {
-        SecurityContext context = SecurityContextHolder.getContext();
+        SecurityContext context = getSessionContext();
+        if (context == null) {
+            context = getContext();
+        }
         Authentication authentication = context.getAuthentication();
         if (authentication == null) {
             throw new AuthenticationException("Please login, authentication is null.");
@@ -93,7 +103,22 @@ class DefaultLoginSession implements LoginSession {
             session.setMaxInactiveInterval(0);
             session.invalidate();
         }
-        SecurityContextHolder.clearContext();
+        clearContext();
+        setSessionContext(null);
     }
 
+    private SecurityContext getSessionContext() {
+        HttpSession session = httpSessionProvider.provide();
+        if (session != null) {
+            return (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT);
+        }
+        return null;
+    }
+
+    private void setSessionContext(SecurityContext context) {
+        HttpSession session = httpSessionProvider.provide();
+        if (session != null) {
+            session.setAttribute(SPRING_SECURITY_CONTEXT, context);
+        }
+    }
 }

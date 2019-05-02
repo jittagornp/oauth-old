@@ -10,6 +10,7 @@ import com.pamarin.commons.security.hashing.HmacSHA256Hashing;
 import com.pamarin.commons.security.hashing.ShortHashing;
 import com.pamarin.commons.security.hashing.StringSignature;
 import com.pamarin.commons.security.hashing.StringSignatureAdapter;
+import com.pamarin.oauth2.security.DefaultSecurityContextRepository;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -46,7 +48,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .securityContext()
+                .securityContextRepository(new DefaultSecurityContextRepository())
+                .and()
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(
                         "/authorize",

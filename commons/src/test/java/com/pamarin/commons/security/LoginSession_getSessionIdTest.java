@@ -29,7 +29,7 @@ public class LoginSession_getSessionIdTest {
     public void before() {
         session = mock(HttpSession.class);
         httpSessionProvider = mock(HttpSessionProvider.class);
-        loginSession = new DefaultLoginSession();
+        loginSession = new DefaultLoginSession(httpSessionProvider);
         ReflectionTestUtils.setField(
                 loginSession,
                 "httpSessionProvider",

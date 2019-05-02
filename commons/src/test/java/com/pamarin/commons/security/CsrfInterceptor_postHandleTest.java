@@ -80,6 +80,7 @@ public class CsrfInterceptor_postHandleTest {
     public void shouldBeOk() throws Exception {
         when(authenticityToken.random()).thenReturn(new AuthenticityToken.RandomOutput("abc", "xyz"));
         when(httpReq.getServletPath()).thenReturn("/login");
+        when(httpResp.getStatus()).thenReturn(HttpServletResponse.SC_OK);
 
         ModelAndView modelAndView = mock(ModelAndView.class);
 

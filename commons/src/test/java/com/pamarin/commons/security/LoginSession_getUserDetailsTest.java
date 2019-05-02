@@ -4,12 +4,14 @@
 package com.pamarin.commons.security;
 
 import com.pamarin.commons.exception.AuthenticationException;
+import com.pamarin.commons.provider.HttpSessionProvider;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import static org.mockito.Mockito.mock;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +32,7 @@ public class LoginSession_getUserDetailsTest {
 
     @Before
     public void before() {
-        loginSession = new DefaultLoginSession();
+        loginSession = new DefaultLoginSession(mock(HttpSessionProvider.class));
     }
     
     @Test
