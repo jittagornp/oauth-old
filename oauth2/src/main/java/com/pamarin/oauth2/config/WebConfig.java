@@ -52,6 +52,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        
+        registry.addResourceHandler("/robots.txt")
+                .addResourceLocations("classpath:/static/robots.txt")
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS));
+        
         registry.addResourceHandler("/favicon.ico")
                 .addResourceLocations("classpath:/static/assets/favicon.ico")
                 .setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS));

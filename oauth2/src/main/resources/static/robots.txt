@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /authorize
+Disallow: /login
+Disallow: /token
+Disallow: /session
+Disallow: /beat
+Disallow: /logout
+Allow: /
