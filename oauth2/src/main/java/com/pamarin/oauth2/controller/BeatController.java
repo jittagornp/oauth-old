@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
@@ -28,12 +29,13 @@ public class BeatController {
         this.sameOriginVerification = new DefaultHttpRequestSameOriginVerification(hostUrlProvider.provide());
     }
 
+    @ResponseBody
     @PostMapping("/beat")
     public void beat(HttpServletRequest httpReq) {
         sameOriginVerification.verify(httpReq);
         HttpSession session = httpReq.getSession(false);
         if (session != null) {
-            log.debug("beat session.id => \"{}}\"", session.getId());
+            log.debug("beat session.id => \"{}\"", session.getId());
         }
     }
 

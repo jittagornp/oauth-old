@@ -94,6 +94,17 @@ Copyright 2017-2019 Pamarin.com
                 </form>
             </div>
         </div>
+        <script type="text/javascript">
+            (function () {
+                function beat() {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.open('POST', './beat', true);
+                    xhttp.setRequestHeader("Content-type", "application/json");
+                    xhttp.send();
+                }
+                setInterval(beat, 1000 * 30);
+            })();
+        </script>
     </body>
 </html>
 
