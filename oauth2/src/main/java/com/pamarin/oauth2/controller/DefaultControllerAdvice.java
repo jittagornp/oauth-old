@@ -23,7 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author jitta
  */
 @ControllerAdvice
-public class OAuth2ControllerAdvice {
+public class DefaultControllerAdvice {
 
     private final ErrorResponseExceptionHandlerResolver resolver;
 
@@ -32,7 +32,7 @@ public class OAuth2ControllerAdvice {
     private final ValidUri.Validator uriValidator;
 
     @Autowired
-    public OAuth2ControllerAdvice(ErrorResponseExceptionHandlerResolver resolver, ObjectMapper objectMapper) {
+    public DefaultControllerAdvice(ErrorResponseExceptionHandlerResolver resolver, ObjectMapper objectMapper) {
         this.resolver = resolver;
         this.objectMapper = objectMapper;
         this.uriValidator = new ValidUri.Validator();
@@ -90,6 +90,7 @@ public class OAuth2ControllerAdvice {
     private boolean isJSONError(HttpServletRequest httpReq) {
         return "/token".equals(httpReq.getServletPath())
                 || "/session".equals(httpReq.getServletPath())
+                || "/beat".equals(httpReq.getServletPath())
                 || isPostLogout(httpReq);
     }
 

@@ -44,7 +44,7 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
     private static final String LAST_SYNCHONIZED = "lastSynchronizedTime";
     private static final String LAST_SYNCHONIZED_LOGIN = "lastSynchronizedTime:login";
 
-    private final int ANONYMOUS_MAX_INACTIVE_INTERVAL = 180;//3 minutes
+    private final int ANONYMOUS_MAX_INACTIVE_INTERVAL = 60;//1 minute
     private int maxInactiveIntervalInSeconds = 1800; //30 minutes
     private int synchronizeTimeout = 1000 * 30; //30 seconds
 

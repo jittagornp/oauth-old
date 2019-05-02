@@ -54,6 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/login",
                         "/logout",
                         "/session",
+                        "/beat",
                         "/",
                         "/code/callback",
                         "/assets/**",
