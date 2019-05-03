@@ -1,7 +1,7 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2.service;
+package com.pamarin.oauth2.ratelimit;
 
 /**
  *
@@ -9,6 +9,6 @@ package com.pamarin.oauth2.service;
  */
 public interface LoginRateLimitService {
 
-    void checkLimit(String username);
+    void limit(String username);
 
 }

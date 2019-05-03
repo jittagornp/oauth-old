@@ -3,7 +3,7 @@
  */
 package com.pamarin.oauth2.exception.handler;
 
-import com.pamarin.oauth2.exception.LoginOverLimitException;
+import com.pamarin.oauth2.exception.RateLimitException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -14,17 +14,17 @@ import org.springframework.stereotype.Component;
  * @author jitta
  */
 @Component
-public class ErrorResponseLoginOverLimitExceptionHandler extends ErrorResponseExceptionHandlerAdapter<LoginOverLimitException> {
+public class ErrorResponseRateLimitExceptionHandler extends ErrorResponseExceptionHandlerAdapter<RateLimitException> {
 
     @Override
-    public Class<LoginOverLimitException> getTypeClass() {
-        return LoginOverLimitException.class;
+    public Class<RateLimitException> getTypeClass() {
+        return RateLimitException.class;
     }
 
     @Override
-    protected ErrorResponse buildError(LoginOverLimitException ex, HttpServletRequest httpReq, HttpServletResponse httpResp) {
+    protected ErrorResponse buildError(RateLimitException ex, HttpServletRequest httpReq, HttpServletResponse httpResp) {
         return ErrorResponse.builder()
-                .error("login_over_limit")
+                .error("rate_limit")
                 .errorDescription(ex.getMessage())
                 .errorStatus(HttpStatus.TOO_MANY_REQUESTS.value())
                 .build();

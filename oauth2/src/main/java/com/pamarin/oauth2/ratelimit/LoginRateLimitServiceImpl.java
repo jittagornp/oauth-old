@@ -1,10 +1,9 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2;
+package com.pamarin.oauth2.ratelimit;
 
-import com.pamarin.oauth2.exception.LoginOverLimitException;
-import com.pamarin.oauth2.service.LoginRateLimitService;
+import com.pamarin.oauth2.exception.RateLimitException;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
@@ -26,19 +25,23 @@ public class LoginRateLimitServiceImpl implements LoginRateLimitService {
         this.cached = new HashMap<>();
     }
 
+    private Bucket createBucket() {
+        // define the limit 1 time per 1 second
+        Bandwidth limit = Bandwidth.simple(1, Duration.ofSeconds(1));
+        // construct the bucket
+        return Bucket4j.builder().addLimit(limit).build();
+    }
+
     @Override
-    public void checkLimit(String username) {
+    public void limit(String username) {
         Bucket bucket = cached.get(username);
         if (bucket == null) {
-            // define the limit 1 time per 1 second
-            Bandwidth limit = Bandwidth.simple(1, Duration.ofSeconds(1));
-            // construct the bucket
-            bucket = Bucket4j.builder().addLimit(limit).build();
+            bucket = createBucket();
             cached.put(username, bucket);
         }
 
         if (!bucket.tryConsume(1)) {
-            throw new LoginOverLimitException("username \"" + username + "\" is login over limit.");
+            throw new RateLimitException("username \"" + username + "\" is over limit on /login.");
         }
     }
 

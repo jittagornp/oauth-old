@@ -7,9 +7,9 @@ package com.pamarin.oauth2.exception;
  *
  * @author jitta
  */
-public class LoginOverLimitException extends RuntimeException {
+public class RateLimitException extends RuntimeException {
 
-    public LoginOverLimitException(String message) {
+    public RateLimitException(String message) {
         super(message);
     }
 
