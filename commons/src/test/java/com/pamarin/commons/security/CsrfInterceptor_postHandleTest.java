@@ -40,7 +40,7 @@ public class CsrfInterceptor_postHandleTest {
         authenticityToken = mock(AuthenticityToken.class);
 
         HttpSession httpSession = mock(HttpSession.class);
-        when(httpReq.getSession()).thenReturn(httpSession);
+        when(httpReq.getSession(false)).thenReturn(httpSession);
 
         interceptor.setAuthenticityToken(authenticityToken);
     }
@@ -88,7 +88,7 @@ public class CsrfInterceptor_postHandleTest {
 
         verify(modelAndView).addObject("csrfParam", "X-CSRF-Token");
         verify(modelAndView).addObject("csrfToken", "xyz");
-        verify(httpReq.getSession()).setAttribute("X-CSRF-Token:/login", "abc");
+        verify(httpReq.getSession(false)).setAttribute("X-CSRF-Token:/login", "abc");
         verify(httpResp).setHeader("X-CSRF-Token", "xyz");
     }
 }

@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import static org.springframework.util.StringUtils.hasText;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -93,14 +94,17 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
     }
 
     private void synchronizeSession(String csrfToken, HttpServletRequest httpReq) {
-        String token = authenticityToken.decode(csrfToken);
-        if (!hasText(token)) {
-            throw new InvalidCsrfTokenException("Can't decode csrf token");
-        }
+        HttpSession session = httpReq.getSession(false);
+        if (session != null) {
+            String token = authenticityToken.decode(csrfToken);
+            if (!hasText(token)) {
+                throw new InvalidCsrfTokenException("Can't decode csrf token");
+            }
 
-        String attribute = getCsrfSessionKey(httpReq.getServletPath());
-        if (!Objects.equals(httpReq.getSession().getAttribute(attribute), token)) {
-            throw new InvalidCsrfTokenException("Not found csrf token in user session");
+            String attribute = getCsrfSessionKey(httpReq.getServletPath());
+            if (!Objects.equals(session.getAttribute(attribute), token)) {
+                throw new InvalidCsrfTokenException("Not found csrf token in user session");
+            }
         }
     }
 
@@ -140,7 +144,7 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
                 AuthenticityToken.RandomOutput random = authenticityToken.random();
                 modelAndView.addObject(CSRF_ATTRIBUTE_KEY, CSRF_HEADER_KEY);
                 modelAndView.addObject(CSRF_ATTRIBUTE_VALUE, random.getAuthenticityToken());
-                saveToken(random, httpReq);
+                saveTokenToSession(random, httpReq);
                 addTokenCookieAndHeader(random.getAuthenticityToken(), httpReq, httpResp);
             }
         }
@@ -150,10 +154,13 @@ public class CsrfInterceptor extends HandlerInterceptorAdapter {
         return httpResp.getStatus() == HttpServletResponse.SC_OK;
     }
 
-    private void saveToken(AuthenticityToken.RandomOutput random, HttpServletRequest request) {
-        String attribute = getCsrfSessionKey(request.getServletPath());
-        String value = random.getToken();
-        request.getSession().setAttribute(attribute, value);
+    private void saveTokenToSession(AuthenticityToken.RandomOutput random, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            String attribute = getCsrfSessionKey(request.getServletPath());
+            String value = random.getToken();
+            session.setAttribute(attribute, value);
+        }
     }
 
     /**

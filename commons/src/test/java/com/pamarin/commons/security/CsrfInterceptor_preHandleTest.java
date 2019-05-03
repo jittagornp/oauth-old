@@ -43,7 +43,7 @@ public class CsrfInterceptor_preHandleTest {
         authenticityToken = mock(AuthenticityToken.class);
 
         HttpSession httpSession = mock(HttpSession.class);
-        when(httpReq.getSession()).thenReturn(httpSession);
+        when(httpReq.getSession(false)).thenReturn(httpSession);
         
         when(httpReq.getHeader("Origin")).thenReturn("https://pamarin.com");
         
@@ -153,7 +153,7 @@ public class CsrfInterceptor_preHandleTest {
             new Cookie(CSRF_COOKIE, "xyz")
         });
         when(authenticityToken.decode("xyz")).thenReturn("1234");
-        when(httpReq.getSession().getAttribute(CSRF_PARAM + ":1234")).thenReturn(null);
+        when(httpReq.getSession(false).getAttribute(CSRF_PARAM + ":1234")).thenReturn(null);
 
         exception.expect(InvalidCsrfTokenException.class);
         exception.expectMessage("Not found csrf token in user session");
@@ -172,7 +172,7 @@ public class CsrfInterceptor_preHandleTest {
         });
         when(authenticityToken.decode("xyz")).thenReturn("1234");
         when(httpReq.getServletPath()).thenReturn("/login");
-        when(httpReq.getSession().getAttribute(CSRF_PARAM + ":/login")).thenReturn("1234");
+        when(httpReq.getSession(false).getAttribute(CSRF_PARAM + ":/login")).thenReturn("1234");
 
         boolean output = interceptor.preHandle(httpReq, httpResp, null);
         boolean expected = true;
