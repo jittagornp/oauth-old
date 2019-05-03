@@ -30,7 +30,7 @@ public class LoginRateLimitServiceImpl implements LoginRateLimitService {
     public void checkLimit(String username) {
         Bucket bucket = cached.get(username);
         if (bucket == null) {
-            // define the limit 1 time per 1 minute
+            // define the limit 1 time per 1 second
             Bandwidth limit = Bandwidth.simple(1, Duration.ofSeconds(1));
             // construct the bucket
             bucket = Bucket4j.builder().addLimit(limit).build();
