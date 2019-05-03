@@ -11,6 +11,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface UserAgentResolver {
 
-    UserAgent resolve(HttpServletRequest httpReq);
+    UserAgent resolve(HttpServletRequest httpReq); 
 
 }
