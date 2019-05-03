@@ -58,7 +58,7 @@ public class UserAgent {
     }
 
     public static UserAgent unknown() {
-        return builder()
+        return UserAgent.builder()
                 .deviceTypeKey(UNKNOWN_KEY)
                 .deviceTypeName(UNKNOWN_NAME)
                 .browserTypeKey(UNKNOWN_KEY)

@@ -31,6 +31,9 @@ public class LoginService_loadUserByUsernameTest {
 
     @Mock
     private UserRepository userRepository;
+    
+    @Mock
+    private LoginRateLimitService loginRateLimitService;
 
     @Before
     public void before() {

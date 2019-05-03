@@ -17,6 +17,7 @@ import com.pamarin.oauth2.service.RevokeSessionService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.pamarin.oauth2.repository.UserRepository;
+import com.pamarin.oauth2.service.LoginRateLimitService;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; createSession : 2017/11/12
@@ -40,11 +41,16 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private LoginHistoryService loginHistoryService;
 
+    @Autowired
+    private LoginRateLimitService loginRateLimitService;
+
     @Override
     public void login(String username, String password) {
         if (username == null || password == null) {
             throw new InvalidUsernamePasswordException("Require username and password.");
         }
+
+        loginRateLimitService.checkLimit(username);
 
         User user = userRepository.findByUsername(username);
         if (user == null) {
