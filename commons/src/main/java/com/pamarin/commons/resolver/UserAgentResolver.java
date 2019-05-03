@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author jitta
  */
-public interface UserAgentResolver {
+public interface UserAgentResolver { 
 
-    UserAgent resolve(HttpServletRequest httpReq); 
+    UserAgent resolve(HttpServletRequest httpReq);  
 
 }
