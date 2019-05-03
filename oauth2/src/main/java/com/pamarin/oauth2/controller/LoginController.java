@@ -80,7 +80,7 @@ public class LoginController {
         return new ModelAndViewBuilder()
                 .setName("login")
                 .addAttribute("error", httpReq.getParameter("error"))
-                .addAttribute("processUrl", hostUrlProvider.provide() + "/login" + (req.haveSomeParameters() ? ("?" + querystring) : ""))
+                .addAttribute("processUrl", hostUrlProvider.provide() + "/login?" + querystring + "&signature=" + httpReq.getParameter("signature"))
                 .build();
     }
 
@@ -91,12 +91,14 @@ public class LoginController {
             LoginCredential credential
     ) throws IOException, MissingServletRequestParameterException {
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
+        String querystring = req.buildQuerystring();
+        verifySignature(querystring, httpReq.getParameter("signature"));
         try {
             loginService.login(credential.getUsername(), credential.getPassword());
-            httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + req.buildQuerystring());
+            httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + querystring);
         } catch (InvalidUsernamePasswordException ex) {
             LOG.warn("Invalid username password ", ex);
-            httpResp.sendRedirect(hostUrlProvider.provide() + "/login?error=invalid_username_password" + (req.haveSomeParameters() ? ("&" + req.buildQuerystring()) : ""));
+            httpResp.sendRedirect(hostUrlProvider.provide() + "/login?error=invalid_username_password&" + querystring + "&signature=" + httpReq.getParameter("signature"));
         }
     }
 }

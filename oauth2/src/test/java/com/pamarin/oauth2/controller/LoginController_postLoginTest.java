@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.controller;
 
+import com.pamarin.commons.security.hashing.StringSignature;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import org.junit.Test;
@@ -34,6 +35,9 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
     @MockBean
     private LoginService loginService;
 
+    @MockBean
+    private StringSignature stringSignature;
+
     private HttpHeaders headers() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36");
@@ -53,13 +57,13 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
                 .when(loginService)
                 .login(null, null);
         this.mockMvc.perform(
-                post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read")
+                post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read&signature=BBBBB")
                         .servletPath("/login")
                         .headers(headers())
                         .cookie(cookies())
         )
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost:-1/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
+                .andExpect(redirectedUrl("http://localhost:-1/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read&signature=BBBBB"));
     }
 
     @Test
@@ -68,7 +72,7 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
                 .when(loginService)
                 .login("AAA", "AAA");
         this.mockMvc.perform(
-                post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read")
+                post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read&signature=BBBBB")
                         .servletPath("/login")
                         .headers(headers())
                         .cookie(cookies())
@@ -76,13 +80,13 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
                         .param("password", "AAA")
         )
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost:-1/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
+                .andExpect(redirectedUrl("http://localhost:-1/login?error=invalid_username_password&response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read&signature=BBBBB"));
     }
 
     @Test
     public void shouldBeOk() throws Exception {
         this.mockMvc.perform(
-                post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read")
+                post("/login?response_type=code&client_id=000000&redirect_uri=http://localhost/callback&scope=read&signature=BBBBB")
                         .servletPath("/login")
                         .headers(headers())
                         .cookie(cookies())

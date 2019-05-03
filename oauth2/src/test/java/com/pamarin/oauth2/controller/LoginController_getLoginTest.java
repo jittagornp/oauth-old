@@ -183,6 +183,6 @@ public class LoginController_getLoginTest extends IntegrationTestBase {
         )
                 .andExpect(status().isOk())
                 .andExpect(view().name("login"))
-                .andExpect(model().attribute("processUrl", "http://localhost:-1/login?response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read"));
+                .andExpect(model().attribute("processUrl", "http://localhost:-1/login?response_type=code&client_id=000000&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read&signature=BBBBB"));
     }
 }
