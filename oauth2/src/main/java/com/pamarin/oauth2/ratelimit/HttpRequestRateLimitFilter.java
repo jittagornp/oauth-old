@@ -20,11 +20,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class HttpRequestRequestLimitFilter extends OncePerRequestFilter {
+public class HttpRequestRateLimitFilter extends OncePerRequestFilter {
 
     private final HttpRequestRateLimitService httpRequestRateLimitService;
 
-    public HttpRequestRequestLimitFilter(@Qualifier("defaultTokenBucketRepository") TokenBucketRepository tokenBucketRepository) {
+    public HttpRequestRateLimitFilter(@Qualifier("defaultTokenBucketRepository") TokenBucketRepository tokenBucketRepository) {
         this.httpRequestRateLimitService = new DefaultHttpRequestRateLimitService(tokenBucketRepository);
     }
 
