@@ -6,6 +6,7 @@ package com.pamarin.oauth2.controller;
 import com.pamarin.commons.exception.InvalidSignatureException;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.commons.security.hashing.StringSignature;
+import com.pamarin.oauth2.ratelimit.LoginRateLimitService;
 import javax.servlet.http.Cookie;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
@@ -37,6 +38,9 @@ public class LoginController_getLoginTest extends IntegrationTestBase {
 
     @MockBean
     private StringSignature stringSignature;
+    
+    @MockBean
+    private LoginRateLimitService loginRateLimitService;
 
     private HttpHeaders headers() {
         HttpHeaders headers = new HttpHeaders();

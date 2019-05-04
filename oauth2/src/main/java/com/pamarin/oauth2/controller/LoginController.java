@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.pamarin.oauth2.service.LoginService;
 import com.pamarin.commons.security.hashing.StringSignature;
+import com.pamarin.oauth2.ratelimit.LoginRateLimitService;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -52,6 +53,9 @@ public class LoginController {
 
     @Autowired
     private StringSignature stringSignature;
+    
+    @Autowired
+    private LoginRateLimitService loginRateLimitService;
 
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);
@@ -71,6 +75,7 @@ public class LoginController {
     @GetCsrfToken
     @GetMapping("/login")
     public ModelAndView login(HttpServletRequest httpReq, HttpServletResponse httpResp) throws MissingServletRequestParameterException, IOException {
+        loginRateLimitService.limit(httpReq);
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
         String querystring = req.buildQuerystring();
         verifySignature(querystring, httpReq.getParameter("signature"));
@@ -90,6 +95,7 @@ public class LoginController {
             HttpServletResponse httpResp,
             LoginCredential credential
     ) throws IOException, MissingServletRequestParameterException {
+        loginRateLimitService.limit(httpReq);
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
         String querystring = req.buildQuerystring();
         verifySignature(querystring, httpReq.getParameter("signature"));

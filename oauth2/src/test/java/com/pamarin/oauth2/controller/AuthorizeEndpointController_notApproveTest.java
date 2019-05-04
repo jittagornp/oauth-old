@@ -5,6 +5,7 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.model.AuthorizationRequest;
+import com.pamarin.oauth2.ratelimit.AuthorizeRateLimitService;
 import com.pamarin.oauth2.service.AuthorizationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,9 @@ public class AuthorizeEndpointController_notApproveTest extends IntegrationTestB
 
     @MockBean
     private AuthorizationService authorizationService;
+
+    @MockBean
+    private AuthorizeRateLimitService rateLimitService;
 
     @Test
     public void shouldBeErrorNotApprove() throws Exception {

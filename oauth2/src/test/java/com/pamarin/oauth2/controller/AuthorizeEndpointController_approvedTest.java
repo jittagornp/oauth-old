@@ -5,6 +5,7 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.model.AuthorizationRequest;
+import com.pamarin.oauth2.ratelimit.AuthorizeRateLimitService;
 import com.pamarin.oauth2.service.AuthorizationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +37,10 @@ public class AuthorizeEndpointController_approvedTest extends IntegrationTestBas
 
     @MockBean
     private AuthorizationService authorizationService;
-    
+
+    @MockBean
+    private AuthorizeRateLimitService rateLimitService;
+
     @Test
     public void shouldBeErrorInvalidRequest_whenEmptyParameter() throws Exception {
         this.mockMvc.perform(post("/authorize").servletPath("/authorize"))
@@ -44,7 +48,7 @@ public class AuthorizeEndpointController_approvedTest extends IntegrationTestBas
                 .andExpect((MvcResult mr) -> {
                     String string = mr.getResponse().getContentAsString();
                     assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Require parameter &#39;answer=approved or answer=not_approve&#39;&quot;}");
-        });
+                });
     }
 
     @Test
@@ -54,7 +58,7 @@ public class AuthorizeEndpointController_approvedTest extends IntegrationTestBas
                 .andExpect((MvcResult mr) -> {
                     String string = mr.getResponse().getContentAsString();
                     assertThat(string).contains("{&quot;error&quot;:&quot;invalid_request&quot;,&quot;error_status&quot;:400,&quot;error_description&quot;:&quot;Require parameter &#39;answer=approved or answer=not_approve&#39;&quot;}");
-        });
+                });
     }
 
     @Test

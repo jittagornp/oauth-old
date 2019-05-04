@@ -76,11 +76,13 @@ public class AuthorizeEndpointController {
 
     @PostMapping(params = "answer=approved")
     public void approved(HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException, MissingServletRequestParameterException {
+        rateLimitService.limit(httpReq);
         httpResp.sendRedirect(authorizationService.approved(buildAuthorizationRequest(httpReq)));
     }
 
     @PostMapping(params = "answer=not_approve")
     public void notApprove(HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException, MissingServletRequestParameterException {
+        rateLimitService.limit(httpReq);
         httpResp.sendRedirect(authorizationService.notApprove(buildAuthorizationRequest(httpReq)));
     }
 }

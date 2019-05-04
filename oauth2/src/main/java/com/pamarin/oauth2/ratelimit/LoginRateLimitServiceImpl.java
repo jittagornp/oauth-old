@@ -3,13 +3,9 @@
  */
 package com.pamarin.oauth2.ratelimit;
 
-import com.pamarin.oauth2.exception.RateLimitException;
-import io.github.bucket4j.Bandwidth;
-import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import com.pamarin.commons.resolver.DefaultHttpClientIPAddressResolver;
+import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,32 +15,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginRateLimitServiceImpl implements LoginRateLimitService {
 
-    private static final int TIMES_PER_SECOND = 1;
+    private final RateLimitService usernameRateLimitService;
 
-    private final Map<String, Bucket> cached;
+    private final RateLimitService ipAddressRateLimitService;
+
+    private final HttpClientIPAddressResolver ipAddressResolver;
 
     public LoginRateLimitServiceImpl() {
-        this.cached = new HashMap<>();
-    }
-
-    private Bucket createBucket() {
-        // define the limit 1 time per 1 second
-        Bandwidth limit = Bandwidth.simple(TIMES_PER_SECOND, Duration.ofSeconds(1));
-        // construct the bucket
-        return Bucket4j.builder().addLimit(limit).build();
+        this.usernameRateLimitService = new TimesPerSecondRateLimitService(1);
+        this.ipAddressRateLimitService = new TimesPerSecondRateLimitService(100);
+        this.ipAddressResolver = new DefaultHttpClientIPAddressResolver();
     }
 
     @Override
     public void limit(String username) {
-        Bucket bucket = cached.get(username);
-        if (bucket == null) {
-            bucket = createBucket();
-            cached.put(username, bucket);
-        }
+        this.usernameRateLimitService.limit(username);
+    }
 
-        if (!bucket.tryConsume(1)) {
-            throw new RateLimitException("username \"" + username + "\" is over limit on /login.");
-        }
+    @Override
+    public void limit(HttpServletRequest httpReq) {
+        String ipAddress = ipAddressResolver.resolve(httpReq);
+        ipAddressRateLimitService.limit(ipAddress);
     }
 
 }

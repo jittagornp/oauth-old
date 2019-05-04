@@ -52,8 +52,7 @@ class DefaultLoginSession implements LoginSession {
         try {
             getUserDetails();
             return true;
-        } catch (Exception ex) {
-            log.warn(null, ex);
+        } catch (AuthenticationException ex) {
             return false;
         }
     }
