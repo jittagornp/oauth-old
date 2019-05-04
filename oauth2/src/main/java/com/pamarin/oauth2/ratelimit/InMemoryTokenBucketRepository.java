@@ -28,12 +28,13 @@ public class InMemoryTokenBucketRepository implements TokenBucketRepository {
 
     @Override
     public void save(String key, Bucket bucket) {
+        log.debug("save bucket => {} : {}", key, bucket);
         cached.put(key, bucket);
     }
 
     @Override
     public void delete(String key) {
-        log.debug("delete => {}", key);
+        log.debug("delete bucket => {}", key);
         cached.remove(key);
     }
 
