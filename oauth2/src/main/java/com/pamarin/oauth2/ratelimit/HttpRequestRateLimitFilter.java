@@ -40,7 +40,9 @@ public class HttpRequestRateLimitFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
-        if (!ignoreFor(httpReq)) {
+        if (ignoreFor(httpReq)) {
+            chain.doFilter(httpReq, httpResp);
+        } else {
             try {
                 httpRequestRateLimitService.limit(httpReq);
                 chain.doFilter(httpReq, httpResp);
