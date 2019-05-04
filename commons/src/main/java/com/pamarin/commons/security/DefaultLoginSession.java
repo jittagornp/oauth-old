@@ -52,14 +52,13 @@ class DefaultLoginSession implements LoginSession {
         try {
             getUserDetails();
             return true;
-        } catch (AuthenticationException ex) {
+        } catch (Exception ex) {
             log.warn(null, ex);
             return false;
         }
     }
 
     @Override
-    @SuppressWarnings("null")
     public UserDetails getUserDetails() {
         Authentication authentication = getAuthentication();
         Object principal = authentication.getPrincipal();
