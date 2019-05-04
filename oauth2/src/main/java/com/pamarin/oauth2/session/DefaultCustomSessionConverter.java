@@ -14,6 +14,10 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  */
 public class DefaultCustomSessionConverter implements CustomSessionConverter {
 
+    private <T> T valueOf(T value, T defaults) {
+        return value == null ? defaults : value;
+    }
+
     @Override
     public CustomSession entriesToSession(Set<Map.Entry<String, Object>> entries) {
         if (isEmpty(entries)) {
@@ -27,13 +31,13 @@ public class DefaultCustomSessionConverter implements CustomSessionConverter {
                 session.setId((String) entry.getValue());
                 session.setSessionId((String) entry.getValue());
             } else if (CREATION_TIME.equals(key)) {
-                session.setCreationTime((Long) entry.getValue());
+                session.setCreationTime(valueOf((Long) entry.getValue(), 0L));
             } else if (MAX_INACTIVE_INTERVAL.equals(key)) {
-                session.setMaxInactiveIntervalInSeconds((Integer) entry.getValue());
+                session.setMaxInactiveIntervalInSeconds(valueOf((Integer) entry.getValue(), 0));
             } else if (LAST_ACCESSED_TIME.equals(key)) {
-                session.setLastAccessedTime((Long) entry.getValue());
+                session.setLastAccessedTime(valueOf((Long) entry.getValue(), 0L));
             } else if (EXPIRATION_TIME.equals(key)) {
-                session.setExpirationTime((Long) entry.getValue());
+                session.setExpirationTime(valueOf((Long) entry.getValue(), 0L));
             } else if (AGENT_ID.equals(key)) {
                 session.setAgentId((String) entry.getValue());
             } else if (USER_ID.equals(key)) {
