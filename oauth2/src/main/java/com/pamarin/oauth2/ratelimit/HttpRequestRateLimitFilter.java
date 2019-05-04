@@ -9,6 +9,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -19,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * @author jitta
  */
+@Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class HttpRequestRateLimitFilter extends OncePerRequestFilter {
@@ -47,6 +49,7 @@ public class HttpRequestRateLimitFilter extends OncePerRequestFilter {
                 httpRequestRateLimitService.limit(httpReq);
                 chain.doFilter(httpReq, httpResp);
             } catch (RateLimitException ex) {
+                log.warn(null, ex);
                 httpResp.sendError(429, "Too many requests, " + ex.getMessage());
             }
         }
