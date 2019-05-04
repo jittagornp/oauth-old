@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthorizeRateLimitServiceImpl implements AuthorizeRateLimitService {
 
+    private static final int TIMES_PER_SECOND = 1;
+    
     private final Map<String, Bucket> cached;
 
     private final HttpClientIPAddressResolver ipAddressResolver;
@@ -33,7 +35,7 @@ public class AuthorizeRateLimitServiceImpl implements AuthorizeRateLimitService 
 
     private Bucket createBucket() {
         // define the limit 10 time per 1 second
-        Bandwidth limit = Bandwidth.simple(10, Duration.ofSeconds(1));
+        Bandwidth limit = Bandwidth.simple(TIMES_PER_SECOND, Duration.ofSeconds(1));
         // construct the bucket
         return Bucket4j.builder().addLimit(limit).build();
     }

@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginRateLimitServiceImpl implements LoginRateLimitService {
 
+    private static final int TIMES_PER_SECOND = 1;
+
     private final Map<String, Bucket> cached;
 
     public LoginRateLimitServiceImpl() {
@@ -27,7 +29,7 @@ public class LoginRateLimitServiceImpl implements LoginRateLimitService {
 
     private Bucket createBucket() {
         // define the limit 1 time per 1 second
-        Bandwidth limit = Bandwidth.simple(1, Duration.ofSeconds(1));
+        Bandwidth limit = Bandwidth.simple(TIMES_PER_SECOND, Duration.ofSeconds(1));
         // construct the bucket
         return Bucket4j.builder().addLimit(limit).build();
     }
