@@ -5,7 +5,6 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.model.AuthorizationRequest;
-import com.pamarin.oauth2.ratelimit.AuthorizeRateLimitService;
 import com.pamarin.oauth2.service.AuthorizationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,9 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,9 +34,6 @@ public class AuthorizeEndpointController_approvedTest extends IntegrationTestBas
 
     @MockBean
     private AuthorizationService authorizationService;
-
-    @MockBean
-    private AuthorizeRateLimitService rateLimitService;
 
     @Test
     public void shouldBeErrorInvalidRequest_whenEmptyParameter() throws Exception {

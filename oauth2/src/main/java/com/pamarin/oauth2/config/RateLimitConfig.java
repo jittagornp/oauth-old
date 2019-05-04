@@ -15,13 +15,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RateLimitConfig {
 
-    @Bean("loginTokenBucketRepository")
-    public TokenBucketRepository newLoginTokenBucketRepository() {
+    @Bean("defaultTokenBucketRepository")
+    public TokenBucketRepository defaultTokenBucketRepository() {
         return new InMemoryTokenBucketRepository();
     }
 
-    @Bean("authorizeTokenBucketRepository")
-    public TokenBucketRepository newAuthorizeTokenBucketRepository() {
+    @Bean("loginTokenBucketRepository")
+    public TokenBucketRepository loginTokenBucketRepository() {
         return new InMemoryTokenBucketRepository();
     }
 }

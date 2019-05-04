@@ -4,7 +4,6 @@
 package com.pamarin.oauth2.controller;
 
 import com.pamarin.commons.generator.ErrorCodeGenerator;
-import com.pamarin.commons.generator.UUIDGenerator;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.exception.InvalidClientIdException;
 import com.pamarin.oauth2.exception.InvalidRedirectUriException;
@@ -12,7 +11,6 @@ import com.pamarin.oauth2.exception.InvalidResponseTypeException;
 import com.pamarin.oauth2.exception.InvalidScopeException;
 import com.pamarin.oauth2.exception.RequireApprovalException;
 import com.pamarin.oauth2.model.AuthorizationRequest;
-import com.pamarin.oauth2.ratelimit.AuthorizeRateLimitService;
 import com.pamarin.oauth2.service.AuthorizationService;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
@@ -47,9 +45,6 @@ public class AuthorizeEndpointController_authorizeTest extends IntegrationTestBa
 
     @MockBean
     private ErrorCodeGenerator errorCodeGenerator;
-    
-    @MockBean
-    private AuthorizeRateLimitService rateLimitService;
 
     @Before
     public void before() {

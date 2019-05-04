@@ -6,7 +6,6 @@ package com.pamarin.oauth2.controller;
 import com.pamarin.commons.security.hashing.StringSignature;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
-import com.pamarin.oauth2.ratelimit.LoginRateLimitService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.Mockito.doThrow;
@@ -38,9 +37,6 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
 
     @MockBean
     private StringSignature stringSignature;
-
-    @MockBean
-    private LoginRateLimitService loginRateLimitService;
 
     private HttpHeaders headers() {
         HttpHeaders headers = new HttpHeaders();

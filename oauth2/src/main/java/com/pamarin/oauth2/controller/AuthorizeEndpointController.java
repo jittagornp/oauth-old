@@ -11,7 +11,6 @@ import com.pamarin.commons.security.GetCsrfToken;
 import com.pamarin.oauth2.service.AuthorizationService;
 import com.pamarin.oauth2.service.AuthorizeViewModelService;
 import com.pamarin.commons.view.ModelAndViewBuilder;
-import com.pamarin.oauth2.ratelimit.AuthorizeRateLimitService;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,9 +46,6 @@ public class AuthorizeEndpointController {
     @Autowired
     private AuthorizeViewModelService authorizeViewModelService;
 
-    @Autowired
-    private AuthorizeRateLimitService rateLimitService;
-
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);
         req.requireParameters();
@@ -59,7 +55,6 @@ public class AuthorizeEndpointController {
     @GetCsrfToken
     @GetMapping
     public ModelAndView authorize(HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException, MissingServletRequestParameterException {
-        rateLimitService.limit(httpReq);
         AuthorizationRequest req = buildAuthorizationRequest(httpReq);
         try {
             httpResp.sendRedirect(authorizationService.authorize(req));
@@ -76,13 +71,11 @@ public class AuthorizeEndpointController {
 
     @PostMapping(params = "answer=approved")
     public void approved(HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException, MissingServletRequestParameterException {
-        rateLimitService.limit(httpReq);
         httpResp.sendRedirect(authorizationService.approved(buildAuthorizationRequest(httpReq)));
     }
 
     @PostMapping(params = "answer=not_approve")
     public void notApprove(HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException, MissingServletRequestParameterException {
-        rateLimitService.limit(httpReq);
         httpResp.sendRedirect(authorizationService.notApprove(buildAuthorizationRequest(httpReq)));
     }
 }
