@@ -14,16 +14,16 @@ import static org.mockito.Mockito.when;
  *
  * @author jitta
  */
-public class UserAgentResolverTest {
+public class UAgentResolverTest {
 
-    private UserAgentResolver resolver;
+    private UAgentResolver resolver;
 
     private HttpServletRequest httpReq;
 
     @Before
     public void before() {
         httpReq = mock(HttpServletRequest.class);
-        resolver = new DefaultUserAgentResolver();
+        resolver = new DefaultUAgentResolver();
     }
     
     @Test

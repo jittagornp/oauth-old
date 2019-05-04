@@ -21,7 +21,7 @@ import static org.springframework.util.StringUtils.hasText;
  * @author jitta
  */
 @Component
-public class DefaultUserAgentResolver implements UserAgentResolver {
+public class DefaultUAgentResolver implements UAgentResolver {
 
     @Override
     public UAgent resolve(HttpServletRequest httpReq) {
