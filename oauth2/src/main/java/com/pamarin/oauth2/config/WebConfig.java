@@ -87,7 +87,8 @@ public class WebConfig extends WebMvcConfigurerAdapter {
                 "/token",
                 "/session",
                 "/beat",
-                "/logout"
+                "/logout",
+                "/error"
         );
         return interceptor;
     }
