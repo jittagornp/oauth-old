@@ -32,8 +32,8 @@ public class UserAgentResolverTest {
         when(httpReq.getHeader("User-Agent"))
                 .thenReturn(userAgent);
 
-        UserAgent output = resolver.resolve(httpReq);
-        UserAgent expected = null;
+        UAgent output = resolver.resolve(httpReq);
+        UAgent expected = null;
         assertThat(output).isEqualTo(expected);
     }
 
@@ -43,8 +43,8 @@ public class UserAgentResolverTest {
         when(httpReq.getHeader("User-Agent"))
                 .thenReturn(userAgent);
 
-        UserAgent output = resolver.resolve(httpReq);
-        UserAgent expected = UserAgent.unknown();
+        UAgent output = resolver.resolve(httpReq);
+        UAgent expected = UAgent.unknown();
         assertThat(output.toString()).isEqualTo(expected.toString());
     }
     
@@ -54,8 +54,8 @@ public class UserAgentResolverTest {
         when(httpReq.getHeader("User-Agent"))
                 .thenReturn(userAgent);
 
-        UserAgent output = resolver.resolve(httpReq);
-        UserAgent expected = UserAgent.builder()
+        UAgent output = resolver.resolve(httpReq);
+        UAgent expected = UAgent.builder()
                 .deviceTypeKey("COMPUTER")
                 .deviceTypeName("Computer")
                 .browserTypeKey("WEB_BROWSER")
