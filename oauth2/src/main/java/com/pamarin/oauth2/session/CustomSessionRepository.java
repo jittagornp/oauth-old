@@ -88,9 +88,8 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
         String userId = principalNameResolver.resolve(session);
         boolean anonymousUser = isAnonymousUser(userId);
         int timeout = anonymousUser ? ANONYMOUS_MAX_INACTIVE_INTERVAL : maxInactiveIntervalInSeconds;
-        session.setMaxInactiveIntervalInSeconds(timeout);
         session.setLastAccessedTime(convert2Timestamp(now()));
-        session.setExpirationTime(session.getLastAccessedTime() + TimeUnit.SECONDS.toMillis(timeout));
+        session.setMaxInactiveIntervalInSeconds(timeout);
         session.setUserId(userId);
 
         saveToRedis(session);

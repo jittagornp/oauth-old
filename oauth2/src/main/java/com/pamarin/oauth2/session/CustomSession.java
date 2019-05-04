@@ -76,13 +76,17 @@ public final class CustomSession implements ExpiringSession, Serializable {
         this.attributes = new HashMap<>();
         this.creationTime = convert2Timestamp(now());
         this.lastAccessedTime = this.creationTime;
-        this.maxInactiveInterval = maxInactiveInterval;
-        this.expirationTime = this.lastAccessedTime + TimeUnit.SECONDS.toMillis(this.maxInactiveInterval);
+        setMaxInactiveInterval(maxInactiveInterval);
+    }
+
+    public void setMaxInactiveInterval(int interval) {
+        setMaxInactiveIntervalInSeconds(interval);
     }
 
     @Override
     public void setMaxInactiveIntervalInSeconds(int interval) {
         this.maxInactiveInterval = interval;
+        this.expirationTime = this.lastAccessedTime + TimeUnit.SECONDS.toMillis(this.maxInactiveInterval);
     }
 
     @Override
@@ -99,8 +103,7 @@ public final class CustomSession implements ExpiringSession, Serializable {
         if (this.maxInactiveInterval < 0) {
             return false;
         }
-        return now - TimeUnit.SECONDS
-                .toMillis(this.maxInactiveInterval) >= this.lastAccessedTime;
+        return (now - TimeUnit.SECONDS.toMillis(this.maxInactiveInterval)) >= this.lastAccessedTime;
     }
 
     @Override
@@ -112,6 +115,10 @@ public final class CustomSession implements ExpiringSession, Serializable {
     @Override
     public Set<String> getAttributeNames() {
         return new HashSet<>(this.attributes.keySet());
+    }
+
+    public Map<String, Object> getAttributes() {
+        return new HashMap<>(this.attributes);
     }
 
     @Override
