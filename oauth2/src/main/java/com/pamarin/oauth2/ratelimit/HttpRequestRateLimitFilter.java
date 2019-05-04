@@ -43,14 +43,11 @@ public class HttpRequestRateLimitFilter extends OncePerRequestFilter {
         if (!ignoreFor(httpReq)) {
             try {
                 httpRequestRateLimitService.limit(httpReq);
+                chain.doFilter(httpReq, httpResp);
             } catch (RateLimitException ex) {
-                httpResp.setStatus(429);
-                httpResp.setContentType("text/plain");
-                httpResp.getOutputStream().print("Too many requests, " + ex.getMessage());
-                return;
+                httpResp.sendError(429, "Too many requests, " + ex.getMessage());
             }
         }
-        chain.doFilter(httpReq, httpResp);
     }
 
 }
