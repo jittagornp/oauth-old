@@ -20,10 +20,22 @@ public class DefaultHttpRequestRateLimitService implements HttpRequestRateLimitS
 
     private final HttpClientIPAddressResolver ipAddressResolver;
 
+    private int ipAddressTimesPerSecond = 10;
+
+    private int sessionTimesPerSecond = 5;
+
     public DefaultHttpRequestRateLimitService(TokenBucketRepository tokenBucketRepository) {
-        this.ipAddressRateLimitService = new TimesPerSecondRateLimitService(10, tokenBucketRepository);
-        this.sessionRateLimitService = new TimesPerSecondRateLimitService(5, tokenBucketRepository);
+        this.ipAddressRateLimitService = new TimesPerSecondRateLimitService(ipAddressTimesPerSecond, tokenBucketRepository);
+        this.sessionRateLimitService = new TimesPerSecondRateLimitService(sessionTimesPerSecond, tokenBucketRepository);
         this.ipAddressResolver = new DefaultHttpClientIPAddressResolver();
+    }
+
+    public void setIpAddressTimesPerSecond(int ipAddressTimesPerSecond) {
+        this.ipAddressTimesPerSecond = ipAddressTimesPerSecond;
+    }
+
+    public void setSessionTimesPerSecond(int sessionTimesPerSecond) {
+        this.sessionTimesPerSecond = sessionTimesPerSecond;
     }
 
     @Override

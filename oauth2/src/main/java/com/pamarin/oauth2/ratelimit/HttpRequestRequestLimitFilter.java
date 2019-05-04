@@ -28,9 +28,20 @@ public class HttpRequestRequestLimitFilter extends OncePerRequestFilter {
         this.httpRequestRateLimitService = new DefaultHttpRequestRateLimitService(tokenBucketRepository);
     }
 
+    private boolean ignoreFor(HttpServletRequest httpReq) {
+        String servletPath = httpReq.getServletPath();
+        return "".equals(servletPath)
+                || "/".equals(servletPath)
+                || servletPath.startsWith("/static/")
+                || servletPath.startsWith("/assets/")
+                || "/favicon.ico".equals(servletPath);
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
-        httpRequestRateLimitService.limit(httpReq);
+        if (!ignoreFor(httpReq)) {
+            httpRequestRateLimitService.limit(httpReq);
+        }
         chain.doFilter(httpReq, httpResp);
     }
 
