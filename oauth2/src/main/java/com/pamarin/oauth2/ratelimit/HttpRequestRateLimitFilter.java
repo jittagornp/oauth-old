@@ -3,6 +3,7 @@
  */
 package com.pamarin.oauth2.ratelimit;
 
+import com.pamarin.oauth2.exception.RateLimitException;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -40,7 +41,14 @@ public class HttpRequestRateLimitFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain) throws ServletException, IOException {
         if (!ignoreFor(httpReq)) {
-            httpRequestRateLimitService.limit(httpReq);
+            try {
+                httpRequestRateLimitService.limit(httpReq);
+            } catch (RateLimitException ex) {
+                httpResp.setStatus(429);
+                httpResp.setContentType("text/plain");
+                httpResp.getOutputStream().print("Too many requests, " + ex.getMessage());
+                return;
+            }
         }
         chain.doFilter(httpReq, httpResp);
     }
