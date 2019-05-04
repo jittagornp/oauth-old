@@ -7,7 +7,7 @@ package com.pamarin.commons.security.hashing;
  *
  * @author jitta
  */
-public interface StringSignature {
+public interface StrSignature {
 
     String sign(String string);
 
