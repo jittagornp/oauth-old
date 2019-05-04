@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.pamarin.oauth2.service.LoginService;
 import javax.servlet.http.Cookie;
 import org.springframework.http.HttpHeaders;
-import com.pamarin.commons.security.hashing.StrSignature;
+import com.pamarin.commons.security.hashing.StringSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -36,7 +36,7 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
     private LoginService loginService;
 
     @MockBean
-    private StrSignature stringSignature;
+    private StringSignature stringSignature;
 
     private HttpHeaders headers() {
         HttpHeaders headers = new HttpHeaders();

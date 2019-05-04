@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.pamarin.oauth2.service.LoginService;
-import com.pamarin.commons.security.hashing.StrSignature;
+import com.pamarin.commons.security.hashing.StringSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -51,7 +51,7 @@ public class LoginController {
     private LoginSession loginSession;
 
     @Autowired
-    private StrSignature stringSignature;
+    private StringSignature stringSignature;
 
     private AuthorizationRequest buildAuthorizationRequest(HttpServletRequest httpReq) throws MissingServletRequestParameterException {
         AuthorizationRequest req = requestConverter.convert(httpReq);

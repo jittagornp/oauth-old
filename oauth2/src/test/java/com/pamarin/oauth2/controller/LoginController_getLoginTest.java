@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import com.pamarin.commons.security.hashing.StrSignature;
+import com.pamarin.commons.security.hashing.StringSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -36,7 +36,7 @@ public class LoginController_getLoginTest extends IntegrationTestBase {
     private MockMvc mockMvc;
 
     @MockBean
-    private StrSignature stringSignature;
+    private StringSignature stringSignature;
 
     private HttpHeaders headers() {
         HttpHeaders headers = new HttpHeaders();

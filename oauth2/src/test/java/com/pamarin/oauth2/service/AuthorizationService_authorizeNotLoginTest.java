@@ -15,7 +15,7 @@ import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
-import com.pamarin.commons.security.hashing.StrSignature;
+import com.pamarin.commons.security.hashing.StringSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -36,7 +36,7 @@ public class AuthorizationService_authorizeNotLoginTest {
     private AuthorizationRequestVerification requestVerification;
     
     @Mock
-    private StrSignature stringSignature;
+    private StringSignature stringSignature;
 
     @Before
     public void initMocks() {

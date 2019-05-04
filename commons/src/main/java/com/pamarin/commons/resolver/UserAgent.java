@@ -18,7 +18,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UAgent {
+public class UserAgent {
 
     private static final String UNKNOWN_KEY = "UNKNOWN";
 
@@ -57,8 +57,8 @@ public class UAgent {
         return "UserAgent{" + "deviceTypeKey=" + deviceTypeKey + ", deviceTypeName=" + deviceTypeName + ", browserTypeKey=" + browserTypeKey + ", browserTypeName=" + browserTypeName + ", browserKey=" + browserKey + ", browserName=" + browserName + ", browserGroupKey=" + browserGroupKey + ", browserGroupName=" + browserGroupName + ", browserRenderingEngine=" + browserRenderingEngine + ", browserManufacturerKey=" + browserManufacturerKey + ", browserManufacturerName=" + browserManufacturerName + ", osManufacturerKey=" + osManufacturerKey + ", osManufacturerName=" + osManufacturerName + ", osGroupKey=" + osGroupKey + ", osGroupName=" + osGroupName + ", osKey=" + osKey + ", osName=" + osName + ", agentVersion=" + agentVersion + ", agentMajorVersion=" + agentMajorVersion + ", agentMinorVersion=" + agentMinorVersion + '}';
     }
 
-    public static UAgent unknown() {
-        return UAgent.builder()
+    public static UserAgent unknown() {
+        return UserAgent.builder()
                 .deviceTypeKey(UNKNOWN_KEY)
                 .deviceTypeName(UNKNOWN_NAME)
                 .browserTypeKey(UNKNOWN_KEY)

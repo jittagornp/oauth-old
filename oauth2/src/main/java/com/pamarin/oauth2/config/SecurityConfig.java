@@ -22,7 +22,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.pamarin.commons.security.hashing.StrSignature;
+import com.pamarin.commons.security.hashing.StringSignature;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/19
@@ -87,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public StrSignature newStringSignature() {
+    public StringSignature newStringSignature() {
         final Hashing hashing = new ShortHashing(newHashing(), 19);
         return new StringSignatureAdapter() {
             @Override

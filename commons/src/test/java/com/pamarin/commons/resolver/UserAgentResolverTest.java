@@ -14,16 +14,16 @@ import static org.mockito.Mockito.when;
  *
  * @author jitta
  */
-public class UAgentResolverTest {
+public class UserAgentResolverTest {
 
-    private UAgentResolver resolver;
+    private UserAgentResolver resolver;
 
     private HttpServletRequest httpReq;
 
     @Before
     public void before() {
         httpReq = mock(HttpServletRequest.class);
-        resolver = new DefaultUAgentResolver();
+        resolver = new DefaultUserAgentResolver();
     }
     
     @Test
@@ -32,8 +32,8 @@ public class UAgentResolverTest {
         when(httpReq.getHeader("User-Agent"))
                 .thenReturn(userAgent);
 
-        UAgent output = resolver.resolve(httpReq);
-        UAgent expected = null;
+        UserAgent output = resolver.resolve(httpReq);
+        UserAgent expected = null;
         assertThat(output).isEqualTo(expected);
     }
 
@@ -43,8 +43,8 @@ public class UAgentResolverTest {
         when(httpReq.getHeader("User-Agent"))
                 .thenReturn(userAgent);
 
-        UAgent output = resolver.resolve(httpReq);
-        UAgent expected = UAgent.unknown();
+        UserAgent output = resolver.resolve(httpReq);
+        UserAgent expected = UserAgent.unknown();
         assertThat(output.toString()).isEqualTo(expected.toString());
     }
     
@@ -54,8 +54,8 @@ public class UAgentResolverTest {
         when(httpReq.getHeader("User-Agent"))
                 .thenReturn(userAgent);
 
-        UAgent output = resolver.resolve(httpReq);
-        UAgent expected = UAgent.builder()
+        UserAgent output = resolver.resolve(httpReq);
+        UserAgent expected = UserAgent.builder()
                 .deviceTypeKey("COMPUTER")
                 .deviceTypeName("Computer")
                 .browserTypeKey("WEB_BROWSER")

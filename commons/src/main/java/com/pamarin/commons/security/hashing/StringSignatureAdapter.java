@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
  *
  * @author jitta
  */
-public abstract class StringSignatureAdapter implements StrSignature {
+public abstract class StringSignatureAdapter implements StringSignature {
 
     protected abstract Hashing getHashing();
 
