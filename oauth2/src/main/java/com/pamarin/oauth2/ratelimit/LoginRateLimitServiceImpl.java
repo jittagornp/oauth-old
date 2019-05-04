@@ -3,8 +3,6 @@
  */
 package com.pamarin.oauth2.ratelimit;
 
-import com.pamarin.commons.resolver.DefaultHttpClientIPAddressResolver;
-import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +13,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginRateLimitServiceImpl implements LoginRateLimitService {
 
+    private static final String SERVICE_NAME = "login";
+
     private final RateLimitService usernameRateLimitService;
 
-    private final RateLimitService ipAddressRateLimitService;
-
-    private final HttpClientIPAddressResolver ipAddressResolver;
+    private final HttpRequestRateLimitService httpRequestRateLimitService;
 
     public LoginRateLimitServiceImpl() {
         this.usernameRateLimitService = new TimesPerSecondRateLimitService(1);
-        this.ipAddressRateLimitService = new TimesPerSecondRateLimitService(100);
-        this.ipAddressResolver = new DefaultHttpClientIPAddressResolver();
+        this.httpRequestRateLimitService = new DefaultHttpRequestRateLimitService(SERVICE_NAME);
     }
 
     @Override
@@ -34,8 +31,7 @@ public class LoginRateLimitServiceImpl implements LoginRateLimitService {
 
     @Override
     public void limit(HttpServletRequest httpReq) {
-        String ipAddress = ipAddressResolver.resolve(httpReq);
-        ipAddressRateLimitService.limit(ipAddress);
+        this.httpRequestRateLimitService.limit(httpReq);
     }
 
 }
