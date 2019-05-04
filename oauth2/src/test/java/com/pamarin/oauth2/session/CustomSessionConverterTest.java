@@ -18,17 +18,17 @@ import org.junit.Test;
  */
 public class CustomSessionConverterTest {
 
-    private CustomSessionConverter customSessionConverter;
+    private CustomSessionConverter converter;
 
     @Before
     public void before() {
-        customSessionConverter = new DefaultCustomSessionConverter();
+        converter = new DefaultCustomSessionConverter();
     }
 
     @Test
     public void shouldBeNull_whenEntriesIsNull() {
         Set<Map.Entry<String, Object>> input = null;
-        CustomSession output = customSessionConverter.entriesToSession(input);
+        CustomSession output = converter.entriesToSession(input);
         CustomSession expected = null;
         assertThat(output).isEqualTo(expected);
     }
@@ -36,7 +36,7 @@ public class CustomSessionConverterTest {
     @Test
     public void shouldBeNull_whenEntriesIsEmptySet() {
         Set<Map.Entry<String, Object>> input = Collections.emptySet();
-        CustomSession output = customSessionConverter.entriesToSession(input);
+        CustomSession output = converter.entriesToSession(input);
         CustomSession expected = null;
         assertThat(output).isEqualTo(expected);
     }
@@ -56,7 +56,7 @@ public class CustomSessionConverterTest {
         input.put(ATTRIBUTES, new Object());
         input.put(ATTRIBUTES + ":name", "jittagornp");
 
-        CustomSession output = customSessionConverter.entriesToSession(input.entrySet());
+        CustomSession output = converter.entriesToSession(input.entrySet());
 
         assertThat(output.getId()).isEqualTo(input.get(SESSION_ID));
         assertThat(output.getSessionId()).isEqualTo(input.get(SESSION_ID));

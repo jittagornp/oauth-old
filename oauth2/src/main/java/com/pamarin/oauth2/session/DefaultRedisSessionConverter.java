@@ -7,6 +7,7 @@ import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.stream.Collectors.toSet;
+import org.springframework.util.Assert;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
@@ -23,6 +24,7 @@ public class DefaultRedisSessionConverter implements RedisSessionConverter {
 
     @Override
     public Map<String, Object> sessionToMap(CustomSession session) {
+        Assert.notNull(session, "require session.");
         Map<String, Object> map = new HashMap<>();
         map.put(SESSION_ID, session.getId());
         map.put(CREATION_TIME, session.getCreationTime());
