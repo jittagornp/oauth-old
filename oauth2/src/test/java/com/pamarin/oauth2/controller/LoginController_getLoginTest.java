@@ -5,7 +5,6 @@ package com.pamarin.oauth2.controller;
 
 import com.pamarin.commons.exception.InvalidSignatureException;
 import com.pamarin.oauth2.IntegrationTestBase;
-import com.pamarin.commons.security.hashing.StringSignature;
 import javax.servlet.http.Cookie;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
@@ -23,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import com.pamarin.commons.security.hashing.StrSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -36,7 +36,7 @@ public class LoginController_getLoginTest extends IntegrationTestBase {
     private MockMvc mockMvc;
 
     @MockBean
-    private StringSignature stringSignature;
+    private StrSignature stringSignature;
 
     private HttpHeaders headers() {
         HttpHeaders headers = new HttpHeaders();

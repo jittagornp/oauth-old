@@ -3,7 +3,6 @@
  */
 package com.pamarin.oauth2.controller;
 
-import com.pamarin.commons.security.hashing.StringSignature;
 import com.pamarin.oauth2.IntegrationTestBase;
 import com.pamarin.oauth2.exception.InvalidUsernamePasswordException;
 import org.junit.Test;
@@ -20,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.pamarin.oauth2.service.LoginService;
 import javax.servlet.http.Cookie;
 import org.springframework.http.HttpHeaders;
+import com.pamarin.commons.security.hashing.StrSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -36,7 +36,7 @@ public class LoginController_postLoginTest extends IntegrationTestBase {
     private LoginService loginService;
 
     @MockBean
-    private StringSignature stringSignature;
+    private StrSignature stringSignature;
 
     private HttpHeaders headers() {
         HttpHeaders headers = new HttpHeaders();

@@ -12,7 +12,7 @@ import com.pamarin.commons.util.QuerystringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.pamarin.commons.security.hashing.StringSignature;
+import com.pamarin.commons.security.hashing.StrSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -38,7 +38,7 @@ class DefaultAuthorizationService implements AuthorizationService {
     private AuthorizationRequestVerification requestVerification;
 
     @Autowired
-    private StringSignature stringSignature;
+    private StrSignature stringSignature;
 
     private boolean wasApprovedClient(String clientId) {
         return approvalService.wasApprovedByUserIdAndClientId(

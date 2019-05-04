@@ -8,7 +8,6 @@ import com.pamarin.commons.security.HashBasedToken;
 import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.commons.security.hashing.HmacSHA256Hashing;
 import com.pamarin.commons.security.hashing.ShortHashing;
-import com.pamarin.commons.security.hashing.StringSignature;
 import com.pamarin.commons.security.hashing.StringSignatureAdapter;
 import com.pamarin.oauth2.security.DefaultSecurityContextRepository;
 import java.util.UUID;
@@ -23,6 +22,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.pamarin.commons.security.hashing.StrSignature;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; create : 2017/11/19
@@ -87,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public StringSignature newStringSignature() {
+    public StrSignature newStringSignature() {
         final Hashing hashing = new ShortHashing(newHashing(), 19);
         return new StringSignatureAdapter() {
             @Override

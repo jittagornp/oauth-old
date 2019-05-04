@@ -7,7 +7,6 @@ import com.pamarin.commons.security.LoginSession;
 import com.pamarin.oauth2.model.AuthorizationRequest;
 import com.pamarin.commons.provider.HostUrlProvider;
 import com.pamarin.commons.security.hashing.Hashing;
-import com.pamarin.commons.security.hashing.StringSignature;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +15,7 @@ import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import com.pamarin.commons.security.hashing.StrSignature;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -36,7 +36,7 @@ public class AuthorizationService_authorizeNotLoginTest {
     private AuthorizationRequestVerification requestVerification;
     
     @Mock
-    private StringSignature stringSignature;
+    private StrSignature stringSignature;
 
     @Before
     public void initMocks() {
