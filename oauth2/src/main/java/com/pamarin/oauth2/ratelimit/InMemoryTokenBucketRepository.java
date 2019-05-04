@@ -6,11 +6,13 @@ package com.pamarin.oauth2.ratelimit;
 import io.github.bucket4j.Bucket;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author jitta
  */
+@Slf4j
 public class InMemoryTokenBucketRepository implements TokenBucketRepository {
 
     private final Map<String, Bucket> cached;
@@ -31,7 +33,15 @@ public class InMemoryTokenBucketRepository implements TokenBucketRepository {
 
     @Override
     public void delete(String key) {
+        log.debug("delete => {}", key);
         cached.remove(key);
+    }
+
+    @Override
+    public void delete() {
+        cached.forEach((key, bucket) -> {
+            delete(key);
+        });
     }
 
 }

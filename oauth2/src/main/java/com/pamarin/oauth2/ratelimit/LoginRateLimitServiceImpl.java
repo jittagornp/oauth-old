@@ -4,6 +4,7 @@
 package com.pamarin.oauth2.ratelimit;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,15 +14,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginRateLimitServiceImpl implements LoginRateLimitService {
 
-    private static final String SERVICE_NAME = "login";
-
     private final RateLimitService usernameRateLimitService;
 
     private final HttpRequestRateLimitService httpRequestRateLimitService;
 
-    public LoginRateLimitServiceImpl() {
-        this.usernameRateLimitService = new TimesPerSecondRateLimitService(1);
-        this.httpRequestRateLimitService = new DefaultHttpRequestRateLimitService(SERVICE_NAME);
+    public LoginRateLimitServiceImpl(@Qualifier("loginTokenBucketRepository") TokenBucketRepository tokenBucketRepository) {
+        this.usernameRateLimitService = new TimesPerSecondRateLimitService(1, tokenBucketRepository);
+        this.httpRequestRateLimitService = new DefaultHttpRequestRateLimitService(tokenBucketRepository);
     }
 
     @Override

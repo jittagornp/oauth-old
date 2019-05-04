@@ -25,10 +25,6 @@ public class TimesPerSecondRateLimitService implements RateLimitService {
         this.tokenBucketRepository = tokenBucketRepository;
     }
 
-    public TimesPerSecondRateLimitService(int times) {
-        this(times, new InMemoryTokenBucketRepository());
-    }
-
     @Override
     public TokenBucketRepository getTokenBucketRepository() {
         return tokenBucketRepository;

@@ -4,6 +4,8 @@
 package com.pamarin.oauth2.ratelimit;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,12 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthorizeRateLimitServiceImpl implements AuthorizeRateLimitService {
 
-    private static final String SERVICE_NAME = "authorize";
-
     private final HttpRequestRateLimitService httpRequestRateLimitService;
 
-    public AuthorizeRateLimitServiceImpl() {
-        this.httpRequestRateLimitService = new DefaultHttpRequestRateLimitService(SERVICE_NAME);
+    @Autowired
+    public AuthorizeRateLimitServiceImpl(@Qualifier("authorizeTokenBucketRepository") TokenBucketRepository tokenBucketRepository) {
+        this.httpRequestRateLimitService = new DefaultHttpRequestRateLimitService(tokenBucketRepository);
     }
 
     @Override

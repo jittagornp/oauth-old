@@ -16,4 +16,6 @@ public interface TokenBucketRepository {
     void save(String key, Bucket bucket);
 
     void delete(String key);
+
+    void delete();
 }
