@@ -53,6 +53,12 @@ Copyright 2017-2019 Pamarin.com
                 position:relative;
                 top:1px;
             }
+            .btn[disabled]{
+                background: #d6d6d6;
+                border-color: #b1b1b1;
+                color: #949494;
+                cursor: not-allowed;
+            }
 
             body {
                 background-color: #f2f2f2;
@@ -171,7 +177,7 @@ Copyright 2017-2019 Pamarin.com
                 Login
             </div>
             <div class="login__body">
-                <form th:attr="action=${processUrl}" method="post">
+                <form id="loginForm" th:attr="action=${processUrl}" method="post">
                     <input th:attr="name=${csrfParam}" type="hidden" th:value="${csrfToken}"/>
                     <label>อีเมล</label>
                     <input name="username" 
@@ -185,7 +191,7 @@ Copyright 2017-2019 Pamarin.com
                            value="password"
                            placeholder="Password"
                            required="true"/>
-                    <button class="btn" type="submit" onclick="this.disabled=true">เข้าสู่ระบบ</button>
+                    <button class="btn" type="submit" onclick="this.disabled = true; document.getElementById('loginForm').submit();">เข้าสู่ระบบ</button>
                 </form>
                 <div class="alert warning" style="margin-bottom: 0;" th:if="${error eq 'invalid_username_password'}">
                     อีเมลหรือรหัสผ่านไม่ถูกต้อง
