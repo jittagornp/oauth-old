@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -28,9 +29,22 @@ public class HttpRequestRateLimitFilter extends OncePerRequestFilter {
 
     private final HttpRequestRateLimitService httpRequestRateLimitService;
 
+    @Value("${server.ratelimit.ip-address.times-per-second:#{10}}")
+    private int ipAddressTimesPerSecond;
+
+    @Value("${server.ratelimit.session.times-per-second:#{5}}")
+    private int sessionTimesPerSecond;
+
     @Autowired
     public HttpRequestRateLimitFilter(@Qualifier("defaultTokenBucketRepository") TokenBucketRepository tokenBucketRepository) {
-        this.httpRequestRateLimitService = new DefaultHttpRequestRateLimitService(tokenBucketRepository);
+        this.httpRequestRateLimitService = createHttpRequestRateLimitService(tokenBucketRepository);
+    }
+
+    private HttpRequestRateLimitService createHttpRequestRateLimitService(TokenBucketRepository tokenBucketRepository) {
+        DefaultHttpRequestRateLimitService requestRateLimitService = new DefaultHttpRequestRateLimitService(tokenBucketRepository);
+        requestRateLimitService.setIpAddressTimesPerSecond(ipAddressTimesPerSecond);
+        requestRateLimitService.setSessionTimesPerSecond(sessionTimesPerSecond);
+        return requestRateLimitService;
     }
 
     private boolean ignoreFor(HttpServletRequest httpReq) {
