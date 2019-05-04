@@ -63,6 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/logout",
                         "/session",
                         "/beat",
+                        "/error",
                         "/",
                         "/assets/**",
                         "/favicon.ico"
