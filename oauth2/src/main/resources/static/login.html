@@ -185,7 +185,7 @@ Copyright 2017-2019 Pamarin.com
                            value="password"
                            placeholder="Password"
                            required="true"/>
-                    <button class="btn" type="submit">เข้าสู่ระบบ</button>
+                    <button class="btn" type="submit" onclick="this.disabled=true">เข้าสู่ระบบ</button>
                 </form>
                 <div class="alert warning" style="margin-bottom: 0;" th:if="${error eq 'invalid_username_password'}">
                     อีเมลหรือรหัสผ่านไม่ถูกต้อง
