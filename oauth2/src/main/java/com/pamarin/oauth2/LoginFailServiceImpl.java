@@ -38,6 +38,8 @@ public class LoginFailServiceImpl implements LoginFailService {
     private static final int NUMBER_OF_FAILS = 2;
 
     private static final int NUMBER_OF_IPS = 3;
+    
+    private static final int MAXIMUM_IP_FAILS = 5;
 
     private final IdGenerator idGenerator;
 
@@ -94,6 +96,9 @@ public class LoginFailServiceImpl implements LoginFailService {
         }
         List<String> ips = aliveIpAddress(histories);
         Map<String, Integer> duplicateMap = countDuplicateItems(ips);
+        if(duplicateMap.size() > MAXIMUM_IP_FAILS){
+            throw new LockUserException("lock user \"" + username + "\".");
+        }
         if (countFailIps(duplicateMap) >= NUMBER_OF_IPS) {
             throw new LockUserException("lock user \"" + username + "\".");
         }
