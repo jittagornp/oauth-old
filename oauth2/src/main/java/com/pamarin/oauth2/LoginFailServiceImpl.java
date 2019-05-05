@@ -89,6 +89,11 @@ public class LoginFailServiceImpl implements LoginFailService {
             return;
         }
 
+        verify(histories);
+    }
+
+    public void verify(List<LoginFailHistory> histories) {
+        String username = histories.get(0).getUsername();
         List<String> ips = histories.stream()
                 .filter(history -> !history.isExpired())
                 .map(history -> history.getIpAddress())
