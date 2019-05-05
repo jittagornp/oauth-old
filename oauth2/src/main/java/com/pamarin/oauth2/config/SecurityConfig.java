@@ -9,7 +9,7 @@ import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.commons.security.hashing.HmacSHA256Hashing;
 import com.pamarin.commons.security.hashing.ShortHashing;
 import com.pamarin.commons.security.hashing.StringSignatureAdapter;
-import com.pamarin.commons.security.DefaultSecurityContextRepository;
+import com.pamarin.commons.security.StatelessSessionSecurityContextRepository;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .securityContext()
-                .securityContextRepository(new DefaultSecurityContextRepository())
+                .securityContextRepository(new StatelessSessionSecurityContextRepository())
                 .and()
                 .csrf().disable()
                 .authorizeRequests()

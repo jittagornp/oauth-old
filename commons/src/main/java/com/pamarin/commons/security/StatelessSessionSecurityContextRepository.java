@@ -17,7 +17,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
  *
  * @author jitta
  */
-public class DefaultSecurityContextRepository implements SecurityContextRepository {
+public class StatelessSessionSecurityContextRepository implements SecurityContextRepository {
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
 
