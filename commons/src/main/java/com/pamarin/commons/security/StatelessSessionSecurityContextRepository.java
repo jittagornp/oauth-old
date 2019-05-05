@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.security.core.context.SecurityContext;
 import static org.springframework.security.core.context.SecurityContextHolder.createEmptyContext;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
-import static org.springframework.security.core.context.SecurityContextHolder.setContext;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 
@@ -23,6 +21,9 @@ public class StatelessSessionSecurityContextRepository implements SecurityContex
 
     @Override
     public SecurityContext loadContext(HttpRequestResponseHolder holder) {
+        if (holder == null) {
+            return createEmptyContext();
+        }
         HttpServletRequest httpReq = holder.getRequest();
         if (httpReq == null) {
             return createEmptyContext();
@@ -31,11 +32,14 @@ public class StatelessSessionSecurityContextRepository implements SecurityContex
         if (session == null) {
             return createEmptyContext();
         }
-        SecurityContext context = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT);
-        if (context == null) {
-            return getContext();
+        Object obj = session.getAttribute(SPRING_SECURITY_CONTEXT);
+        if (obj == null) {
+            return createEmptyContext();
         }
-        return context;
+        if (!(obj instanceof SecurityContext)) {
+            return createEmptyContext();
+        }
+        return (SecurityContext) obj;
     }
 
     @Override
@@ -44,7 +48,6 @@ public class StatelessSessionSecurityContextRepository implements SecurityContex
             HttpSession session = httpReq.getSession(false);
             if (session != null) {
                 session.setAttribute(SPRING_SECURITY_CONTEXT, context);
-                setContext(context);
             }
         }
     }
@@ -58,11 +61,11 @@ public class StatelessSessionSecurityContextRepository implements SecurityContex
         if (session == null) {
             return false;
         }
-        SecurityContext context = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT);
-        if (context == null) {
-            context = getContext();
+        Object obj = session.getAttribute(SPRING_SECURITY_CONTEXT);
+        if (obj == null) {
+            return false;
         }
-        return context != null;
+        return obj instanceof SecurityContext;
     }
 
 }
