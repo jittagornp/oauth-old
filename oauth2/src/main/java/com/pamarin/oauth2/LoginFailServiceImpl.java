@@ -35,7 +35,7 @@ public class LoginFailServiceImpl implements LoginFailService {
 
     private static final int EXPIRE_MINUTES = 15;
 
-    private static final int NUMBER_OF_FAILS = 3;
+    private static final int NUMBER_OF_FAILS = 2;
 
     private static final int NUMBER_OF_IPS = 3;
 
