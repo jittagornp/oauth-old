@@ -3,9 +3,11 @@
  */
 package com.pamarin.commons.security;
 
+import static com.pamarin.commons.util.SecurityContextUtils.getAuthenticationName;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContext;
 import static org.springframework.security.core.context.SecurityContextHolder.createEmptyContext;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
@@ -15,6 +17,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
  *
  * @author jitta
  */
+@Slf4j
 public class StatelessSessionSecurityContextRepository implements SecurityContextRepository {
 
     private static final String SPRING_SECURITY_CONTEXT = "SPRING_SECURITY_CONTEXT";
@@ -48,6 +51,7 @@ public class StatelessSessionSecurityContextRepository implements SecurityContex
             HttpSession session = httpReq.getSession(false);
             if (session != null) {
                 session.setAttribute(SPRING_SECURITY_CONTEXT, context);
+                log.debug("save SecurityContext of => {}", getAuthenticationName(context));
             }
         }
     }
@@ -67,5 +71,4 @@ public class StatelessSessionSecurityContextRepository implements SecurityContex
         }
         return obj instanceof SecurityContext;
     }
-
 }
