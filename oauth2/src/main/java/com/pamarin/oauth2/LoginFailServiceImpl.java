@@ -12,10 +12,10 @@ import com.pamarin.oauth2.collection.LoginFailHistory;
 import com.pamarin.oauth2.exception.LockUserException;
 import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import com.pamarin.oauth2.service.LoginFailService;
-import java.time.LocalDateTime;
 import static java.time.LocalDateTime.now;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import static java.util.stream.Collectors.toList;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,18 +67,19 @@ public class LoginFailServiceImpl implements LoginFailService {
     @Override
     public void collect(String username) {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
-        LocalDateTime now = now();
-        long creationTime = convert2Timestamp(now);
-        long expirationTime = convert2Timestamp(now.plusMinutes(EXPIRE_MINUTES));
-        LoginFailHistory history = LoginFailHistory.builder()
-                .id(idGenerator.generate())
-                .username(username)
-                .creationTime(creationTime)
-                .expirationTime(expirationTime)
-                .agentId(userAgentTokenIdResolver.resolve(httpReq))
-                .ipAddress(httpClientIPAddressResolver.resolve(httpReq))
-                .build();
-        mongoOperations.save(history, LoginFailHistory.COLLECTION_NAME);
+        long creationTime = convert2Timestamp(now());
+        long expirationTime = creationTime + TimeUnit.MINUTES.toMillis(EXPIRE_MINUTES);
+        mongoOperations.save(
+                LoginFailHistory.builder()
+                        .id(idGenerator.generate())
+                        .username(username)
+                        .creationTime(creationTime)
+                        .expirationTime(expirationTime)
+                        .agentId(userAgentTokenIdResolver.resolve(httpReq))
+                        .ipAddress(httpClientIPAddressResolver.resolve(httpReq))
+                        .build(),
+                LoginFailHistory.COLLECTION_NAME
+        );
     }
 
     @Override
