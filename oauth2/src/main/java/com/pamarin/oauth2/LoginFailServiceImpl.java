@@ -65,4 +65,9 @@ public class LoginFailServiceImpl implements LoginFailService {
 
     }
 
+    @Override
+    public void clear(String username) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

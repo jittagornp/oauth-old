@@ -13,4 +13,5 @@ public interface LoginFailService {
 
     void verify(String username);
 
+    void clear(String username);
 }
