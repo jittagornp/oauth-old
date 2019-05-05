@@ -7,6 +7,7 @@ import com.pamarin.commons.generator.IdGenerator;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
 import com.pamarin.commons.util.CollectionUtils;
+import static com.pamarin.commons.util.CollectionUtils.countDuplicateItems;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import com.pamarin.oauth2.collection.LoginFailHistory;
 import com.pamarin.oauth2.exception.LockUserException;
@@ -84,49 +85,49 @@ public class LoginFailServiceImpl implements LoginFailService {
     @Override
     public void verify(String username) {
         Query query = query(where("username").is(username));
-        List<LoginFailHistory> histories = mongoOperations.find(query, LoginFailHistory.class);
-        if (isEmpty(histories)) {
-            return;
-        }
-
-        verify(histories);
+        verify(mongoOperations.find(query, LoginFailHistory.class));
     }
 
     public void verify(List<LoginFailHistory> histories) {
+        if (isEmpty(histories)) {
+            return;
+        }
         String username = histories.get(0).getUsername();
-        List<String> ips = histories.stream()
-                .filter(history -> !history.isExpired())
-                .map(history -> history.getIpAddress())
-                .collect(toList());
+        List<String> ips = aliveIpAddress(histories);
 
-        Map<String, Integer> duplicateMap = CollectionUtils.countDuplicateItems(ips);
-        long failIps = duplicateMap.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() >= NUMBER_OF_FAILS)
-                .count();
-
-        if (failIps >= NUMBER_OF_IPS) {
+        Map<String, Integer> duplicateMap = countDuplicateItems(ips);
+        if (countFailIps(duplicateMap) >= NUMBER_OF_IPS) {
             throw new LockUserException("lock user \"" + username + "\".");
         }
 
-        String ipAddress = getIpAddress();
-        Integer fails = duplicateMap.get(ipAddress);
-        if (fails == null) {
-            return;
-        }
-
-        if (failIps >= NUMBER_OF_FAILS) {
+        String ipAddress = getRequestIpAddress();
+        Integer count = duplicateMap.get(ipAddress);
+        if (count != null && count >= NUMBER_OF_FAILS) {
             throw new LockUserException("lock user \"" + username + "\", for ip address \"" + ipAddress + "\".");
         }
     }
 
+    private List<String> aliveIpAddress(List<LoginFailHistory> histories) {
+        return histories.stream()
+                .filter(history -> !history.isExpired())
+                .map(history -> history.getIpAddress())
+                .collect(toList());
+    }
+
+    private long countFailIps(Map<String, Integer> duplicateMap) {
+        return duplicateMap.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() >= NUMBER_OF_FAILS)
+                .count();
+    }
+
     @Override
     public void clear(String username) {
-        Query query = query(where("username").is(username).and("ipAddress").is(getIpAddress()));
+        Query query = query(where("username").is(username).and("ipAddress").is(getRequestIpAddress()));
         mongoOperations.remove(query, LoginFailHistory.class);
     }
 
-    private String getIpAddress() {
+    private String getRequestIpAddress() {
         HttpServletRequest httpReq = httpServletRequestProvider.provide();
         return httpClientIPAddressResolver.resolve(httpReq);
     }
