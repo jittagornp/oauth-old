@@ -3,8 +3,9 @@
  */
 package com.pamarin.oauth2.collection;
 
+import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import com.pamarin.commons.util.ObjectEquals;
-import java.time.LocalDateTime;
+import static java.time.LocalDateTime.now;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,11 +34,18 @@ public class LoginFailHistory {
 
     private String username;
 
-    private LocalDateTime failDate;
+    private long creationTime;
+
+    private long expirationTime;
 
     private String ipAddress;
 
     private String agentId;
+
+    public boolean isExpired() {
+        long now = convert2Timestamp(now());
+        return now >= expirationTime;
+    }
 
     @Override
     public int hashCode() {

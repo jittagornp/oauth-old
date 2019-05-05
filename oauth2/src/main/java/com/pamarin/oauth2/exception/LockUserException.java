@@ -7,9 +7,9 @@ package com.pamarin.oauth2.exception;
  *
  * @author jitta
  */
-public class BlockRequestException extends RuntimeException {
+public class LockUserException extends RuntimeException {
 
-    public BlockRequestException(String message) {
+    public LockUserException(String message) {
         super(message);
     }
 
