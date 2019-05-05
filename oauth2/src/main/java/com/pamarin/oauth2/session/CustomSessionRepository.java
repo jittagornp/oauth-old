@@ -15,7 +15,6 @@ import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import static com.pamarin.oauth2.session.CustomSession.Attribute.*;
 import static java.time.LocalDateTime.now;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -42,7 +41,7 @@ public class CustomSessionRepository implements SessionRepository<CustomSession>
     private static final String LAST_SYNCHONIZED = "lastSynchronizedTime";
     private static final String LAST_SYNCHONIZED_LOGIN = "lastSynchronizedTime:login";
 
-    private final int ANONYMOUS_MAX_INACTIVE_INTERVAL = 60;//1 minute
+    private static final int ANONYMOUS_MAX_INACTIVE_INTERVAL = 60;//1 minute
     private int maxInactiveIntervalInSeconds = 1800; //30 minutes
     private int synchronizeTimeout = 1000 * 15; //15 seconds
 

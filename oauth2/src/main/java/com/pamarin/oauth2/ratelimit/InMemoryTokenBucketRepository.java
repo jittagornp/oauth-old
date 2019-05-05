@@ -40,9 +40,7 @@ public class InMemoryTokenBucketRepository implements TokenBucketRepository {
 
     @Override
     public void delete() {
-        cached.forEach((key, bucket) -> {
-            log.debug("delete bucket => {}", key);
-        });
+        cached.forEach((key, bucket) -> log.debug("delete bucket => {}", key));
         cached.clear();
     }
 
