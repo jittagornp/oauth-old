@@ -1,13 +1,15 @@
 /*
  * Copyright 2017-2019 Pamarin.com
  */
-package com.pamarin.oauth2.security;
+package com.pamarin.commons.security;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.security.core.context.SecurityContext;
 import static org.springframework.security.core.context.SecurityContextHolder.createEmptyContext;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+import static org.springframework.security.core.context.SecurityContextHolder.setContext;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 
@@ -31,7 +33,7 @@ public class DefaultSecurityContextRepository implements SecurityContextReposito
         }
         SecurityContext context = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT);
         if (context == null) {
-            return createEmptyContext();
+            return getContext();
         }
         return context;
     }
@@ -42,6 +44,7 @@ public class DefaultSecurityContextRepository implements SecurityContextReposito
             HttpSession session = httpReq.getSession(false);
             if (session != null) {
                 session.setAttribute(SPRING_SECURITY_CONTEXT, context);
+                setContext(context);
             }
         }
     }
@@ -55,7 +58,11 @@ public class DefaultSecurityContextRepository implements SecurityContextReposito
         if (session == null) {
             return false;
         }
-        return (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT) != null;
+        SecurityContext context = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT);
+        if (context == null) {
+            context = getContext();
+        }
+        return context != null;
     }
 
 }

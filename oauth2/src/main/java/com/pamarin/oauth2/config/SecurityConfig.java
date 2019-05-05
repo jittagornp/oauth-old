@@ -9,7 +9,7 @@ import com.pamarin.commons.security.hashing.Hashing;
 import com.pamarin.commons.security.hashing.HmacSHA256Hashing;
 import com.pamarin.commons.security.hashing.ShortHashing;
 import com.pamarin.commons.security.hashing.StringSignatureAdapter;
-import com.pamarin.oauth2.security.DefaultSecurityContextRepository;
+import com.pamarin.commons.security.DefaultSecurityContextRepository;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
