@@ -85,21 +85,18 @@ public class LoginFailServiceImpl implements LoginFailService {
     @Override
     public void verify(String username) {
         Query query = query(where("username").is(username));
-        verify(mongoOperations.find(query, LoginFailHistory.class));
+        verify(username, mongoOperations.find(query, LoginFailHistory.class));
     }
 
-    public void verify(List<LoginFailHistory> histories) {
+    private void verify(String username, List<LoginFailHistory> histories) {
         if (isEmpty(histories)) {
             return;
         }
-        String username = histories.get(0).getUsername();
         List<String> ips = aliveIpAddress(histories);
-
         Map<String, Integer> duplicateMap = countDuplicateItems(ips);
         if (countFailIps(duplicateMap) >= NUMBER_OF_IPS) {
             throw new LockUserException("lock user \"" + username + "\".");
         }
-
         String ipAddress = getRequestIpAddress();
         Integer count = duplicateMap.get(ipAddress);
         if (count != null && count >= NUMBER_OF_FAILS) {
