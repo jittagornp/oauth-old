@@ -47,6 +47,7 @@ import com.pamarin.oauth2.repository.UserAgentRepository;
 import com.pamarin.oauth2.repository.UserRepository;
 import com.pamarin.oauth2.session.UserSessionRepository;
 import com.pamarin.oauth2.repository.mongodb.LoginHistoryRepository;
+import com.pamarin.oauth2.service.LoginFailService;
 import org.springframework.data.redis.core.RedisOperations;
 
 /**
@@ -130,6 +131,9 @@ public class IntegrationTestBase {
     @MockBean
     protected RedisOperations<String, String> redisOperations;
 
+    @MockBean
+    protected LoginFailService loginFailService;
+    
     private OAuth2RefreshToken stubRefreshToken() {
         return OAuth2RefreshToken.builder()
                 .tokenId(UUID.randomUUID().toString().replace("-", ""))

@@ -53,6 +53,9 @@ public class LoginService_loginTest {
     @Mock
     private LoginRateLimitService loginRateLimitService;
 
+    @Mock
+    private LoginFailService loginFailService;
+    
     @Before
     public void before() {
         MockitoAnnotations.initMocks(this);

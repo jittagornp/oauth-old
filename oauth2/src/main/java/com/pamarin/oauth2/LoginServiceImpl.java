@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.pamarin.oauth2.repository.UserRepository;
 import com.pamarin.oauth2.ratelimit.LoginRateLimitService;
+import com.pamarin.oauth2.service.LoginFailService;
 
 /**
  * @author jittagornp &lt;http://jittagornp.me&gt; createSession : 2017/11/12
@@ -44,6 +45,9 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private LoginRateLimitService loginRateLimitService;
 
+    @Autowired
+    private LoginFailService loginFailService;
+
     @Override
     public void login(String username, String password) {
         if (username == null || password == null) {
@@ -51,13 +55,16 @@ public class LoginServiceImpl implements LoginService {
         }
 
         loginRateLimitService.limit(username);
+        loginFailService.verify(username);
 
         User user = userRepository.findByUsername(username);
         if (user == null) {
+            loginFailService.collect(username);
             throw new InvalidUsernamePasswordException("User not found.");
         }
 
         if (!passwordEncryption.matches(password, user.getPassword())) {
+            loginFailService.collect(username);
             throw new InvalidUsernamePasswordException("Password not match.");
         }
 
