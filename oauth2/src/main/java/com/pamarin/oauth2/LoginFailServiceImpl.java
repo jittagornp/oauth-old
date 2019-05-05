@@ -6,7 +6,6 @@ package com.pamarin.oauth2;
 import com.pamarin.commons.generator.IdGenerator;
 import com.pamarin.commons.provider.HttpServletRequestProvider;
 import com.pamarin.commons.resolver.HttpClientIPAddressResolver;
-import com.pamarin.commons.util.CollectionUtils;
 import static com.pamarin.commons.util.CollectionUtils.countDuplicateItems;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import com.pamarin.oauth2.collection.LoginFailHistory;

@@ -196,6 +196,9 @@ Copyright 2017-2019 Pamarin.com
                 <div class="alert warning" style="margin-bottom: 0;" th:if="${error eq 'invalid_username_password'}">
                     อีเมลหรือรหัสผ่านไม่ถูกต้อง
                 </div>
+                <div class="alert warning" style="margin-bottom: 0;" th:if="${error eq 'lock_user'}">
+                    บัญชีผู้ใช้ถูกระงับชั่วคราว
+                </div>
             </div>
             <div class="login-footer">
                 <div class="login__footer--left">

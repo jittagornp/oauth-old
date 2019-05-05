@@ -15,8 +15,6 @@ import com.pamarin.commons.view.ModelAndViewBuilder;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.pamarin.oauth2.service.LoginService;
 import com.pamarin.commons.security.hashing.StringSignature;
+import com.pamarin.oauth2.exception.LockUserException;
 
 /**
  * @author jittagornp <http://jittagornp.me>
@@ -32,8 +31,6 @@ import com.pamarin.commons.security.hashing.StringSignature;
  */
 @Controller
 public class LoginController {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private HttpServletRequest2AuthorizationRequestConverter requestConverter;
@@ -97,8 +94,9 @@ public class LoginController {
             loginService.login(credential.getUsername(), credential.getPassword());
             httpResp.sendRedirect(hostUrlProvider.provide() + "/authorize?" + querystring);
         } catch (InvalidUsernamePasswordException ex) {
-            LOG.warn("Invalid username password ", ex);
             httpResp.sendRedirect(hostUrlProvider.provide() + "/login?error=invalid_username_password&" + querystring + "&signature=" + httpReq.getParameter("signature"));
+        } catch (LockUserException ex) {
+            httpResp.sendRedirect(hostUrlProvider.provide() + "/login?error=lock_user&" + querystring + "&signature=" + httpReq.getParameter("signature"));
         }
     }
 }
