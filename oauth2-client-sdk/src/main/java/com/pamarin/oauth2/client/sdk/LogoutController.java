@@ -4,9 +4,9 @@
 package com.pamarin.oauth2.client.sdk;
 
 import com.pamarin.commons.provider.HostUrlProvider;
-import com.pamarin.commons.util.QuerystringBuilder;
 import java.io.IOException;
 import static java.lang.String.format;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,25 +23,29 @@ public class LogoutController {
 
     private final OAuth2ClientOperations clientOperations;
 
+    private final OAuth2AccessTokenResolver accessTokenResolver;
+
     @Autowired
-    public LogoutController(HostUrlProvider hostUrlProvider, OAuth2ClientOperations clientOperations) {
+    public LogoutController(
+            HostUrlProvider hostUrlProvider,
+            OAuth2ClientOperations clientOperations,
+            OAuth2AccessTokenResolver accessTokenResolver
+    ) {
         this.hostUrlProvider = hostUrlProvider;
         this.clientOperations = clientOperations;
-    }
-
-    private String getLogoutUrl() {
-        return format("%s/logout?%s",
-                clientOperations.getAuthorizationServerHostUrl(),
-                new QuerystringBuilder()
-                        .addParameter("client_id", clientOperations.getClientId())
-                        .addParameter("redirect_uri", hostUrlProvider.provide())
-                        .build()
-        );
+        this.accessTokenResolver = accessTokenResolver;
     }
 
     @GetMapping("/logout")
-    public void logout(HttpServletResponse httpResp) throws IOException {
-        httpResp.sendRedirect(getLogoutUrl());
+    public void logout(HttpServletRequest httpReq, HttpServletResponse httpResp) throws IOException {
+        clientOperations.post(
+                format("%s/logout", clientOperations.getAuthorizationServerHostUrl()),
+                null,
+                String.class,
+                accessTokenResolver.resolve(httpReq)
+        );
+
+        httpResp.sendRedirect(hostUrlProvider.provide());
     }
 
 }
