@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -15,6 +16,8 @@ import static org.springframework.util.StringUtils.hasText;
  */
 @Component
 public class DefaultOAuth2RefreshTokenResolver implements OAuth2RefreshTokenResolver {
+
+    private static final String CACHED_KEY = OAuth2RefreshTokenResolver.class.getName() + ".OAUTH2_ACCESS_TOKEN";
 
     private static final String ACCESS_TOKEN = "refresh_token";
 
@@ -26,10 +29,15 @@ public class DefaultOAuth2RefreshTokenResolver implements OAuth2RefreshTokenReso
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
+        Assert.notNull(httpReq, "require httpReq.");
+        String cached = (String) httpReq.getAttribute(CACHED_KEY);
+        if (hasText(cached)) {
+            return cached;
+        }
         for (OAuth2TokenResolver resolver : resovlers) {
             String token = resolver.resolve(httpReq);
             if (hasText(token)) {
-                return token;
+                return cached(token, httpReq);
             }
         }
         return null;
@@ -40,4 +48,8 @@ public class DefaultOAuth2RefreshTokenResolver implements OAuth2RefreshTokenReso
         return ACCESS_TOKEN;
     }
 
+    private String cached(String token, HttpServletRequest httpReq) {
+        httpReq.setAttribute(CACHED_KEY, token);
+        return token;
+    }
 }
