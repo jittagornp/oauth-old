@@ -40,8 +40,6 @@ public class LoginFailHistory {
 
     private String ipAddress;
 
-    private String agentId;
-
     public boolean isExpired() {
         long now = convert2Timestamp(now());
         return now >= expirationTime;

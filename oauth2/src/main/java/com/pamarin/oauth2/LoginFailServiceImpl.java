@@ -10,7 +10,6 @@ import static com.pamarin.commons.util.CollectionUtils.countDuplicateItems;
 import static com.pamarin.commons.util.DateConverterUtils.convert2Timestamp;
 import com.pamarin.oauth2.collection.LoginFailHistory;
 import com.pamarin.oauth2.exception.LockUserException;
-import com.pamarin.oauth2.resolver.UserAgentTokenIdResolver;
 import com.pamarin.oauth2.service.LoginFailService;
 import static java.time.LocalDateTime.now;
 import java.util.List;
@@ -49,26 +48,21 @@ public class LoginFailServiceImpl implements LoginFailService {
 
     private final HttpClientIPAddressResolver httpClientIPAddressResolver;
 
-    private final UserAgentTokenIdResolver userAgentTokenIdResolver;
-
     @Autowired
     public LoginFailServiceImpl(
             IdGenerator idGenerator,
             MongoOperations mongoOperations,
             HttpServletRequestProvider httpServletRequestProvider,
-            HttpClientIPAddressResolver httpClientIPAddressResolver,
-            UserAgentTokenIdResolver userAgentTokenIdResolver
+            HttpClientIPAddressResolver httpClientIPAddressResolver
     ) {
         this.idGenerator = idGenerator;
         this.mongoOperations = mongoOperations;
         this.httpServletRequestProvider = httpServletRequestProvider;
         this.httpClientIPAddressResolver = httpClientIPAddressResolver;
-        this.userAgentTokenIdResolver = userAgentTokenIdResolver;
     }
 
     @Override
     public void collect(String username) {
-        HttpServletRequest httpReq = httpServletRequestProvider.provide();
         long creationTime = convert2Timestamp(now());
         long expirationTime = creationTime + TimeUnit.MINUTES.toMillis(EXPIRE_MINUTES);
         mongoOperations.save(
@@ -77,8 +71,7 @@ public class LoginFailServiceImpl implements LoginFailService {
                         .username(username)
                         .creationTime(creationTime)
                         .expirationTime(expirationTime)
-                        .agentId(userAgentTokenIdResolver.resolve(httpReq))
-                        .ipAddress(httpClientIPAddressResolver.resolve(httpReq))
+                        .ipAddress(getRequestIpAddress())
                         .build(),
                 LoginFailHistory.COLLECTION_NAME
         );
