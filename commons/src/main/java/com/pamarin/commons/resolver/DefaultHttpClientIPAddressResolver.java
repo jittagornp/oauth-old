@@ -5,6 +5,7 @@ package com.pamarin.commons.resolver;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -13,6 +14,8 @@ import static org.springframework.util.StringUtils.hasText;
  */
 @Component
 public class DefaultHttpClientIPAddressResolver implements HttpClientIPAddressResolver {
+
+    private static final String CACHED_KEY = HttpClientIPAddressResolver.class.getName() + ".IP_ADDRESS";
 
     private static final String[] IP_ADDRESS_HEADERS = {
         "X-Forwarded-For",
@@ -28,7 +31,7 @@ public class DefaultHttpClientIPAddressResolver implements HttpClientIPAddressRe
         "REMOTE_ADDR"
     };
 
-    private static boolean hasIp(String ip) {
+    private static boolean has(String ip) {
         if (!hasText(ip)) {
             return false;
         }
@@ -38,18 +41,24 @@ public class DefaultHttpClientIPAddressResolver implements HttpClientIPAddressRe
 
     @Override
     public String resolve(HttpServletRequest httpReq) {
-        if (httpReq == null) {
-            throw new IllegalArgumentException("require httpReq.");
+        Assert.notNull(httpReq, "require httpReq.");
+        String cached = (String) httpReq.getAttribute(CACHED_KEY);
+        if (has(cached)) {
+            return cached;
         }
 
         for (String header : IP_ADDRESS_HEADERS) {
             String ip = httpReq.getHeader(header);
-            if (hasIp(ip)) {
-                return ip;
+            if (has(ip)) {
+                return cached(ip, httpReq);
             }
         }
 
-        return httpReq.getRemoteAddr();
+        return cached(httpReq.getRemoteAddr(), httpReq);
     }
 
+    private String cached(String ip, HttpServletRequest httpReq) {
+        httpReq.setAttribute(CACHED_KEY, ip);
+        return ip;
+    }
 }
