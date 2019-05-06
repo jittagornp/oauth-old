@@ -14,6 +14,7 @@ import eu.bitwalker.useragentutils.Version;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -23,8 +24,16 @@ import static org.springframework.util.StringUtils.hasText;
 @Component
 public class DefaultUserAgentResolver implements UserAgentResolver {
 
+    private static final String CACHED_KEY = UserAgentResolver.class.getName() + ".USER_AGENT";
+
     @Override
     public UserAgent resolve(HttpServletRequest httpReq) {
+        Assert.notNull(httpReq, "require httpReq.");
+        UserAgent cached = (UserAgent) httpReq.getAttribute(CACHED_KEY);
+        if (cached != null) {
+            return cached;
+        }
+
         String header = httpReq.getHeader("User-Agent");
         if (!hasText(header)) {
             return null;
@@ -36,7 +45,7 @@ public class DefaultUserAgentResolver implements UserAgentResolver {
             copyOperatingSystem(agent.getOperatingSystem(), userAgent);
             copyVerion(agent.getBrowserVersion(), userAgent);
         });
-        return userAgent;
+        return cached(userAgent, httpReq);
     }
 
     private <T> Optional<T> of(T value) {
@@ -120,4 +129,8 @@ public class DefaultUserAgentResolver implements UserAgentResolver {
         });
     }
 
+    private UserAgent cached(UserAgent userAgent, HttpServletRequest httpReq) {
+        httpReq.setAttribute(CACHED_KEY, userAgent);
+        return userAgent;
+    }
 }
